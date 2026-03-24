@@ -890,17 +890,9 @@ const wikiCache = {};
 async function fetchWikiThumb(searchTerm) {
   if (wikiCache[searchTerm] !== undefined) return wikiCache[searchTerm];
   try {
-    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&srlimit=1&format=json&origin=*`;
-    const searchRes = await fetch(searchUrl);
-    const searchData = await searchRes.json();
-    const topResult = searchData?.query?.search?.[0]?.title;
-    if (!topResult) { wikiCache[searchTerm] = null; return null; }
-    const imgUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(topResult)}&prop=pageimages&pithumbsize=300&format=json&origin=*`;
-    const imgRes = await fetch(imgUrl);
-    const imgData = await imgRes.json();
-    const pages = imgData?.query?.pages || {};
-    const page = Object.values(pages)[0];
-    const src = page?.thumbnail?.source || null;
+    const res = await fetch(`/api/image-search?q=${encodeURIComponent(searchTerm)}`);
+    const data = await res.json();
+    const src = data?.url || null;
     wikiCache[searchTerm] = src;
     return src;
   } catch(e) { wikiCache[searchTerm] = null; return null; }
