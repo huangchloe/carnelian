@@ -885,12 +885,72 @@ function hashColor(str) {
 // =============================================================================
 // NODE IMAGE COMPONENT (Memoized)
 // =============================================================================
+const wikiCache = {};
+
+async function fetchWikiThumb(searchTerm) {
+  if (wikiCache[searchTerm] !== undefined) return wikiCache[searchTerm];
+  try {
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&srlimit=1&format=json&origin=*`;
+    const searchRes = await fetch(searchUrl);
+    const searchData = await searchRes.json();
+    const topResult = searchData?.query?.search?.[0]?.title;
+    if (!topResult) { wikiCache[searchTerm] = null; return null; }
+    const imgUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(topResult)}&prop=pageimages&pithumbsize=300&format=json&origin=*`;
+    const imgRes = await fetch(imgUrl);
+    const imgData = await imgRes.json();
+    const pages = imgData?.query?.pages || {};
+    const page = Object.values(pages)[0];
+    const src = page?.thumbnail?.source || null;
+    wikiCache[searchTerm] = src;
+    return src;
+  } catch(e) { wikiCache[searchTerm] = null; return null; }
+}
+
+const CardBanner = memo(function CardBanner({ searchTerm, fallbackColor, label }) {
+  const [imgUrl, setImgUrl] = useState(null);
+
+  useEffect(() => {
+    if (!searchTerm) return;
+    fetchWikiThumb(searchTerm).then(src => { if (src) setImgUrl(src); });
+  }, [searchTerm]);
+
+  return (
+    <div style={{ width: '100%', height: '100%', position: 'relative', background: fallbackColor }}>
+      {imgUrl && (
+        <img
+          src={imgUrl}
+          alt={label}
+          onError={() => setImgUrl(null)}
+          style={{
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center top',
+            position: 'absolute', top: 0, left: 0,
+          }}
+        />
+      )}
+      {!imgUrl && (
+        <div style={{
+          position: 'absolute', bottom: '12px', left: '16px',
+          fontSize: '40px', fontWeight: '600',
+          color: 'rgba(255,255,255,0.4)',
+        }}>{label?.charAt(0) || '?'}</div>
+      )}
+    </div>
+  );
+});
+
 const NodeImage = memo(function NodeImage({ searchTerm, nodeId, fallbackColor, label, size }) {
+  const [imgUrl, setImgUrl] = useState(null);
   const [status, setStatus] = useState('loading');
-  const imgUrl = searchTerm 
-    ? `https://source.unsplash.com/200x200/?${encodeURIComponent(searchTerm.toLowerCase())}&sig=${nodeId}`
-    : null;
-  
+
+  useEffect(() => {
+    if (!searchTerm) { setStatus('error'); return; }
+    fetchWikiThumb(searchTerm).then(src => {
+      if (src) { setImgUrl(src); setStatus('loaded'); }
+      else setStatus('error');
+    });
+  }, [searchTerm]);
+
   return (
     <div style={{
       width: '100%', height: '100%', borderRadius: '50%',
@@ -898,16 +958,13 @@ const NodeImage = memo(function NodeImage({ searchTerm, nodeId, fallbackColor, l
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       position: 'relative',
     }}>
-      {imgUrl && status !== 'error' && (
+      {imgUrl && status === 'loaded' && (
         <img
           src={imgUrl}
           alt={label}
-          onLoad={() => setStatus('loaded')}
-          onError={() => setStatus('error')}
+          onError={() => { setImgUrl(null); setStatus('error'); }}
           style={{
             width: '100%', height: '100%', objectFit: 'cover',
-            opacity: status === 'loaded' ? 1 : 0,
-            transition: 'opacity 0.3s ease',
             position: 'absolute', top: 0, left: 0,
           }}
         />
@@ -924,6 +981,8 @@ const NodeImage = memo(function NodeImage({ searchTerm, nodeId, fallbackColor, l
     </div>
   );
 });
+
+
 
 // =============================================================================
 // MAIN COMPONENT
@@ -2129,15 +2188,13 @@ export default function CulturalGraphExplorer() {
           boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 400, overflow: 'hidden',
         }}>
           <div style={{
-            height: '100px', background: selectedNode.fallbackColor,
+            height: '160px', background: selectedNode.fallbackColor,
             position: 'relative', overflow: 'hidden',
           }}>
-            <NodeImage 
+            <CardBanner
               searchTerm={selectedNode.image_search || selectedNode.label}
-              nodeId={selectedNode.id + '_card'}
               fallbackColor={selectedNode.fallbackColor}
               label={selectedNode.label}
-              size={100}
             />
             <button onClick={() => setSelectedNode(null)} style={{
               position: 'absolute', top: '10px', right: '10px',
