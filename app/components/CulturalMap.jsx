@@ -1053,7 +1053,7 @@ export default function CulturalGraphExplorer() {
   // =============================================================================
   // API CALL
   // =============================================================================
-  const callAPI = async (systemPrompt, userMessage, signal) => {
+  const callAPI = async (systemPrompt, userMessage, signal, useWebSearch = false) => {
     const response = await fetch("/api/claude", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1063,6 +1063,7 @@ export default function CulturalGraphExplorer() {
         max_tokens: 8000,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }],
+        useWebSearch,
       })
     });
 
@@ -1142,7 +1143,7 @@ export default function CulturalGraphExplorer() {
   // STEP 2: GENERATE GRAPH
   // =============================================================================
   const generateGraph = async (artifactData, signal) => {
-    const text = await callAPI(MAP_SYSTEM_PROMPT, MAP_USER_TEMPLATE(artifactData), signal);
+    const text = await callAPI(MAP_SYSTEM_PROMPT, MAP_USER_TEMPLATE(artifactData), signal, true);
     if (!text.trim()) throw new Error('Empty graph response');
     
     let cleanJson = extractJSON(text);
