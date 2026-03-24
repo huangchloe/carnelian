@@ -231,6 +231,19 @@ Ring 1 = Things that are CONCRETELY in the artifact:
 - "Catholic aesthetics" (genre label)
 - "Feminine suffering" (interpretation)
 
+🚨 CRITICAL RULE FOR PEOPLE NODES IN RING 1:
+A PERSON may only appear in Ring 1 if they are OFFICIALLY CREDITED on the work.
+- Featured artists: only if credited in official release metadata (Spotify, Apple Music, liner notes)
+- Producers: only if officially credited
+- DO NOT add a person because they "influenced" the work or "sound similar"
+- DO NOT infer collaborators from stylistic similarities
+- DO NOT add ensembles or choirs unless you can cite a specific official source
+- If you are not 100% certain a person or ensemble is officially credited — DO NOT include them
+- It is BETTER to have fewer nodes than to include an uncredited person
+- Including an uncredited person as a collaborator is MISINFORMATION
+- When in doubt: OMIT. Never guess. Never infer from sound alone.
+- If you cannot name the exact Spotify/Apple Music credit, do not include the person.
+
 claim_type: "present"
 
 🟨 RING 2 — DOCUMENTED REFERENCES & LINEAGE (6-10 nodes)
