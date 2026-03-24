@@ -2001,10 +2001,10 @@ export default function CulturalGraphExplorer() {
               </svg>
             </div>
             <h2 style={{ margin: '0 0 8px', fontSize: '24px', fontWeight: '600', color: COLORS.black }}>
-              Explore Cultural Lineage
+              Trace your taste
             </h2>
             <p style={{ margin: 0, fontSize: '14px', color: COLORS.gray, maxWidth: '300px' }}>
-              Search for any artwork, artist, film, album, or movement.
+              Understand what you love—and where it comes from.
             </p>
           </div>
         )}
