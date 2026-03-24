@@ -1436,10 +1436,10 @@ export default function CulturalGraphExplorer() {
         <div style={{ flexShrink: 0, padding: '28px 28px 0 28px', width: '360px', boxSizing: 'border-box' }}>
           {/* Header - Clean, no logo */}
           <div style={{ marginBottom: '28px' }}>
-            <h1 style={{ margin: 0, fontSize: '14px', fontWeight: '600', letterSpacing: '0.08em', color: COLORS.black }}>
-              CULTURAL GRAPH
+            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '400', letterSpacing: '-0.01em', color: COLORS.black, fontFamily: 'Georgia, "Times New Roman", serif', lineHeight: 1 }}>
+              Carnelian
             </h1>
-            <p style={{ margin: '4px 0 0', fontSize: '12px', color: COLORS.gray }}>
+            <p style={{ margin: '5px 0 0', fontSize: '11px', color: COLORS.gray, letterSpacing: '0.04em' }}>
               Map artistic lineage & influence
             </p>
           </div>
