@@ -1100,6 +1100,7 @@ while (true) {
 }
 
 return fullText;
+  };
 
   // =============================================================================
   // STEP 1: RESOLVE ARTIFACT (with alias map check)
