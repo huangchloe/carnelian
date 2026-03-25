@@ -1072,10 +1072,34 @@ export default function CulturalGraphExplorer() {
       throw new Error(errorData.error?.message || `HTTP ${response.status}`);
     }
 
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.content?.map(item => item.type === "text" ? item.text : "").join("") || "";
-  };
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+let buffer = "";
+let fullText = "";
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+  const lines = buffer.split("\n");
+  buffer = lines.pop();
+
+  for (const line of lines) {
+    if (!line.startsWith("data: ")) continue;
+    const data = line.slice(6).trim();
+    if (!data) continue;
+    try {
+      const event = JSON.parse(data);
+      if (event.error) throw new Error(event.error.message || "API error");
+      if (event.type === "done") return event.content?.map(i => i.text || "").join("") || fullText;
+      if (event.type === "text_delta") fullText += event.text;
+    } catch (e) {
+      if (e.message === "API error" || e.message.includes("credit")) throw e;
+    }
+  }
+}
+
+return fullText;
 
   // =============================================================================
   // STEP 1: RESOLVE ARTIFACT (with alias map check)
