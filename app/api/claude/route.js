@@ -47,7 +47,8 @@ export async function POST(request) {
     finalText += textBlocks;
 
     if (data.stop_reason !== "tool_use") {
-      return Response.json({ content: [{ type: "text", text: finalText }] });
+      const cleanText = finalText.replace(/<cite[^>]*>|<\/cite>/g, '');
+return Response.json({ content: [{ type: "text", text: cleanText }] });
     }
 
     const toolUseBlocks = assistantContent.filter(b => b.type === "tool_use");
