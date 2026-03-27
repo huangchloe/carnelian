@@ -3,6 +3,21 @@ export async function POST(request) {
   const { useWebSearch, ...rest } = body;
 
   const requestBody = { ...rest };
+
+  // Convert plain string system prompt to a cacheable content block.
+  // This tells Anthropic to cache the (large, static) system prompt so it
+  // doesn't count against your input-token-per-minute rate limit on
+  // subsequent calls with the same prompt.
+  if (typeof requestBody.system === "string") {
+    requestBody.system = [
+      {
+        type: "text",
+        text: requestBody.system,
+        cache_control: { type: "ephemeral" },
+      },
+    ];
+  }
+
   if (useWebSearch) {
     requestBody.tools = [{ type: "web_search_20250305", name: "web_search" }];
   }
@@ -17,7 +32,9 @@ export async function POST(request) {
         "Content-Type": "application/json",
         "x-api-key": process.env.ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
-        "anthropic-beta": "web-search-2025-03-05",
+        // prompt-caching-2024-07-31 is required for cache_control support.
+        // Combine both betas as a comma-separated list.
+        "anthropic-beta": "prompt-caching-2024-07-31,web-search-2025-03-05",
       },
       body: JSON.stringify({ ...requestBody, messages }),
     });
