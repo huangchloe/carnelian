@@ -1053,14 +1053,14 @@ export default function CulturalGraphExplorer() {
   // =============================================================================
   // API CALL
   // =============================================================================
-  const callAPI = async (systemPrompt, userMessage, signal, useWebSearch = false) => {
+  const callAPI = async (systemPrompt, userMessage, signal, useWebSearch = false, maxTokens = 4000) => {
     const response = await fetch("/api/claude", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal,
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 8000,
+        max_tokens: maxTokens,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }],
         useWebSearch,
@@ -1096,10 +1096,12 @@ export default function CulturalGraphExplorer() {
     }
     
     const text = await callAPI(
-      RESOLVE_SYSTEM_PROMPT, 
-      RESOLVE_USER_TEMPLATE(searchQuery, userCorrection), 
-      signal
-    );
+  RESOLVE_SYSTEM_PROMPT, 
+  RESOLVE_USER_TEMPLATE(searchQuery, userCorrection), 
+  signal,
+  false,
+  2000
+);
     if (!text.trim()) throw new Error('Empty resolution response');
     
     const cleanJson = extractJSON(text);
@@ -1143,7 +1145,7 @@ export default function CulturalGraphExplorer() {
   // STEP 2: GENERATE GRAPH
   // =============================================================================
   const generateGraph = async (artifactData, signal) => {
-    const text = await callAPI(MAP_SYSTEM_PROMPT, MAP_USER_TEMPLATE(artifactData), signal, true);
+    const text = await callAPI(MAP_SYSTEM_PROMPT, MAP_USER_TEMPLATE(artifactData), signal, true, 16000);
     if (!text.trim()) throw new Error('Empty graph response');
     
     let cleanJson = extractJSON(text);
