@@ -1096,12 +1096,12 @@ export default function CulturalGraphExplorer() {
     }
     
     const text = await callAPI(
-  RESOLVE_SYSTEM_PROMPT, 
-  RESOLVE_USER_TEMPLATE(searchQuery, userCorrection), 
-  signal,
-  false,
-  2000
-);
+      RESOLVE_SYSTEM_PROMPT, 
+      RESOLVE_USER_TEMPLATE(searchQuery, userCorrection), 
+      signal,
+      false,
+      2000
+    );
     if (!text.trim()) throw new Error('Empty resolution response');
     
     const cleanJson = extractJSON(text);
