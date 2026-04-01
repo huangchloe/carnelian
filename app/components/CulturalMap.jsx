@@ -362,11 +362,15 @@ INSTRUCTIONS:
 4. Build Ring 2 — document where each Ring 1 item comes from
 5. Generate all edges
 
-Scale depth to richness. A well-documented music video with fashion, text,
-sound, and visual tracks should have 30+ nodes. A niche fashion piece may
-have 10. Both are correct.
+Be MAXIMALLY GENEROUS with nodes. Target 30-50 nodes for any music video,
+song, or film. Use web search aggressively — find exact credits, specific
+garment names with season and year, filming locations, choir names, conductor
+names, quoted works with composer and date.
 
-Never invent — if you cannot verify a specific credit, garment, or reference, omit it.
+Every active track MUST have at least 5 nodes. A sparse graph is a failure.
+The richest graphs will have 10+ nodes per active track.
+
+Never invent — verify via web search or omit. But search hard before omitting.
 
 Output raw JSON only.`;
 
