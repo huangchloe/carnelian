@@ -1,11 +1,8 @@
 export const maxDuration = 60;
 
 export async function POST(request) {
-  
-  export async function POST(request) {
   const body = await request.json();
   const { useWebSearch, ...rest } = body;
-
   const requestBody = { ...rest };
 
   // Convert plain string system prompt to a cacheable content block.
