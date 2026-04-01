@@ -1211,7 +1211,7 @@ export default function CulturalGraphExplorer() {
   // PHASE 1: GENERATE FACTUAL BACKBONE (Rings 0-2)
   // =============================================================================
   const generatePhase1 = async (artifactData, signal) => {
-    const text = await callAPI(MAP_PHASE1_SYSTEM_PROMPT, MAP_PHASE1_USER_TEMPLATE(artifactData), signal, false, 32000);
+    const text = await callAPI(MAP_PHASE1_SYSTEM_PROMPT, MAP_PHASE1_USER_TEMPLATE(artifactData), signal, true, 32000);
     if (!text.trim()) throw new Error('Empty Phase 1 response');
     let cleanJson = extractJSON(text);
     let parsed = safeJSONParse(cleanJson);
