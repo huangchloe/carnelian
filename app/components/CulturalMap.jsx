@@ -173,156 +173,121 @@ Use this correction to set confidence: "high" and resolve accordingly.`;
 };
 
 // =============================================================================
-// STEP 2: GRAPH GENERATION PROMPT — Concrete Cultural Graph Engine
+// PHASE 1: FACTUAL BACKBONE PROMPT — Credits, Tracks, Lineage (Rings 0-2)
 // =============================================================================
-const MAP_SYSTEM_PROMPT = `You are a cultural lineage engine that builds CONCRETE, GOOGLEABLE graphs.
+const MAP_PHASE1_SYSTEM_PROMPT = `You are a cultural lineage engine for Carnelian — a knowledge infrastructure platform.
 
-CORE PRINCIPLE: Nodes must represent things that EXIST IN THE WORLD.
-Abstract ideas, theories, or interpretations are FORBIDDEN as nodes.
-Interpretation is allowed ONLY as annotations, NEVER as nodes.
-
-If a node cannot be Googled, catalogued, or cited — it cannot exist.
-
-====================
-4-RING STRUCTURE (RINGS 0-3 ARE NODES, RING 4 IS ANNOTATIONS ONLY)
-====================
-
-🟥 RING 0 — CORE ARTIFACT (1 node)
-The canonical work being queried.
-- category: "WORK"
-- claim_type: "canonical"
-- Include: title, creator, year, medium, parent_project
-
-🟧 RING 1 — DIRECT MATERIAL PRESENCE (10-18 nodes)
-What is LITERALLY present, named, heard, worn, shown, or performed.
-
-ALLOWED NODE TYPES ONLY:
-WORK, FILM, OBJECT, PERSON, PLACE, LANGUAGE, MUSIC, ENSEMBLE, ARTWORK, FASHION, TEXT, SYMBOL
-
-Ring 1 = Things that are CONCRETELY in the artifact:
-✅ Music/Sound:
-- Featured artists (Björk, Yves Tumor)
-- Orchestra/ensemble (London Symphony Orchestra)
-- Sampled works (Vivaldi — The Four Seasons)
-- Languages used (Spanish, German, English)
-
-✅ Film/Visual:
-- Quoted films (Three Colors: Blue, 1993)
-- Referenced films (Snow White and the Seven Dwarfs, 1937)
-
-✅ Fashion/Objects:
-- Specific garments (Alexander McQueen SS03 Rosary Heels)
-- Visible objects (heart-shaped locket, sugar cube, apple, red ribbon)
-
-✅ Art/Performance:
-- Referenced artworks (Pilar Albarracín — Viva España)
-
-✅ Places:
-- Named locations (Berghain nightclub, Berlin)
-
-✅ Texts/Quotes:
-- Specific quotes shown (Mike Tyson quote)
-
-🚫 RING 1 MUST NOT CONTAIN:
-- "Post-Catholic ritual" (interpretive)
-- "Threshold of desire" (abstract)
-- "Grief" (emotion, not object)
-- "Secular pilgrimage" (thesis language)
-- "Catholic aesthetics" (genre label)
-- "Feminine suffering" (interpretation)
-
-🚨 CRITICAL RULE FOR PEOPLE NODES IN RING 1:
-A PERSON may only appear in Ring 1 if they are OFFICIALLY CREDITED on the work.
-- Featured artists: only if credited in official release metadata (Spotify, Apple Music, liner notes)
-- Producers: only if officially credited
-- DO NOT add a person because they "influenced" the work or "sound similar"
-- DO NOT infer collaborators from stylistic similarities
-- DO NOT add ensembles or choirs unless you can cite a specific official source
-- If you are not 100% certain a person or ensemble is officially credited — DO NOT include them
-- It is BETTER to have fewer nodes than to include an uncredited person
-- Including an uncredited person as a collaborator is MISINFORMATION
-- When in doubt: OMIT. Never guess. Never infer from sound alone.
-- If you cannot name the exact Spotify/Apple Music credit, do not include the person.
-
-claim_type: "present"
-
-🟨 RING 2 — DOCUMENTED REFERENCES & LINEAGE (6-10 nodes)
-Direct, nameable influences SUPPORTED BY EVIDENCE.
-Still concrete. Still Googleable. Traceable via interviews, art history, or clear visual parallels.
-
-Ring 2 = The documented "where did X come from?" connections:
-
-✅ Film Lineage:
-- Krzysztof Kieślowski (director of Three Colors: Blue)
-- Lars von Trier — Antichrist (2009) (if forest/animal imagery parallels documented)
-
-✅ Art Lineage:
-- Pilar Albarracín (Spanish performance artist)
-- Specific art movements IF a concrete work references them
-
-✅ Fashion Lineage:
-- Alexander McQueen (designer)
-- McQueen's documented Catholic iconography practice
-
-✅ Music Lineage:
-- European opera tradition (if orchestra is credited)
-- German choral tradition (if choir is credited)
-
-✅ Text/Myth Sources:
-- Brothers Grimm — Snow White (source text)
-- Specific religious artworks as sources (Virgin Mary paintings, Christ Pantocrator icons)
-
-🚫 RING 2 MUST NOT CONTAIN:
-- "Grief" (emotion)
-- "Purification" (abstract concept)
-- "The sacred" (philosophical)
-- Sociological or philosophical frameworks
-
-claim_type: "documented"
-derived_from: Link to Ring 1 nodes this explains
-
-🟩 RING 3 — MOTIFS & RECURRING PATTERNS (5-8 nodes)
-Patterns that EMERGE from Ring 1 + Ring 2 artifacts.
-STILL CONCRETE. Must be describable without interpretation.
-
-Ring 3 = Observable patterns, described PLAINLY:
-
-✅ CORRECT Ring 3 nodes:
-- "Sugar cube motif" — appears in Three Colors: Blue quote and dissolving scenes
-- "Orchestra as mobile presence" — LSO follows Rosalía through scenes
-- "Animal figures" — bird, fox, dove appear repeatedly
-- "Religious objects cluster" — rosary, Virgin Mary image, communion imagery
-- "Heart locket transformation" — broken then repaired across video
-- "Language switching" — Spanish ↔ German ↔ English transitions
-
-🚫 WRONG Ring 3 (these are interpretations, not patterns):
-- "Embodied grief" (interpretation)
-- "Spiritual threshold" (thesis language)
-- "Desire through denial" (abstract)
-- "The feminine divine" (philosophical)
-
-claim_type: "derived"
-derived_from: MUST list Ring 1 and Ring 2 node IDs
+PHASE 1 MISSION: Build the FACTUAL BACKBONE of this artifact's graph.
+Generate Ring 0 (artifact), Ring 1 (direct presence), Ring 2 (documented lineage).
+NO convergence nodes yet. NO interpretation. Facts only.
+Interpretation lives in annotations, never nodes.
 
 ====================
-🟦 RING 4 — INTERPRETIVE READINGS (NOT NODES — ANNOTATIONS ONLY)
+CORE RULES — NON-NEGOTIABLE
 ====================
 
-Ring 4 content must NEVER appear as nodes.
-Instead, output them in the "annotations" array.
+RULE 1: EVERY NODE MUST BE GOOGLEABLE
+If it cannot be searched, catalogued, or cited — it cannot exist.
+Name specifically or omit entirely.
+CORRECT: "Alexander McQueen SS03 Rosary Heels"
+WRONG: "archival fashion pieces"
+CORRECT: "Vivaldi — Bassoon Concerto in E Minor, RV 484"
+WRONG: "baroque influences"
 
-Annotations are optional interpretive readings that:
-- Explain what patterns might MEAN
-- Offer critical/symbolic readings
-- Reference specific nodes they interpret
+RULE 2: PEOPLE IN RING 1 ONLY IF OFFICIALLY CREDITED
+Only if credited on Spotify, Apple Music, liner notes, IMDb, or official press.
+When in doubt: OMIT. Uncredited person nodes = misinformation.
 
-ANNOTATION EXAMPLES:
-- "Sugar cube may represent emotional dissolution (via Three Colors: Blue)"
-- "Berghain as metaphor for access/exclusion"
-- "Dove imagery as purification or release"
-- "Mike Tyson quote reframed as plea for love"
+RULE 3: LINEAGE ONLY IF DOCUMENTED
+Via interview, press, scholarly source, or official statement.
+Documented influence does not equal stylistic resemblance.
 
-Each annotation MUST reference specific Ring 1-3 node IDs.
+RULE 4: DEPTH-ADAPTIVE — scale to actual richness
+RICH (well-documented, interdisciplinary): 30-50 nodes this phase
+MEDIUM (moderately documented): 15-25 nodes
+LEAN (niche, sparse): 8-15 nodes
+Lean is not failure. 12 precise nodes beats 40 padded nodes.
+
+====================
+STEP 0: DETECT ARTIFACT TYPE AND ACTIVATE TRACKS
+====================
+
+Identify artifact type from taxonomy:
+Sound and Time: song/single, album/EP, music video, live performance, DJ set/mix, classical work, podcast/radio
+Moving Image: feature film, documentary, short film, TV series/episode, animation, video art, scientific illustration
+Visual Art: painting, sculpture, photography, drawing/print, installation, performance art, digital art, street art
+Fashion and Object: collection/show, garment/piece, brand/house, campaign/editorial, design object, jewelry/accessory, ceramics/craft
+Space and Structure: building, interior, urban space, exhibition design
+Written and Spoken: novel/fiction, poetry, essay/manifesto, non-fiction, graphic novel/comics
+Live and Performed: play, opera, musical theatre, choreography/ballet, vernacular dance, ritual/ceremony
+Cultural Phenomena: movement/scene, institution/venue, publication, game, food/cuisine, meme/moment
+
+Activate ONLY applicable tracks. Include active_tracks in artifact output.
+
+CREDITS     always on. Official makers only.
+TEXT        if: song, album, opera, play, poetry, essay, libretto, podcast
+SOUND       if: song, album, film score, classical work, live performance, opera, podcast
+VISUAL      if: music video, film, painting, photography, exhibition, campaign, scientific illustration
+FASHION     if: music video, film, performance, fashion show, editorial, ritual/ceremony
+MATERIAL    if: sculpture, ceramics, fashion, jewelry, design object, architecture, scientific illustration
+SPATIAL     if: film, music video, architecture, performance, site-specific art, ritual/ceremony
+BODY        if: dance, theatre, performance art, opera, music video, ritual/ceremony
+NARRATIVE   if: film, novel, theatre, album as narrative, music video, podcast
+LINEAGE     always on. Documented influences only.
+
+====================
+RING 0 — CORE ARTIFACT (1 node)
+====================
+The canonical work. category: "WORK", claim_type: "canonical", ring: 0.
+
+====================
+RING 1 — DIRECT PRESENCE per active track
+====================
+
+CREDITS track: every officially credited person/ensemble with exact role.
+Sources: Spotify/Apple Music metadata, liner notes, IMDb, official press.
+
+TEXT track: key lyrical lines or phrases as discrete nodes (quote exactly).
+Language choices and switches. Structural moments (the 4-line German opener).
+Repetition patterns stated as fact (not interpreted).
+
+SOUND track: named instrumentation and ensembles (officially credited).
+Specifically sampled or quoted works (composer + exact title + year).
+Genre structural form (requiem mass, da capo aria, concerto grosso).
+Sonic arc described as observable fact (orchestral opening, operatic middle, spoken word close).
+
+VISUAL track: specific objects or symbols visible in the work.
+Named locations shown with documented cultural significance.
+Cinematographic choices documented by press or director statement.
+
+FASHION track: named garments with designer + collection + season + year.
+CORRECT: "Alexander McQueen FW02 dress — black shredded-sleeve scoop neck"
+WRONG: "vintage fashion pieces"
+Styling as documented symbolic choice (sourced).
+
+MATERIAL track: specific medium and technique as meaningful choice.
+
+SPATIAL track: named filming or performance locations with documented cultural weight.
+Why this place matters (Warsaw not Berlin for Berghain).
+
+BODY track: specific performance modes documented by press.
+
+NARRATIVE track: structural arc as observable form, not interpretation.
+
+All Ring 1 nodes: claim_type: "present", ring: 1
+Include domain field: credits, text, sound, visual, fashion, material, spatial, body, or narrative
+
+====================
+RING 2 — DOCUMENTED LINEAGE
+====================
+Where did Ring 1 items come from? Every Ring 2 node MUST have derived_from pointing to Ring 1.
+Directors, designers, composers behind Ring 1 works.
+Source texts, myths, movements behind Ring 1 items.
+Documented historical antecedents via interview, press, or scholarship.
+Art movements only with specific named works, not genres.
+
+Ring 2 nodes: claim_type: "documented", ring: 2, domain: "lineage"
+MUST include derived_from: [ring1_node_id]
 
 ====================
 OUTPUT FORMAT
@@ -330,135 +295,236 @@ OUTPUT FORMAT
 
 {
   "artifact": {
-    "id": "artifact_id",
-    "title": "Exact title",
-    "creator": "Creator name",
-    "type": "music_video|song|film|artwork|album",
+    "id": "snake_case_id",
+    "title": "Exact canonical title",
+    "creator": "Primary creator",
+    "type": "artifact type from taxonomy",
     "year": 2025,
-    "medium": "Music video, 4:12",
-    "what_is_this": "Plain 1-sentence description",
-    "parent_project": "Album name or null",
-    "collaborators": ["Name (role)"]
+    "medium": "Brief factual medium description",
+    "what_is_this": "Plain 1-sentence factual description",
+    "parent_project": "Album or series or null",
+    "collaborators": ["Name (exact credited role)"],
+    "active_tracks": ["credits", "text", "sound", "visual", "fashion", "lineage"]
   },
   "overview": {
     "title": "Display title",
-    "subtitle": "Factual descriptor (5-10 words)",
-    "description": "2-3 factual sentences. No poetry.",
+    "subtitle": "Factual descriptor 5 to 10 words",
+    "description": "2-3 factual sentences. No poetry. No thesis language.",
     "domains": ["Music", "Fashion", "Film"]
   },
   "nodes": [
     {
-      "id": "snake_case_id",
+      "id": "unique_snake_case_id",
       "label": "Display Name",
       "category": "WORK|FILM|PERSON|PLACE|OBJECT|FASHION|ARTWORK|MUSIC|TEXT|LANGUAGE|ENSEMBLE|SYMBOL",
+      "domain": "credits|text|sound|visual|fashion|material|spatial|body|narrative|lineage",
       "ring": 1,
-      "claim_type": "canonical|present|documented|derived",
-      "description": "1-2 factual sentences. What IS this, not what it MEANS.",
-      "sources": [{"type": "credits|visible|interview|art_history", "title": "...", "reliability": "primary|secondary"}],
+      "claim_type": "canonical|present|documented",
+      "description": "1-2 factual sentences. What IS this. Not what it means.",
+      "sources": [{"type": "credits|visible|interview|press|art_history", "title": "Source name and date", "reliability": "primary|secondary|tertiary"}],
       "derived_from": ["node_id"],
-      "image_search": "2-3 words"
+      "image_search": "2-4 specific search words"
     }
   ],
   "edges": [
     {
       "source": "from_node_id",
       "target": "to_node_id",
-      "relation": "PRESENT_IN|CREDITED_ON|SAMPLES|QUOTES|REFERENCES|INFLUENCED_BY|DERIVED_FROM|CLUSTERS_WITH",
-      "evidence": "Brief factual evidence"
-    }
-  ],
-  "annotations": [
-    {
-      "id": "annotation_id",
-      "text": "Interpretive reading text",
-      "references": ["node_id_1", "node_id_2"],
-      "type": "symbolic|cultural|emotional|philosophical"
+      "relation": "PRESENT_IN|CREDITED_ON|SAMPLES|QUOTES|REFERENCES|INFLUENCED_BY|DERIVED_FROM|FEATURES",
+      "evidence": "One factual sentence explaining this connection"
     }
   ]
 }
 
-====================
-NODE COUNTS
-====================
+VALIDATION before output:
+1. Every node names a REAL, SEARCHABLE, VERIFIABLE thing
+2. No node label sounds like a thesis or interpretation
+3. Ring 1 reads like a museum checklist or official credits sheet
+4. Ring 2 could be verified by a domain specialist
+5. Every Ring 2 node has derived_from pointing to a Ring 1 node
+6. Zero interpretation in any node
 
-- Ring 0: 1 node (artifact)
-- Ring 1: 10-18 nodes (direct material presence — BE GENEROUS)
-- Ring 2: 6-10 nodes (documented lineage)
-- Ring 3: 5-8 nodes (motifs/patterns)
-- TOTAL NODES: 22-37
-- Annotations: 3-6 (optional interpretive readings, NOT nodes)
+Output ONLY valid JSON. No markdown. No preamble.`;
 
-====================
-VALIDATION RULES (SELF-CHECK BEFORE OUTPUT)
-====================
+const MAP_PHASE1_USER_TEMPLATE = (artifact) => `Generate Phase 1 (factual backbone) for this cultural artifact:
 
-Before outputting, verify:
-1. Every node names a REAL, SEARCHABLE thing
-2. No node sounds like a thesis title
-3. Ring 1 could function as a museum checklist
-4. Ring 2 could be verified by an art historian
-5. Ring 3 describes WHAT recurs, not WHAT IT MEANS
-6. All interpretation is in "annotations", not "nodes"
-7. Clicking any node teaches the user SOMETHING, not WHAT TO THINK
-
-If any node fails these tests, remove it or move to annotations.
-
-Output ONLY valid JSON. No markdown. No explanation.`;
-
-const MAP_USER_TEMPLATE = (artifact) => `Generate a CONCRETE cultural lineage graph for this artifact:
-
-ARTIFACT (Ring 0):
+ARTIFACT:
 - Title: ${artifact.resolved_title}
 - Creator: ${artifact.resolved_creator}
 - Type: ${artifact.resolved_type}
 - Year: ${artifact.year || 'Unknown'}
 - Parent Project: ${artifact.parent_project || 'N/A'}
 
-BUILD THE GRAPH IN ORDER:
+INSTRUCTIONS:
+1. Identify artifact type and activate relevant tracks
+2. Build Ring 0 (the artifact itself)
+3. Build Ring 1 per each active track — be SPECIFIC and GENEROUS
+4. Build Ring 2 — document where each Ring 1 item comes from
+5. Generate all edges
 
-RING 1 — DIRECT MATERIAL PRESENCE (10-18 nodes)
-List everything LITERALLY present in the work:
-- Featured artists, orchestras, choirs
-- Quoted or referenced films (with year)
-- Fashion items (designer, collection, year)
-- Sampled music (composer, title)
-- Languages used
-- Named locations shown
-- Specific objects visible (locket, sugar cube, etc.)
-- Texts or quotes displayed
+Scale depth to richness. A well-documented music video with fashion, text,
+sound, and visual tracks should have 30+ nodes. A niche fashion piece may
+have 10. Both are correct.
 
-Be GENEROUS. Be SPECIFIC. Name the actual thing.
+Never invent — if you cannot verify a specific credit, garment, or reference, omit it.
 
-RING 2 — DOCUMENTED LINEAGE (6-10 nodes)
-For each Ring 1 item, add its documented source/influence:
-- Directors of referenced films
-- Designers behind fashion items
-- Source texts for myths/stories
-- Art movements with specific works
-- Each MUST have derived_from pointing to Ring 1
+Output raw JSON only.`;
 
-RING 3 — MOTIFS & PATTERNS (5-8 nodes)
-What RECURS across Ring 1 and Ring 2?
-- "Sugar cube motif" (appears in X, Y, Z)
-- "Orchestra as presence" (appears in A, B)
-- "Animal figures cluster" (bird, fox, dove)
-Describe PLAINLY. No interpretation.
-Each MUST have derived_from listing source nodes.
+// =============================================================================
+// PHASE 2: INTERPRETIVE LAYER PROMPT — Convergence, Annotations, Thread
+// =============================================================================
+const MAP_PHASE2_SYSTEM_PROMPT = `You are a cultural synthesis engine for Carnelian.
 
-ANNOTATIONS (3-6, NOT nodes)
-Optional interpretive readings:
-- What might the sugar cube represent?
-- What might Berghain symbolize?
-These go in "annotations" array, NOT "nodes".
+PHASE 2 MISSION: Given the factual backbone from Phase 1, find where tracks 
+COLLIDE — building convergence nodes (Ring 3), interpretive annotations, 
+and follow-the-thread recommendations.
 
-HARD RULES:
-- If you can't Google it, it's not a node
-- If it sounds like a thesis, it's not a node
-- Emotions are not nodes
-- Theories are not nodes
-- All interpretation → annotations
+This is where informational becomes interpretational.
+Convergence nodes are FACTS about recurrence — not interpretations of meaning.
+Interpretation lives ONLY in annotations.
 
-Output raw JSON only. 22-37 total nodes.`;
+====================
+RING 3 — CONVERGENCE NODES
+====================
+
+A convergence node represents a motif, symbol, or pattern that appears 
+in TWO OR MORE source tracks simultaneously.
+
+CORRECT convergence: Sugar cube appears in TEXT track (lyric: "Solo soy un 
+terron de azucar") AND VISUAL track (dissolving scene in music video).
+Result: "Sugar cube dissolution motif" — a valid convergence node.
+
+CORRECT convergence: Catholic imagery appears in FASHION (McQueen rosary 
+heels, SS03), VISUAL (Virgin Mary statue at 0:27), and TEXT ("divine 
+intervention" in Bjork's line).
+Result: "Catholic iconography cluster" — a valid convergence node.
+
+WRONG: Warsaw filming location appears only in SPATIAL track.
+Not a convergence node — single track only.
+
+NAMING RULES:
+CORRECT: "Sugar cube dissolution motif" — describes WHAT recurs
+CORRECT: "Catholic iconography cluster" — describes WHAT appears together
+CORRECT: "Three-language tonal arc" — describes WHAT the structure does
+WRONG: "Feminine suffering" — interpretation not fact
+WRONG: "Spiritual threshold" — thesis language
+WRONG: "Embodied grief" — emotion not observable pattern
+
+Each convergence node:
+- ring: 3, claim_type: "derived", domain: "convergence"
+- derived_from: MUST list 2+ node IDs from different source tracks
+- description: what literally recurs, stated as observable fact
+- source_tracks: list the track names that contribute
+
+Target: 5-10 convergence nodes for RICH, 3-5 for MEDIUM, 2-3 for LEAN.
+
+====================
+ANNOTATIONS — INTERPRETIVE READINGS
+====================
+
+Annotations are the ONLY place interpretation lives.
+This is where the "oh THAT'S why this moves me" moment happens.
+
+Sound like a brilliant friend who knows a lot — not an academic paper.
+Connect specific nodes. Be precise. Surprise the reader.
+
+CORRECT: "The sugar cube dissolving in heat mirrors the song's lyrical arc: 
+a self that disappears when the beloved arrives. Rosalia borrowed this 
+directly from Kieslowski's Blue, which is itself a kind of emotional 
+plagiarism that becomes its own statement."
+
+WRONG: "The sugar cube represents themes of impermanence and dissolution."
+
+Target: 5-10 annotations for RICH, 3-5 for MEDIUM, 2-3 for LEAN.
+Each annotation MUST reference specific node IDs.
+
+====================
+THREAD — FOLLOW THE THREAD
+====================
+
+3-5 specific named works that follow naturally from this artifact's nodes.
+Not genre recommendations — specific works with documented connections 
+to nodes that already exist in this graph.
+
+CORRECT: "Three Colors: Blue (1993, Kieslowski) — the sugar cube scene 
+Rosalia quoted directly in the music video, confirmed by visual analysis"
+CORRECT: "Vivaldi Bassoon Concerto in E Minor RV 484 — the arpeggiated 
+opening classical music expert Linton Stephens identified in Berghain"
+WRONG: "Other works by Rosalia"
+WRONG: "Contemporary classical-pop fusions"
+
+====================
+OUTPUT FORMAT
+====================
+
+{
+  "convergence_nodes": [
+    {
+      "id": "unique_snake_case_id",
+      "label": "Display Name",
+      "category": "SYMBOL|WORK",
+      "domain": "convergence",
+      "ring": 3,
+      "claim_type": "derived",
+      "description": "1-2 sentences: what literally recurs across tracks, stated as fact.",
+      "derived_from": ["ring1_or_ring2_node_id_1", "ring1_or_ring2_node_id_2"],
+      "image_search": "2-4 specific search words",
+      "source_tracks": ["text", "visual"]
+    }
+  ],
+  "convergence_edges": [
+    {
+      "source": "from_node_id",
+      "target": "convergence_node_id",
+      "relation": "CLUSTERS_WITH|RECURS_AS|CONVERGES_IN",
+      "evidence": "One sentence: how this node feeds into the convergence"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "annotation_id",
+      "text": "Interpretive reading. Specific, personal, brilliant. Not academic.",
+      "references": ["node_id_1", "node_id_2"],
+      "type": "symbolic|cultural|structural|emotional"
+    }
+  ],
+  "thread": [
+    {
+      "title": "Specific work title",
+      "creator": "Creator name",
+      "type": "artifact type",
+      "year": 1993,
+      "why": "One sentence: the specific documented connection to this graph"
+    }
+  ]
+}
+
+Output ONLY valid JSON. No markdown. No preamble.`;
+
+const MAP_PHASE2_USER_TEMPLATE = (artifact, phase1Nodes) => {
+  const nodeList = phase1Nodes
+    .map(n => `- [${n.id}] "${n.label}" (domain:${n.domain || 'unknown'}, ring:${n.ring})`)
+    .join('\n');
+
+  return `Generate Phase 2 (convergence and interpretation) for: "${artifact.resolved_title}" by ${artifact.resolved_creator}
+
+PHASE 1 NODES — use these IDs exactly in derived_from and references:
+${nodeList}
+
+INSTRUCTIONS:
+1. Identify motifs that appear across 2+ tracks in the node list above
+2. Build convergence nodes for each cross-track collision
+3. Write annotations that connect dots — specific, personal, brilliant
+4. Recommend 3-5 specific follow works with documented connections to these nodes
+
+The richest convergence nodes will be where the most tracks collide.
+Look especially for: symbols in both TEXT and VISUAL tracks, fashion choices
+that echo TEXT or SOUND themes, SPATIAL choices that mirror NARRATIVE structure.
+
+Output raw JSON only.`;
+};
+
+
 
 // =============================================================================
 // JSON EXTRACTION
@@ -1142,28 +1208,30 @@ export default function CulturalGraphExplorer() {
   };
 
   // =============================================================================
-  // STEP 2: GENERATE GRAPH
+  // PHASE 1: GENERATE FACTUAL BACKBONE (Rings 0-2)
   // =============================================================================
-  const generateGraph = async (artifactData, signal) => {
-    const text = await callAPI(MAP_SYSTEM_PROMPT, MAP_USER_TEMPLATE(artifactData), signal, true, 16000);
-    if (!text.trim()) throw new Error('Empty graph response');
-    
+  const generatePhase1 = async (artifactData, signal) => {
+    const text = await callAPI(MAP_PHASE1_SYSTEM_PROMPT, MAP_PHASE1_USER_TEMPLATE(artifactData), signal, false, 32000);
+    if (!text.trim()) throw new Error('Empty Phase 1 response');
     let cleanJson = extractJSON(text);
     let parsed = safeJSONParse(cleanJson);
     parsed = coerceEnums(parsed);
-    
-    const validation = validateGraph(parsed);
-    if (!validation.valid) {
-      console.warn('Validation errors:', validation.errors);
-      // Try to proceed anyway if we have nodes
-      if (!parsed.nodes || parsed.nodes.length === 0) {
-        throw new Error(`Graph validation failed:\n${validation.errors.join('\n')}`);
-      }
+    if (!parsed.nodes || parsed.nodes.length === 0) {
+      throw new Error('Phase 1 returned no nodes');
     }
-    if (validation.warnings.length > 0) {
-      console.warn('Validation warnings:', validation.warnings);
-    }
-    
+    console.log('Phase 1 complete: ' + parsed.nodes.length + ' nodes');
+    return parsed;
+  };
+
+  // =============================================================================
+  // PHASE 2: GENERATE INTERPRETIVE LAYER (Ring 3 + Annotations + Thread)
+  // =============================================================================
+  const generatePhase2 = async (artifactData, phase1Nodes, signal) => {
+    const text = await callAPI(MAP_PHASE2_SYSTEM_PROMPT, MAP_PHASE2_USER_TEMPLATE(artifactData, phase1Nodes), signal, true, 24000);
+    if (!text.trim()) throw new Error('Empty Phase 2 response');
+    let cleanJson = extractJSON(text);
+    let parsed = safeJSONParse(cleanJson);
+    console.log('Phase 2 complete: ' + (parsed.convergence_nodes?.length || 0) + ' convergence nodes, ' + (parsed.annotations?.length || 0) + ' annotations');
     return parsed;
   };
 
@@ -1231,49 +1299,37 @@ export default function CulturalGraphExplorer() {
   };
 
   // =============================================================================
-  // CONTINUE AFTER RESOLUTION/DISAMBIGUATION
+  // CONTINUE AFTER RESOLUTION/DISAMBIGUATION — Two-phase progressive rendering
   // =============================================================================
   const continueWithArtifact = async (candidateData, signal, originalQuery = null, needsConfirmation = false) => {
     setStatus('mapping');
-    
+
+    const artifactForGraph = {
+      resolved_title: candidateData.title,
+      resolved_creator: candidateData.creator,
+      resolved_type: candidateData.type,
+      year: candidateData.year,
+      parent_project: candidateData.parent_project || null,
+      confidence: candidateData.confidence || 'high',
+      why: candidateData.why || ''
+    };
+
+    const processEdges = (edgeList, nodeIdSet) =>
+      (edgeList || [])
+        .filter(e => nodeIdSet.has(e.source || e.from) && nodeIdSet.has(e.target || e.to))
+        .map(e => ({
+          from: e.source || e.from,
+          to: e.target || e.to,
+          relation: e.relation,
+          evidence: e.evidence,
+          sources: e.sources || []
+        }));
+
     try {
-      // Normalize artifact data for the graph generator
-      const artifactForGraph = {
-        resolved_title: candidateData.title,
-        resolved_creator: candidateData.creator,
-        resolved_type: candidateData.type,
-        year: candidateData.year,
-        parent_project: candidateData.parent_project || null,
-        confidence: candidateData.confidence || 'high',
-        why: candidateData.why || ''
-      };
-      
-      const graphData = await generateGraph(artifactForGraph, signal);
-      
-      // Process nodes
-      const nodeIds = new Set(graphData.nodes.map(n => n.id));
-      const processedEdges = (graphData.edges || []).filter(e => {
-        const from = e.source || e.from;
-        const to = e.target || e.to;
-        return nodeIds.has(from) && nodeIds.has(to);
-      }).map(e => ({
-        from: e.source || e.from,
-        to: e.target || e.to,
-        relation: e.relation,
-        evidence: e.evidence,
-        sources: e.sources || []
-      }));
-      
-      const positioned = calculateLayout(graphData.nodes, artifactForGraph);
-      const colored = positioned.map(n => ({ 
-        ...n, 
-        fallbackColor: hashColor(n.id),
-        // Mark Ring 0 if confirmation is pending
-        _needsConfirmation: n.ring === 0 && needsConfirmation
-      }));
-      
-      // Build artifact object for display
-      const displayArtifact = graphData.artifact || {
+      // ── PHASE 1: Factual backbone (Rings 0-2) ────────────────────────────
+      const phase1 = await generatePhase1(artifactForGraph, signal);
+
+      const displayArtifact = phase1.artifact || {
         title: candidateData.title,
         creator: candidateData.creator,
         type: candidateData.type,
@@ -1282,25 +1338,67 @@ export default function CulturalGraphExplorer() {
         confidence: candidateData.confidence,
         what_is_this: candidateData.why
       };
-      
+
+      const phase1Ids = new Set(phase1.nodes.map(n => n.id));
+      const phase1Edges = processEdges(phase1.edges, phase1Ids);
+      const phase1Positioned = calculateLayout(phase1.nodes, artifactForGraph);
+      const phase1Colored = phase1Positioned.map(n => ({
+        ...n,
+        fallbackColor: hashColor(n.id),
+        _needsConfirmation: n.ring === 0 && needsConfirmation
+      }));
+
+      // Render Phase 1 immediately — user sees the graph
       setArtifact(displayArtifact);
-      setOverview(graphData.overview);
-      setEdges(processedEdges);
-      setNodes(colored);
+      setOverview(phase1.overview);
+      setNodes(phase1Colored);
+      setEdges(phase1Edges);
+      setAnnotations([]);
       setTransform({ x: 0, y: 0, scale: 0.55 });
-      
-      // Store annotations (Ring 4 interpretive readings)
-      if (graphData.annotations && Array.isArray(graphData.annotations)) {
-        setAnnotations(graphData.annotations);
-      } else {
-        setAnnotations([]);
-      }
-      
-      // All rings visible by default (0-3 only, Ring 4 is annotations not nodes)
       setVisibleRings({ 0: true, 1: true, 2: true, 3: true });
-      
+      setStatus('enriching'); // new status: graph visible, Phase 2 running
+
+      // ── PHASE 2: Interpretive layer (Ring 3 + annotations + thread) ──────
+      try {
+        const phase2 = await generatePhase2(artifactForGraph, phase1.nodes, signal);
+
+        // Merge convergence nodes into the graph
+        const convergenceNodes = (phase2.convergence_nodes || []).map(n => ({
+          ...n,
+          ring: 3,
+          claim_type: 'derived',
+          domain: 'convergence',
+          fallbackColor: hashColor(n.id),
+        }));
+
+        const allNodes = [...phase1.nodes, ...convergenceNodes];
+        const allNodeIds = new Set(allNodes.map(n => n.id));
+        const convergenceEdges = processEdges(phase2.convergence_edges, allNodeIds);
+
+        const allPositioned = calculateLayout(allNodes, artifactForGraph);
+        const allColored = allPositioned.map(n => ({
+          ...n,
+          fallbackColor: n.fallbackColor || hashColor(n.id),
+          _needsConfirmation: n.ring === 0 && needsConfirmation
+        }));
+
+        setNodes(allColored);
+        setEdges([...phase1Edges, ...convergenceEdges]);
+        setAnnotations(phase2.annotations || []);
+
+        // Store thread recommendations on the artifact object
+        if (phase2.thread) {
+          setArtifact(prev => ({ ...prev, thread: phase2.thread }));
+        }
+      } catch (phase2Err) {
+        // Phase 2 failure is non-fatal — Phase 1 graph stays visible
+        if (phase2Err.name !== 'AbortError') {
+          console.warn('Phase 2 failed (non-fatal):', phase2Err.message);
+        }
+      }
+
       setStatus('success');
-      
+
     } catch (err) {
       if (err.name === 'AbortError') return;
       setErrorMsg(err.message);
@@ -1472,14 +1570,14 @@ export default function CulturalGraphExplorer() {
               />
               <button
                 onClick={() => doSearch(query)}
-                disabled={status === 'resolving' || status === 'mapping'}
+                disabled={status === 'resolving' || status === 'mapping' || status === 'enriching'}
                 style={{
                   padding: '14px 20px',
                   border: 'none',
-                  background: (status === 'resolving' || status === 'mapping') ? COLORS.gray : COLORS.black,
+                  background: (status === 'resolving' || status === 'mapping' || status === 'enriching') ? COLORS.gray : COLORS.black,
                   color: COLORS.cream,
                   fontSize: '16px',
-                  cursor: (status === 'resolving' || status === 'mapping') ? 'wait' : 'pointer',
+                  cursor: (status === 'resolving' || status === 'mapping' || status === 'enriching') ? 'wait' : 'pointer',
                 }}
               >
                 →
@@ -2012,7 +2110,7 @@ export default function CulturalGraphExplorer() {
         )}
         
         {/* Loading State */}
-        {(status === 'resolving' || status === 'mapping') && (
+        {(status === 'resolving' || status === 'mapping' || status === 'enriching') && (
           <div style={{
             position: 'absolute',
             top: '50%', left: '50%',
@@ -2029,7 +2127,7 @@ export default function CulturalGraphExplorer() {
             }} />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <p style={{ margin: 0, fontSize: '14px', color: COLORS.gray }}>
-              {status === 'resolving' ? 'Identifying artifact...' : 'Mapping cultural lineage...'}
+              {status === 'resolving' ? 'Identifying artifact...' : status === 'mapping' ? 'Mapping cultural lineage...' : 'Deepening the map...'}
             </p>
           </div>
         )}
