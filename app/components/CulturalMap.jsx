@@ -375,93 +375,143 @@ Never invent — verify via web search or omit. But search hard before omitting.
 Output raw JSON only.`;
 
 // =============================================================================
-// PHASE 2: INTERPRETIVE LAYER PROMPT — Convergence, Annotations, Thread
+// PHASE 2: DISCOURSE-FIRST INTERPRETIVE LAYER
 // =============================================================================
-const MAP_PHASE2_SYSTEM_PROMPT = `You are a cultural synthesis engine for Carnelian.
+const MAP_PHASE2_SYSTEM_PROMPT = `You are a cultural discourse engine for Carnelian.
 
-PHASE 2 MISSION: Given the factual backbone from Phase 1, find where tracks 
-COLLIDE — building convergence nodes (Ring 3), interpretive annotations, 
-and follow-the-thread recommendations.
+PHASE 2 MISSION: Search the internet for what real humans have said about 
+this artifact — critics, fans, scholars, Reddit, Genius, TikTok, Twitter, 
+independent music blogs, fashion press, academic essays — then build 
+convergence nodes and annotations FROM that real discourse.
 
-This is where informational becomes interpretational.
-Convergence nodes are FACTS about recurrence — not interpretations of meaning.
-Interpretation lives ONLY in annotations.
+This is the soul of Carnelian: not AI generating interpretation, but AI 
+surfacing and synthesizing what humans who love culture have already said.
 
 ====================
-RING 3 — CONVERGENCE NODES
+STEP 1: SEARCH FOR REAL DISCOURSE (do this first, before building anything)
 ====================
 
-A convergence node represents a motif, symbol, or pattern that appears 
-in TWO OR MORE source tracks simultaneously.
+Use web search to find:
 
-CORRECT convergence: Sugar cube appears in TEXT track (lyric: "Solo soy un 
-terron de azucar") AND VISUAL track (dissolving scene in music video).
-Result: "Sugar cube dissolution motif" — a valid convergence node.
+GENIUS: Search "[artifact title] genius lyrics annotation" — Genius has 
+line-by-line fan and critic annotations that are often brilliant. Find 
+the most insightful ones and quote them (under 15 words).
 
-CORRECT convergence: Catholic imagery appears in FASHION (McQueen rosary 
-heels, SS03), VISUAL (Virgin Mary statue at 0:27), and TEXT ("divine 
-intervention" in Bjork's line).
-Result: "Catholic iconography cluster" — a valid convergence node.
+REDDIT: Search "[artifact title] reddit analysis" or "[artifact title] 
+reddit meaning" — Reddit threads often contain the most unfiltered, 
+specific observations. r/popheads, r/indieheads, r/movies, r/fashion, etc.
 
-WRONG: Warsaw filming location appears only in SPATIAL track.
-Not a convergence node — single track only.
+INDEPENDENT PRESS: Search "[artifact title] [publication]" for:
+- Pitchfork, The Wire, Crack Magazine, Resident Advisor (music)
+- Dazed, i-D, System Magazine, 032c (fashion/culture)  
+- Artforum, Frieze, e-flux (art)
+- The Guardian, NYT, Vulture (general culture)
 
-NAMING RULES:
-CORRECT: "Sugar cube dissolution motif" — describes WHAT recurs
-CORRECT: "Catholic iconography cluster" — describes WHAT appears together
-CORRECT: "Three-language tonal arc" — describes WHAT the structure does
-WRONG: "Feminine suffering" — interpretation not fact
-WRONG: "Spiritual threshold" — thesis language
-WRONG: "Embodied grief" — emotion not observable pattern
+TIKTOK/TWITTER/SOCIAL: Search "[artifact title] tiktok analysis" or 
+"[artifact title] twitter meaning" — social commentary often catches 
+things critics miss. Look for viral threads or breakdowns.
 
-Each convergence node:
-- ring: 3, claim_type: "derived", domain: "convergence"
-- derived_from: MUST list 2+ node IDs from different source tracks
+SPECIALIZED: Search for any YouTube essays, Substack newsletters, or 
+academic papers that analyze this specific work.
+
+For each piece of discourse found:
+- Note the source (platform + publication/handle)
+- Extract a short direct quote (under 15 words) if possible
+- Note which Phase 1 nodes it references or connects
+- Note what convergence or pattern it reveals
+
+====================
+STEP 2: BUILD CONVERGENCE NODES FROM DISCOURSE
+====================
+
+A convergence node is a motif, symbol, or pattern where:
+1. It appears in 2+ source tracks simultaneously (factual)
+2. Real human discourse has noticed and commented on it (sourced)
+
+The discourse is what VALIDATES the convergence.
+
+EXAMPLES:
+- Sugar cube motif: appears in TEXT (lyric) + VISUAL (video scene)
+  AND Genius annotations discuss it, Reddit threads analyze it
+  → Valid convergence node with real sourcing
+
+- Catholic iconography cluster: McQueen rosary heels (FASHION) + 
+  Virgin Mary statue (VISUAL) + "divine intervention" (TEXT)
+  AND Harper's Bazaar wrote about the Catholic symbolism
+  → Valid convergence node with press sourcing
+
+Each convergence node MUST have:
+- derived_from: 2+ Phase 1 node IDs from different tracks
+- discourse_source: where real humans discussed this pattern
 - description: what literally recurs, stated as observable fact
-- source_tracks: list the track names that contribute
 
-Target: 5-10 convergence nodes for RICH, 3-5 for MEDIUM, 2-3 for LEAN.
+Naming rules:
+CORRECT: "Sugar cube dissolution motif"
+CORRECT: "Catholic iconography cluster" 
+CORRECT: "Three-language structural arc"
+WRONG: "Feminine suffering" (interpretation, not pattern)
+WRONG: "Spiritual threshold" (thesis language)
 
-====================
-ANNOTATIONS — INTERPRETIVE READINGS
-====================
-
-Annotations are the ONLY place interpretation lives.
-This is where the "oh THAT'S why this moves me" moment happens.
-
-Sound like a brilliant friend who knows a lot — not an academic paper.
-Connect specific nodes. Be precise. Surprise the reader.
-
-CORRECT: "The sugar cube dissolving in heat mirrors the song's lyrical arc: 
-a self that disappears when the beloved arrives. Rosalia borrowed this 
-directly from Kieslowski's Blue, which is itself a kind of emotional 
-plagiarism that becomes its own statement."
-
-WRONG: "The sugar cube represents themes of impermanence and dissolution."
-
-Target: 5-10 annotations for RICH, 3-5 for MEDIUM, 2-3 for LEAN.
-Each annotation MUST reference specific node IDs.
+Target: 5-8 convergence nodes, each grounded in real discourse.
 
 ====================
-THREAD — FOLLOW THE THREAD
+STEP 3: WRITE DISCOURSE-GROUNDED ANNOTATIONS
 ====================
 
-3-5 specific named works that follow naturally from this artifact's nodes.
-Not genre recommendations — specific works with documented connections 
-to nodes that already exist in this graph.
+Annotations are interpretive readings grounded in what real humans said.
+Each annotation should:
+- Draw on a specific piece of discourse found in Step 1
+- Cite the source (Genius annotation, Reddit u/username, publication)
+- Connect specific Phase 1 node IDs
+- Sound like a brilliant friend synthesizing what the smartest fans said
 
-CORRECT: "Three Colors: Blue (1993, Kieslowski) — the sugar cube scene 
-Rosalia quoted directly in the music video, confirmed by visual analysis"
-CORRECT: "Vivaldi Bassoon Concerto in E Minor RV 484 — the arpeggiated 
-opening classical music expert Linton Stephens identified in Berghain"
-WRONG: "Other works by Rosalia"
-WRONG: "Contemporary classical-pop fusions"
+CORRECT format:
+"Genius annotators note that the German opener functions as a 'catechism' — 
+a ritual recitation of devotion. Combined with the McQueen rosary heels 
+(visible at 0:47), the song opens as a religious ceremony before collapsing 
+into techno repetition. The club and the church share the same architecture 
+of surrender."
+
+WRONG format:
+"The song explores themes of love and religion."
+
+Each annotation MUST:
+- Reference at least one specific piece of real discourse (with source)
+- Reference at least 2 specific Phase 1 node IDs
+- Be 2-4 sentences that teach the reader something specific
+
+Target: 6-10 annotations, all discourse-grounded.
+
+====================
+STEP 4: THREAD — FOLLOW THE THREAD
+====================
+
+3-5 specific named works to explore next.
+These must have documented connections to nodes already in this graph.
+Priority: works that the discourse itself recommends or references.
+
+CORRECT: "Three Colors: Blue (Kieślowski, 1993) — multiple Reddit threads 
+and Genius annotations identify the sugar cube scene as a direct visual quote"
+CORRECT: "Vivaldi Bassoon Concerto in E Minor RV 484 — Linton Stephens in 
+Crack Magazine specifically named this as the arpeggiated opening reference"
+WRONG: "Other works exploring love and identity"
 
 ====================
 OUTPUT FORMAT
 ====================
 
 {
+  "discourse_found": [
+    {
+      "source_type": "genius|reddit|press|twitter|tiktok|substack|academic",
+      "platform": "Genius / Reddit r/popheads / Crack Magazine / etc",
+      "handle_or_author": "username or author name or null",
+      "quote": "Direct quote under 15 words, or null",
+      "insight": "1-2 sentence paraphrase of their key observation",
+      "references_nodes": ["node_id_1", "node_id_2"],
+      "year": "2025 or null"
+    }
+  ],
   "convergence_nodes": [
     {
       "id": "unique_snake_case_id",
@@ -470,8 +520,9 @@ OUTPUT FORMAT
       "domain": "convergence",
       "ring": 3,
       "claim_type": "derived",
-      "description": "1-2 sentences: what literally recurs across tracks, stated as fact.",
-      "derived_from": ["ring1_or_ring2_node_id_1", "ring1_or_ring2_node_id_2"],
+      "description": "1-2 sentences: what literally recurs across tracks, as observable fact.",
+      "derived_from": ["phase1_node_id_1", "phase1_node_id_2"],
+      "discourse_source": "Where real humans discussed this — publication, Reddit thread, Genius annotation",
       "image_search": "2-4 specific search words",
       "source_tracks": ["text", "visual"]
     }
@@ -487,8 +538,9 @@ OUTPUT FORMAT
   "annotations": [
     {
       "id": "annotation_id",
-      "text": "Interpretive reading. Specific, personal, brilliant. Not academic.",
+      "text": "Interpretive reading grounded in real discourse. Cite the source. Connect specific nodes. Sound human, not academic.",
       "references": ["node_id_1", "node_id_2"],
+      "source": "Genius / Reddit u/handle / Crack Magazine / etc",
       "type": "symbolic|cultural|structural|emotional"
     }
   ],
@@ -498,7 +550,7 @@ OUTPUT FORMAT
       "creator": "Creator name",
       "type": "artifact type",
       "year": 1993,
-      "why": "One sentence: the specific documented connection to this graph"
+      "why": "One sentence: the specific documented connection, ideally sourced from discourse"
     }
   ]
 }
@@ -510,20 +562,29 @@ const MAP_PHASE2_USER_TEMPLATE = (artifact, phase1Nodes) => {
     .map(n => `- [${n.id}] "${n.label}" (domain:${n.domain || 'unknown'}, ring:${n.ring})`)
     .join('\n');
 
-  return `Generate Phase 2 (convergence and interpretation) for: "${artifact.resolved_title}" by ${artifact.resolved_creator}
+  return `Generate Phase 2 (discourse-first interpretation) for: "${artifact.resolved_title}" by ${artifact.resolved_creator}
 
 PHASE 1 NODES — use these IDs exactly in derived_from and references:
 ${nodeList}
 
-INSTRUCTIONS:
-1. Identify motifs that appear across 2+ tracks in the node list above
-2. Build convergence nodes for each cross-track collision
-3. Write annotations that connect dots — specific, personal, brilliant
-4. Recommend 3-5 specific follow works with documented connections to these nodes
+STEP 1 — SEARCH FOR REAL DISCOURSE FIRST:
+Search the web for what real humans have said about this artifact:
+- "${artifact.resolved_title} ${artifact.resolved_creator} genius lyrics annotation"
+- "${artifact.resolved_title} ${artifact.resolved_creator} reddit analysis meaning"
+- "${artifact.resolved_title} ${artifact.resolved_creator} review analysis"
+- "${artifact.resolved_title} ${artifact.resolved_creator} fashion meaning symbols"
+- "${artifact.resolved_title} ${artifact.resolved_creator} tiktok breakdown"
+- "${artifact.resolved_title} ${artifact.resolved_creator} substack essay"
 
-The richest convergence nodes will be where the most tracks collide.
-Look especially for: symbols in both TEXT and VISUAL tracks, fashion choices
-that echo TEXT or SOUND themes, SPATIAL choices that mirror NARRATIVE structure.
+Find at least 5-8 real pieces of discourse from different sources before building anything.
+
+STEP 2 — BUILD FROM WHAT YOU FOUND:
+Use the discourse to identify which motifs and patterns humans have actually 
+noticed. Build convergence nodes only for patterns that real humans have 
+commented on. Write annotations that synthesize and cite the discourse.
+
+The best annotations will feel like: "here is what the smartest people who 
+love this work have noticed, synthesized into one insight."
 
 Output raw JSON only.`;
 };
@@ -1080,6 +1141,7 @@ export default function CulturalGraphExplorer() {
   const [visibleRings, setVisibleRings] = useState({ 0: true, 1: true, 2: true, 3: true });
   const [pendingConfirmation, setPendingConfirmation] = useState(null); // For medium confidence artifacts
   const [annotations, setAnnotations] = useState([]); // Ring 4 interpretive readings (not nodes)
+  const [discourseItems, setDiscourseItems] = useState([]); // Real human discourse found in Phase 2
   
   const canvasRef = useRef(null);
   const lastPos = useRef({ x: 0, y: 0 });
@@ -1215,7 +1277,7 @@ export default function CulturalGraphExplorer() {
   // PHASE 1: GENERATE FACTUAL BACKBONE (Rings 0-2)
   // =============================================================================
   const generatePhase1 = async (artifactData, signal) => {
-    const text = await callAPI(MAP_PHASE1_SYSTEM_PROMPT, MAP_PHASE1_USER_TEMPLATE(artifactData), signal, true, 32000);
+    const text = await callAPI(MAP_PHASE1_SYSTEM_PROMPT, MAP_PHASE1_USER_TEMPLATE(artifactData), signal, false, 32000);
     if (!text.trim()) throw new Error('Empty Phase 1 response');
     let cleanJson = extractJSON(text);
     let parsed = safeJSONParse(cleanJson);
@@ -1389,6 +1451,7 @@ export default function CulturalGraphExplorer() {
         setNodes(allColored);
         setEdges([...phase1Edges, ...convergenceEdges]);
         setAnnotations(phase2.annotations || []);
+        setDiscourseItems(phase2.discourse_found || []);
 
         // Store thread recommendations on the artifact object
         if (phase2.thread) {
@@ -1872,30 +1935,94 @@ export default function CulturalGraphExplorer() {
             </div>
           )}
           
+          {/* Discourse Feed — real human commentary */}
+          {discourseItems.length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <p style={{ fontSize: '9px', color: COLORS.gray, textTransform: 'uppercase', marginBottom: '10px', letterSpacing: '0.05em' }}>
+                What People Are Saying
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {discourseItems.map((item, i) => {
+                  const sourceColors = {
+                    genius: { bg: '#FFFF64', text: '#1A1A1A' },
+                    reddit: { bg: '#FF4500', text: '#fff' },
+                    press: { bg: '#1A1A1A', text: '#FAF9F6' },
+                    twitter: { bg: '#000', text: '#fff' },
+                    tiktok: { bg: '#010101', text: '#fff' },
+                    substack: { bg: '#FF6719', text: '#fff' },
+                    academic: { bg: '#5C5346', text: '#FAF9F6' },
+                  };
+                  const sc = sourceColors[item.source_type] || sourceColors.press;
+                  return (
+                    <div key={i} style={{
+                      background: COLORS.cream,
+                      borderRadius: '8px',
+                      padding: '10px 12px',
+                      border: `1px solid ${COLORS.gray}20`,
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                        <span style={{
+                          padding: '2px 7px', borderRadius: '3px',
+                          fontSize: '9px', fontWeight: '700',
+                          background: sc.bg, color: sc.text,
+                          letterSpacing: '0.03em',
+                        }}>
+                          {item.source_type?.toUpperCase() || 'SOURCE'}
+                        </span>
+                        <span style={{ fontSize: '10px', color: COLORS.gray }}>
+                          {item.platform}{item.handle_or_author ? ` · ${item.handle_or_author}` : ''}
+                        </span>
+                      </div>
+                      {item.quote && (
+                        <p style={{ margin: '0 0 4px', fontSize: '12px', color: COLORS.black, fontStyle: 'italic', lineHeight: 1.5, fontFamily: 'Georgia, serif' }}>
+                          "{item.quote}"
+                        </p>
+                      )}
+                      {item.insight && (
+                        <p style={{ margin: 0, fontSize: '11px', color: COLORS.accent, lineHeight: 1.5 }}>
+                          {item.insight}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Interpretive Readings (Annotations - not nodes) */}
           {annotations.length > 0 && (
             <div style={{ marginBottom: '20px' }}>
               <p style={{ fontSize: '9px', color: COLORS.gray, textTransform: 'uppercase', marginBottom: '10px', letterSpacing: '0.05em' }}>
                 Interpretive Readings
               </p>
-              <div style={{
-                background: '#F5F3FF',
-                borderRadius: '8px',
-                padding: '12px',
-                borderLeft: '3px solid #8B5CF6',
-              }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {annotations.map((ann, i) => (
                   <div key={ann.id || i} style={{
-                    fontSize: '11px',
-                    color: COLORS.accent,
-                    marginBottom: i < annotations.length - 1 ? '10px' : 0,
-                    lineHeight: 1.5,
+                    background: '#F5F3FF',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    borderLeft: '3px solid #8B5CF6',
                   }}>
-                    <span style={{ fontStyle: 'italic' }}>{ann.text}</span>
+                    {ann.source && (
+                      <div style={{
+                        fontSize: '9px',
+                        fontWeight: '600',
+                        color: '#6D28D9',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        marginBottom: '6px',
+                      }}>
+                        via {ann.source}
+                      </div>
+                    )}
+                    <p style={{ margin: 0, fontSize: '11px', color: COLORS.accent, lineHeight: 1.6, fontStyle: 'italic' }}>
+                      {ann.text}
+                    </p>
                     {ann.references && ann.references.length > 0 && (
-                      <span style={{ color: COLORS.gray, fontSize: '10px', marginLeft: '4px' }}>
-                        (via {ann.references.slice(0, 2).join(', ')}{ann.references.length > 2 ? '...' : ''})
-                      </span>
+                      <p style={{ margin: '6px 0 0', fontSize: '10px', color: COLORS.gray }}>
+                        ↗ {ann.references.slice(0, 3).join(', ')}{ann.references.length > 3 ? '...' : ''}
+                      </p>
                     )}
                   </div>
                 ))}
