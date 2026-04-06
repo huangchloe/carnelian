@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cr: #B94932;
+  --cr-light: #f5ece8;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', 'Helvetica Neue', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-family: var(--font-body);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: #f7f5f1;
+  color: #1a1816;
+  min-height: 100vh;
+}
+
+/* --- Brand --- */
+.cr-red { color: var(--cr); }
+.cr-bg { background-color: var(--cr); }
+.font-display { font-family: var(--font-display); }
+
+/* --- Search input --- */
+.search-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #ccc9c2;
+  padding: 14px 0;
+  font-size: 1.2rem;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body);
+  color: inherit;
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-bottom-color: var(--cr); }
+.search-input::placeholder { color: #b8b4ac; }
+
+/* --- Depth pill tabs --- */
+.depth-pill {
+  display: inline-block;
+  padding: 5px 14px;
+  border: 1px solid #d0cdc8;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  transition: all 0.12s;
+  color: #6b6860;
+  text-transform: uppercase;
+  user-select: none;
+  background: transparent;
+  font-family: var(--font-body);
+}
+.depth-pill.active, .depth-pill:hover {
+  background: var(--cr);
+  color: white;
+  border-color: var(--cr);
+}
+
+/* --- Knowledge pills --- */
+.k-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid #d0cdc8;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #6b6860;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+  background: white;
+  white-space: nowrap;
+}
+.k-pill:hover { border-color: var(--cr); color: var(--cr); }
+
+/* --- Source rows --- */
+.source-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #ebe7e0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.source-row:last-child { border-bottom: none; }
+
+/* --- Lineage items --- */
+.lineage-item {
+  position: relative;
+  margin-bottom: 18px;
+  padding-left: 16px;
+}
+.lineage-item:last-child { margin-bottom: 0; }
+.lineage-dot {
+  position: absolute;
+  left: -21px;
+  top: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cr);
+}
+
+/* --- Thread cards --- */
+.thread-card {
+  padding: 14px 16px;
+  background: #f0ede8;
+  border-radius: 10px;
+  border-left: 3px solid #ccc;
+  margin-bottom: 10px;
+}
+.thread-card:last-child { margin-bottom: 0; }
+
+/* --- Look cards --- */
+.look-card {
+  padding: 14px 16px;
+  background: #f0ede8;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.look-card:last-child { margin-bottom: 0; }
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d0cdc8; border-radius: 2px; }
+
+@media (prefers-color-scheme: dark) {
+  body { background: #111008; color: #e4e0d6; }
+  .search-input { border-bottom-color: #3a3732; }
+  .depth-pill { border-color: #3a3732; color: #908d88; }
+  .k-pill { border-color: #3a3732; color: #908d88; background: transparent; }
+  .source-row { border-bottom-color: #2a2724; }
+  .thread-card, .look-card { background: #1c1a18; }
+}

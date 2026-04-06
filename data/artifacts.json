@@ -1,0 +1,228 @@
+[
+  {
+    "id": "ballet-flat",
+    "slug": "ballet-flat",
+    "title": "The Ballet Flat",
+    "aliases": [
+      "ballet flats", "ballerina flat", "ballerina shoe", "ballet shoes",
+      "repetto shoe", "flat shoe", "ballet pump", "cendrillon"
+    ],
+    "type": "Object",
+    "medium": "Footwear",
+    "origin": "France",
+    "year": 1947,
+    "era": "Post-WWII",
+    "tabLabels": ["Know", "See", "Trace", "Read"],
+    "hook": "Born in the rehearsal room. Claimed by fashion. A shoe that carries an entire century of how women wanted to move through the world.",
+    "carnelianReads": "Softness as a recurring site of reinvention — the shoe that refuses to demand attention, and in doing so, demands everything.",
+    "know": {
+      "paragraphs": [
+        "The ballet flat predates fashion itself — soft leather slippers worn by court dancers in 17th-century France. The modern silhouette was crystallized by Rose Repetto in 1947, who created a flexible sole using the \"stitch and return\" technique for her son Roland, a choreographer at the Paris Opéra Ballet.",
+        "What makes this culturally interesting isn't just the garment — it's the mechanism: utility invented for one context migrating into fashion through proximity to aspiration (Hepburn), then effortlessness (Bardot), then democratization. The flat is a case study in how culture travels through bodies."
+      ],
+      "relatedNodes": ["Rose Repetto", "Roland Petit", "Soft power", "Democratization of dress"]
+    },
+    "see": {
+      "type": "motifs",
+      "label": "Visual motifs",
+      "items": [
+        { "name": "Round toe", "color": "#edddd0", "textColor": "#8a5030" },
+        { "name": "Pointed toe", "color": "#e0d0c0", "textColor": "#7a4a28" },
+        { "name": "Cap toe", "color": "#d8c8b5", "textColor": "#6a4020" },
+        { "name": "Grosgrain bow", "color": "#ccc0aa", "textColor": "#604018" },
+        { "name": "Ankle strap", "color": "#c8b8a0", "textColor": "#584010" },
+        { "name": "T-strap", "color": "#d5c5b0", "textColor": "#604018" },
+        { "name": "Metallic", "color": "#c8c0b0", "textColor": "#504018" },
+        { "name": "Satin", "color": "#e0d0bc", "textColor": "#6a4020" }
+      ]
+    },
+    "trace": {
+      "type": "lineage",
+      "label": "Cultural lineage",
+      "items": [
+        { "year": "1700s", "title": "French court ballet", "description": "Soft leather slippers for royal dance performances" },
+        { "year": "1947", "title": "Rose Repetto", "description": "Flexible sole invented for choreographer son Roland Petit using the stitch-and-return technique" },
+        { "year": "1954–56", "title": "Hepburn + Bardot", "description": "From rehearsal room to film set (Sabrina) to Saint-Tropez street — the Cendrillon model is born" },
+        { "year": "1990s", "title": "Democratization", "description": "Every price point, every material, every retailer" },
+        { "year": "2022", "title": "Ballet core revival", "description": "\"Old money\" and \"ballet core\" aesthetics on TikTok drive the flat back into cultural conversation" }
+      ]
+    },
+    "read": {
+      "sources": [
+        { "outlet": "Vogue", "year": "2023", "title": "The ballet flat's rise from rehearsal room to runway", "url": "https://vogue.com", "abbr": "vogu" },
+        { "outlet": "Repetto Heritage Archive", "year": null, "title": "Official atelier history since 1947", "url": "https://repetto.com", "abbr": "repe" },
+        { "outlet": "MoMu Antwerp", "year": "2019", "title": "Footwear and the Female Form, exhibition catalog", "url": "https://momu.be", "abbr": "momu" }
+      ]
+    },
+    "constellation": [
+      { "label": "Repetto", "x": 80, "y": 12, "color": "#378ADD", "fullLabel": "Rose Repetto" },
+      { "label": "Hepburn", "x": 148, "y": 48, "color": "#378ADD", "fullLabel": "Audrey Hepburn" },
+      { "label": "New Wave", "x": 142, "y": 96, "color": "#BA7517", "fullLabel": "French New Wave" },
+      { "label": "Ballet", "x": 14, "y": 96, "color": "#1D9E75", "fullLabel": "Ballet tradition" },
+      { "label": "Soft power", "x": 10, "y": 48, "color": "#7F77DD", "fullLabel": "Soft power aesthetics" }
+    ],
+    "tags": ["fashion", "footwear", "france", "1940s", "dance", "ballet", "luxury", "repetto"],
+    "searchTerms": [
+      "ballet flat", "ballerina flat", "repetto", "ballet shoe fashion",
+      "ballet flat history", "cendrillon repetto", "ballet core",
+      "flat shoes history", "ballet pump", "audrey hepburn shoes"
+    ],
+    "redditQueries": ["ballet flat"],
+    "redditRequiredTerms": ["ballet flat", "ballerina flat", "repetto", "ballet pump", "ballet shoe"],
+    "newsQueries": ["ballet flat fashion 2025"]
+  },
+  {
+    "id": "christinas-world",
+    "slug": "christinas-world",
+    "title": "Christina's World",
+    "aliases": [
+      "christinas world painting", "andrew wyeth painting", "wyeth painting",
+      "the woman in the field", "moma wyeth", "wyeth moma"
+    ],
+    "type": "Painting",
+    "medium": "Egg tempera on panel",
+    "origin": "USA",
+    "year": 1948,
+    "era": "American Realism",
+    "tabLabels": ["Know", "Look", "Lineage", "Read"],
+    "hook": "A woman reaches toward a farmhouse across a vast field. The painting everyone knows, and almost no one understands.",
+    "carnelianReads": "American myth-making in reverse — the heroic landscape turned instrument of isolation, the body not conquering but reaching.",
+    "know": {
+      "paragraphs": [
+        "Andrew Wyeth painted Christina Olson from his summer home in Cushing, Maine. Christina had a degenerative neuromuscular disease — likely Charcot-Marie-Tooth — that had paralyzed her lower body. She refused a wheelchair, dragging herself across the land she refused to leave.",
+        "What the painting refuses to do is sentimentalize. Wyeth saw her from an upstairs window mid-reach and rendered what he saw: the effort, the stubbornness, the vast indifference of land that doesn't care either way. The \"world\" in the title is the operative word — this is hers, defined entirely by what she can reach."
+      ],
+      "relatedNodes": ["Christina Olson", "Maine landscape", "Egg tempera", "American Realism"]
+    },
+    "see": {
+      "type": "analysis",
+      "label": "How to look at it",
+      "items": [
+        {
+          "title": "The figure from behind",
+          "body": "We never see her face. The viewer is denied the shortcut of expression — instead we read the body: the strain in the shoulders, the splayed angle of her hips, one arm reaching. It forces identification without sympathy."
+        },
+        {
+          "title": "The color field",
+          "body": "Wyeth worked in egg tempera, producing a matte, almost dusty surface. The palette is narrow: warm ochre, dried grass, pale sky. No green, no freshness. The season is ending. The technique is inseparable from the meaning."
+        },
+        {
+          "title": "The house as horizon",
+          "body": "The farmhouse sits at upper right, small and receding — simultaneously destination and prison. The space between figure and house is what the painting is about. Not the reaching, but the distance."
+        }
+      ]
+    },
+    "trace": {
+      "type": "lineage",
+      "label": "Art historical lineage",
+      "items": [
+        { "year": "Late 19th c.", "title": "Winslow Homer", "description": "American landscape + isolated figures; stark Maine coastlines; unsentimental dignity in plain subjects" },
+        { "year": "1920s–30s", "title": "American Regionalism", "description": "Grant Wood, Benton — vernacular American landscapes as worthy subject; the rural as cultural" },
+        { "year": "1942", "title": "Hopper's Nighthawks", "description": "Loneliness as American aesthetic; the gap between people and the spaces they inhabit" },
+        { "year": "Post-1948", "title": "Wyeth's contested place", "description": "Abstract expressionists dismissed him as illustrator. The public ignored the debate. The painting sold 300,000 prints in its first year." }
+      ]
+    },
+    "read": {
+      "sources": [
+        { "outlet": "MoMA", "year": null, "title": "Christina's World, 1948 — acquisition notes and critical record", "url": "https://moma.org", "abbr": "moma" },
+        { "outlet": "The New Yorker", "year": "2022", "title": "What Christina Olson actually wanted us to understand", "url": "https://newyorker.com", "abbr": "nyer" },
+        { "outlet": "Smithsonian Magazine", "year": null, "title": "The true story of the woman who inspired the painting", "url": "https://smithsonianmag.com", "abbr": "smit" }
+      ]
+    },
+    "constellation": [
+      { "label": "Wyeth", "x": 80, "y": 12, "color": "#378ADD", "fullLabel": "Andrew Wyeth" },
+      { "label": "C. Olson", "x": 148, "y": 48, "color": "#378ADD", "fullLabel": "Christina Olson" },
+      { "label": "Am. Realism", "x": 142, "y": 96, "color": "#BA7517", "fullLabel": "American Realism" },
+      { "label": "E. Hopper", "x": 14, "y": 96, "color": "#1D9E75", "fullLabel": "Edward Hopper" },
+      { "label": "Maine", "x": 10, "y": 48, "color": "#1D9E75", "fullLabel": "Maine landscape tradition" }
+    ],
+    "tags": ["painting", "american art", "realism", "1940s", "moma", "wyeth", "disability"],
+    "searchTerms": [
+      "christinas world", "christina's world", "wyeth", "andrew wyeth painting",
+      "woman in field painting", "moma painting", "egg tempera", "american realism",
+      "christina olson", "wyeth moma"
+    ],
+    "redditQueries": ["Christina's World Wyeth"],
+    "redditRequiredTerms": ["christina", "wyeth", "painting", "moma", "olson"],
+    "newsQueries": ["Andrew Wyeth Christina's World painting"]
+  },
+  {
+    "id": "rosalia-berghain",
+    "slug": "rosalia-berghain",
+    "title": "Berghain",
+    "aliases": [
+      "rosalia berghain", "rosalía berghain", "berghain song", "berghain rosalia",
+      "lux rosalia", "rosalía lux single", "rosalia bjork", "rosalía björk"
+    ],
+    "type": "Song",
+    "medium": "Orchestral pop / Avant-garde",
+    "origin": "Spain · UK · USA",
+    "year": 2025,
+    "era": "Contemporary",
+    "tabLabels": ["Event", "References", "Threads", "Listen"],
+    "hook": "Rosalía, Björk, and Yves Tumor walk into a Berlin nightclub. What comes out the other side is something none of them could have made alone.",
+    "carnelianReads": "A song named for a space of dissolution that ends up being about the opposite — the accumulation of faith, language, and the body under spiritual pressure.",
+    "know": {
+      "paragraphs": [
+        "Released October 27, 2025 as the lead single from Rosalía's fourth studio album Lux, \"Berghain\" features Björk and Yves Tumor, and was recorded with the London Symphony Orchestra conducted by Daníel Bjarnason. The song cycles through German, Spanish, and English — each section sung by a different voice, each language carrying a different register of the same spiritual reckoning.",
+        "Rosalía later clarified that the title was inspired by the literal German meaning — \"mountain grove\" — rather than the Berlin nightclub directly, though the song leans into the club's mythology of chaos, darkness, and transformation. Opening with verses from Hildegard of Bingen, it moves from Rosalía's introspective soprano through Björk's desperate appeal for divine intervention to Yves Tumor's confrontational close. Three artists, three languages, one unbearable question."
+      ],
+      "relatedNodes": ["Lux (album)", "Björk", "Yves Tumor", "London Symphony Orchestra", "Hildegard of Bingen"]
+    },
+    "see": {
+      "type": "references",
+      "label": "Interdisciplinary references",
+      "items": [
+        { "category": "Music", "variant": "info", "body": "London Symphony Orchestra, conducted by Daníel Bjarnason. Pitchfork described it as Rosalía's most rigorous use of her classical training — comparing passages to Vivaldi's Winter and Wagner's Ring Cycle trading bars with pop melody." },
+        { "category": "Historical", "variant": "neutral", "body": "Hildegard of Bingen (1098–1179) — medieval German abbess, composer, and mystic. The song opens with her words. Rosalía has described Lux as an album about female saints; Hildegard is its spiritual anchor." },
+        { "category": "Linguistic", "variant": "danger", "body": "German / Spanish / English, one per artist. The German opening — \"Seine Angst ist meine Angst / Seine Wut ist meine Wut\" (His fear is my fear / His anger is my anger) — is direct Hildegard. Each language shift is a tonal key change, not a translation." },
+        { "category": "Place", "variant": "neutral", "body": "Berghain, Berlin — former East German power plant turned techno venue. Mythologized for its door policy, no-phone rule, and atmosphere of radical anonymity. The song uses the club as a metaphor for the threshold between self and dissolution." },
+        { "category": "Visual art", "variant": "warning", "body": "Music video directed by Nicolás Méndez (Canada production company, Barcelona), filmed in Warsaw. Rosalía performs in an apartment, a hospital, a bus, a pawn shop — everyday spaces charged with sacred symbolism. The visual grammar is Flemish painting meets contemporary Catholic art." }
+      ]
+    },
+    "trace": {
+      "type": "threads",
+      "label": "Cultural threads",
+      "items": [
+        {
+          "title": "Flamenco → orchestral pop",
+          "color": "#BA7517",
+          "body": "El Mal Querer (2018) → MOTOMAMI (2022) → Lux (2025). Each album a complete genre reinvention. Berghain represents the most radical departure: Rosalía's classical training — Conservatori Superior de Música del Liceu — finally fully surfaced."
+        },
+        {
+          "title": "Björk as lineage, not feature",
+          "color": "#378ADD",
+          "body": "Rosalía cited Björk in her 2025 Elle interview: \"If Björk and Kate Bush exist, it means there's another way to make pop.\" Their collaboration on Berghain is less a feature than a passing of something — a logic of artistic refusal that Rosalía is now the inheritor of."
+        },
+        {
+          "title": "Sacred music underground",
+          "color": "#7F77DD",
+          "body": "Hildegard of Bingen → Montserrat choir → London Symphony Orchestra → Berghain's subwoofers. The song collapses the distance between medieval sacred music and contemporary club culture. Both are, at their root, music for altered states."
+        }
+      ]
+    },
+    "read": {
+      "sources": [
+        { "outlet": "Pitchfork", "year": "2025", "title": "Berghain — Single Review", "url": "https://pitchfork.com", "abbr": "pitc" },
+        { "outlet": "Consequence", "year": "2025", "title": "Rosalía unveils new song Berghain with Björk, Yves Tumor", "url": "https://consequence.net/2025/10/rosalia-new-song-berghain/", "abbr": "cons" },
+        { "outlet": "Wikipedia", "year": "2025", "title": "Berghain (song) — full critical record", "url": "https://en.wikipedia.org/wiki/Berghain_(song)", "abbr": "wiki" }
+      ]
+    },
+    "constellation": [
+      { "label": "Björk", "x": 80, "y": 12, "color": "#378ADD", "fullLabel": "Björk" },
+      { "label": "Yves Tumor", "x": 148, "y": 48, "color": "#1D9E75", "fullLabel": "Yves Tumor" },
+      { "label": "Hildegard", "x": 142, "y": 96, "color": "#7F77DD", "fullLabel": "Hildegard of Bingen" },
+      { "label": "LSO", "x": 14, "y": 96, "color": "#BA7517", "fullLabel": "London Symphony Orchestra" },
+      { "label": "Berghain", "x": 10, "y": 48, "color": "#993C1D", "fullLabel": "Berghain nightclub" }
+    ],
+    "tags": ["music", "song", "rosalia", "bjork", "yves tumor", "2025", "orchestral", "spanish", "lux", "avant-garde"],
+    "searchTerms": [
+      "rosalia berghain", "rosalía berghain", "berghain song rosalia", "lux rosalia",
+      "rosalía lux", "berghain bjork", "berghain yves tumor", "rosalia bjork song",
+      "rosalía new song 2025", "lux single berghain"
+    ],
+    "redditQueries": ["Rosalía Berghain song"],
+    "redditRequiredTerms": ["rosalía", "rosalia", "berghain", "lux", "björk", "bjork", "yves tumor"],
+    "newsQueries": ["Rosalía Berghain Björk Lux 2025"]
+  }
+]
