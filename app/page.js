@@ -71,20 +71,7 @@ export default function Home() {
 
   useEffect(() => { inputRef.current?.focus(); }, []);
 
-  const search = async (q) => {
-    if (!q.trim() || q.trim().length < 2) { setStatus('idle'); setResults(null); return; }
-    setStatus('searching');
-
-    const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`).then(r => r.json());
-    const match = res.exact || res.primarySuggestion || res.didYouMean;
-
-    if (match) {
-      setResults({ type: 'catalog', artifact: match });
-      setStatus('done');
-      return;
-    }
-
-    // No catalog match — generate
+  const generate = async (q) => {
     setStatus('generating');
     try {
       const gen = await fetch(`/api/generate?q=${encodeURIComponent(q)}`).then(r => r.json());
@@ -97,6 +84,30 @@ export default function Home() {
     } catch {
       setStatus('error');
     }
+  };
+
+  const search = async (q) => {
+    if (!q.trim() || q.trim().length < 2) { setStatus('idle'); setResults(null); return; }
+    setStatus('searching');
+
+    const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`).then(r => r.json());
+
+    // Confident catalog match — show immediately
+    if (res.exact || res.primarySuggestion) {
+      setResults({ type: 'catalog', artifact: res.exact || res.primarySuggestion });
+      setStatus('done');
+      return;
+    }
+
+    // Fuzzy match — prompt user before committing
+    if (res.didYouMean) {
+      setResults({ type: 'didYouMean', artifact: res.didYouMean });
+      setStatus('done');
+      return;
+    }
+
+    // No catalog match — generate
+    await generate(q);
   };
 
   const handleChange = (e) => {
@@ -178,13 +189,13 @@ export default function Home() {
       {/* Results block — inline below search */}
       {showResults && (
         <div style={{ width: '100%', maxWidth: 640, marginTop: 24 }}>
-          {(status === 'searching') && (
+          {status === 'searching' && (
             <div style={{ textAlign: 'center', padding: '40px 0', color: '#a0a8a0', fontSize: 14 }}>
               Searching...
             </div>
           )}
 
-          {(status === 'generating') && (
+          {status === 'generating' && (
             <div style={{ textAlign: 'center', padding: '48px 0' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#B94932', marginBottom: 8 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B94932', display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite' }} />
@@ -201,7 +212,27 @@ export default function Home() {
             </div>
           )}
 
-          {status === 'done' && results?.artifact && (
+          {status === 'done' && results?.type === 'didYouMean' && (
+            <div style={{ padding: '28px 0', textAlign: 'center' }}>
+              <p style={{ fontSize: 13, color: '#a0a8a0', marginBottom: 14 }}>
+                Nothing exact for <em style={{ color: '#6b6860' }}>&ldquo;{query}&rdquo;</em> in the catalog.
+              </p>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
+                <button
+                  onClick={() => setResults({ type: 'catalog', artifact: results.artifact })}
+                  style={{ padding: '9px 18px', background: '#1a1816', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                  Show &ldquo;{results.artifact.title}&rdquo; instead
+                </button>
+                <button
+                  onClick={() => generate(query)}
+                  style={{ padding: '9px 18px', background: 'none', color: '#B94932', border: '1px solid #e0dcd6', borderRadius: 8, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                  Generate new entry for &ldquo;{query}&rdquo; →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {status === 'done' && results?.type !== 'didYouMean' && results?.artifact && (
             <ResultCard artifact={results.artifact} generated={results.type === 'generated'} />
           )}
         </div>
