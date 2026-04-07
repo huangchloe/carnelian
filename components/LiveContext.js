@@ -5,42 +5,62 @@ import { useEffect, useState } from 'react';
 function RedditPost({ post }) {
   return (
     <a href={post.url} target="_blank" rel="noopener noreferrer"
-      style={{ display: 'block', padding: '10px 0', borderBottom: '1px solid #f0ede8', textDecoration: 'none' }}
-      onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
+      style={{ display: 'flex', gap: 20, padding: '24px 0', borderBottom: `1px solid #E7E3DC`, textDecoration: 'none', transition: 'opacity 0.15s' }}
+      onMouseEnter={e => e.currentTarget.style.opacity = '0.6'}
       onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-        <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 4, background: '#f0ede8', color: '#a0a8a0', flexShrink: 0, marginTop: 2 }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 9, padding: '2px 8px', borderRadius: 2, background: '#EDE9E2', color: '#8A8680', display: 'inline-block', marginBottom: 10, fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           r/{post.subreddit}
-        </span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, color: '#3a3632', lineHeight: 1.5 }}>{post.title}</div>
-          {post.preview && (
-            <p style={{ fontSize: 11, color: '#a0a8a0', marginTop: 3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{post.preview}</p>
-          )}
-          <div style={{ fontSize: 11, color: '#c0bdb8', marginTop: 4 }}>
-            ↑ {post.score?.toLocaleString()} · {post.comments} comments
-          </div>
         </div>
-        <span style={{ fontSize: 11, color: '#d0cdc8', flexShrink: 0 }}>↗</span>
+        <div style={{ fontSize: 16, color: '#111111', lineHeight: 1.6, fontFamily: 'var(--font-body)', fontWeight: 400, marginBottom: 8 }}>{post.title}</div>
+        {post.preview && (
+          <p style={{ fontSize: 13, color: '#6F6A63', marginBottom: 10, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontFamily: 'var(--font-body)', fontWeight: 300 }}>{post.preview}</p>
+        )}
+        <div style={{ fontSize: 11, color: '#C0BDB8', fontFamily: 'var(--font-body)', letterSpacing: '0.04em' }}>
+          ↑ {post.score?.toLocaleString()} · {post.comments} comments
+        </div>
       </div>
+      <span style={{ fontSize: 14, color: '#B31B1B', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }}>↗</span>
     </a>
   );
 }
 
 function NewsItem({ item }) {
+  const [imgError, setImgError] = useState(false);
   const date = item.publishedAt
     ? new Date(item.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : null;
+
+  // Try to extract og image from the article URL via a meta fetch
+  // Use the serpapi thumbnail if available, else fallback to no image
+  const thumb = item.thumbnail || item.urlToImage || null;
+
   return (
     <a href={item.url} target="_blank" rel="noopener noreferrer"
-      style={{ display: 'block', padding: '10px 0', borderBottom: '1px solid #f0ede8', textDecoration: 'none' }}
-      onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
+      style={{ display: 'flex', gap: 20, padding: '28px 0', borderBottom: `1px solid #E7E3DC`, textDecoration: 'none', transition: 'opacity 0.15s' }}
+      onMouseEnter={e => e.currentTarget.style.opacity = '0.6'}
       onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ fontSize: 13, color: '#3a3632', lineHeight: 1.5, flex: 1 }}>{item.title}</div>
-        <span style={{ fontSize: 11, color: '#d0cdc8', flexShrink: 0 }}>↗</span>
+
+      {/* Article thumbnail */}
+      {thumb && !imgError ? (
+        <div style={{ width: 80, height: 80, borderRadius: 3, overflow: 'hidden', flexShrink: 0, background: '#E7E3DC' }}>
+          <img src={thumb} alt="" onError={() => setImgError(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        </div>
+      ) : (
+        <div style={{ width: 80, height: 80, borderRadius: 3, background: '#EDE9E2', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 20, opacity: 0.2 }}>◎</span>
+        </div>
+      )}
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {item.source && (
+          <div style={{ fontSize: 9, color: '#B31B1B', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 8, fontWeight: 500 }}>{item.source}</div>
+        )}
+        <div style={{ fontSize: 16, color: '#111111', lineHeight: 1.55, fontFamily: 'var(--font-body)', fontWeight: 400, marginBottom: 8 }}>{item.title}</div>
+        {date && <div style={{ fontSize: 11, color: '#C0BDB8', fontFamily: 'var(--font-body)', letterSpacing: '0.04em' }}>{date}</div>}
       </div>
-      {date && <div style={{ fontSize: 11, color: '#c0bdb8', marginTop: 3 }}>{date}</div>}
+      <span style={{ fontSize: 14, color: '#B31B1B', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }}>↗</span>
     </a>
   );
 }
@@ -50,11 +70,9 @@ export default function LiveContext({ slug, artifact }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // For generated artifacts, use the title as the search query
     const param = artifact && !slug.match(/^[a-z-]+$/)
       ? `q=${encodeURIComponent(artifact.title)}`
       : `slug=${slug}`;
-
     fetch(`/api/context?${param}`)
       .then(r => r.json())
       .then(setContext)
@@ -68,15 +86,13 @@ export default function LiveContext({ slug, artifact }) {
   if (loading) {
     return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B94932', display: 'inline-block', animation: 'pulse 1.2s infinite' }} />
-          <span style={{ fontSize: 11, color: '#a0a8a0', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Loading live context...</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#B31B1B', display: 'inline-block', animation: 'pulse 1.2s infinite' }} />
+          <span style={{ fontSize: 10, color: '#B8B4AE', textTransform: 'uppercase', letterSpacing: '0.14em', fontFamily: 'var(--font-body)' }}>Loading live context...</span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {[1, 2, 3].map(i => (
-            <div key={i} style={{ height: 44, borderRadius: 8, background: '#f5f3f0', opacity: 1.1 - i * 0.2 }} />
-          ))}
-        </div>
+        {[1, 2, 3].map(i => (
+          <div key={i} style={{ height: 80, borderRadius: 3, background: '#EDE9E2', marginBottom: 3, opacity: 1.1 - i * 0.2 }} />
+        ))}
       </div>
     );
   }
@@ -89,24 +105,24 @@ export default function LiveContext({ slug, artifact }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B94932', display: 'inline-block' }} />
-          <span style={{ fontSize: 11, fontWeight: 500, color: '#1a1816', textTransform: 'uppercase', letterSpacing: '0.1em' }}>What people are saying</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 48 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#B31B1B', display: 'inline-block' }} />
+          <span style={{ fontSize: 10, fontWeight: 600, color: '#111111', textTransform: 'uppercase', letterSpacing: '0.16em', fontFamily: 'var(--font-body)' }}>What people are saying</span>
         </div>
-        {fetchedTime && <span style={{ fontSize: 11, color: '#c8c4bc' }}>Updated {fetchedTime}</span>}
+        {fetchedTime && <span style={{ fontSize: 11, color: '#C8C4BC', fontFamily: 'var(--font-body)' }}>Updated {fetchedTime}</span>}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: hasReddit && hasNews ? '1fr 1fr' : '1fr', gap: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: hasReddit && hasNews ? '1fr 1fr' : '1fr', gap: 80 }}>
         {hasReddit && (
           <div>
-            <div style={{ fontSize: 10, color: '#a0a8a0', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>From Reddit</div>
+            <div style={{ fontSize: 9, color: '#B8B4AE', textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: 4, fontFamily: 'var(--font-body)' }}>From Reddit</div>
             {context.reddit.map((p, i) => <RedditPost key={i} post={p} />)}
           </div>
         )}
         {hasNews && (
           <div>
-            <div style={{ fontSize: 10, color: '#a0a8a0', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>In the news</div>
+            <div style={{ fontSize: 9, color: '#B8B4AE', textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: 4, fontFamily: 'var(--font-body)' }}>In the news</div>
             {context.news.map((p, i) => <NewsItem key={i} item={p} />)}
           </div>
         )}
