@@ -7,25 +7,21 @@ export async function GET(request) {
 
   if (!q) return NextResponse.json({ images: [] });
 
-  const key = process.env.GOOGLE_API_KEY;
-  const cx = process.env.GOOGLE_CSE_ID;
-
-  if (!key || !cx) {
-    return NextResponse.json({ images: [], error: 'Missing API keys' });
-  }
+  const key = process.env.SERPAPI_KEY;
+  if (!key) return NextResponse.json({ images: [], error: 'Missing SERPAPI_KEY' });
 
   try {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${encodeURIComponent(q)}&searchType=image&num=${num}&safe=active&imgSize=large`;
+    const url = `https://serpapi.com/search.json?engine=google_images&q=${encodeURIComponent(q)}&num=${num}&api_key=${key}`;
     const res = await fetch(url, { next: { revalidate: 86400 } });
     const data = await res.json();
 
-    const images = (data.items || []).map(item => ({
-      url: item.link,
-      title: item.title,
-      contextLink: item.image?.contextLink,
-      thumbnail: item.image?.thumbnailLink,
-      width: item.image?.width,
-      height: item.image?.height,
+    const images = (data.images_results || []).slice(0, num).map(img => ({
+      url: img.original,
+      title: img.title || '',
+      contextLink: img.link,
+      thumbnail: img.thumbnail,
+      width: img.original_width,
+      height: img.original_height,
     }));
 
     return NextResponse.json({ images }, {
