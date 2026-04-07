@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 
-// Type → color mapping from schema
+const P = {
+  bone:     '#F5F3EF',
+  stone:    '#E7E3DC',
+  ink:      '#111111',
+  muted:    '#6F6A63',
+  espresso: '#2A1E1A',
+  brand:    '#B31B1B',
+};
+
 const TYPE_COLORS = {
   '#378ADD': { label: 'Person',   bg: '#dbeafe', text: '#1e40af' },
   '#BA7517': { label: 'Movement', bg: '#fef3c7', text: '#92400e' },
@@ -12,11 +20,11 @@ const TYPE_COLORS = {
   '#993C1D': { label: 'Work',     bg: '#fee2e2', text: '#991b1b' },
 };
 
-function getTypeLabel(color) {
-  return TYPE_COLORS[color]?.label || 'Reference';
-}
 function getTypeBadge(color) {
   return TYPE_COLORS[color] || { label: 'Reference', bg: '#f3f4f6', text: '#6b7280' };
+}
+function getTypeLabel(color) {
+  return TYPE_COLORS[color]?.label || 'Reference';
 }
 
 export default function GraphView({ artifact, onClose }) {
@@ -27,9 +35,9 @@ export default function GraphView({ artifact, onClose }) {
   const [positions, setPositions] = useState({});
   const [loading, setLoading] = useState(false);
   const [expandCount, setExpandCount] = useState(0);
-  const [selectedNode, setSelectedNode] = useState(null); // node for info panel
-  const [nodeImages, setNodeImages] = useState({}); // id → image url
-  const [expandData, setExpandData] = useState({}); // nodeId → { connections, description }
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [nodeImages, setNodeImages] = useState({});
+  const [expandData, setExpandData] = useState({});
 
   const expandedRef = useRef(new Set());
   const nodesRef = useRef([]);
@@ -37,29 +45,22 @@ export default function GraphView({ artifact, onClose }) {
   const positionsRef = useRef({});
   const imagesFetchedRef = useRef(new Set());
 
-  // Fetch image for a single node
   const fetchNodeImage = useCallback(async (id, query) => {
     if (imagesFetchedRef.current.has(id)) return;
     imagesFetchedRef.current.add(id);
     try {
       const res = await fetch(`/api/images?q=${encodeURIComponent(query)}&num=1`);
       const { images } = await res.json();
-      if (images?.[0]?.url) {
-        setNodeImages(prev => ({ ...prev, [id]: images[0].url }));
-      }
+      if (images?.[0]?.url) setNodeImages(prev => ({ ...prev, [id]: images[0].url }));
     } catch {}
   }, []);
 
-  // Fetch images for all visible non-artifact nodes
   useEffect(() => {
     nodes.forEach(n => {
-      if (n.type !== 'artifact') {
-        fetchNodeImage(n.id, n.fullLabel || n.label);
-      }
+      if (n.type !== 'artifact') fetchNodeImage(n.id, n.fullLabel || n.label);
     });
   }, [nodes, fetchNodeImage]);
 
-  // Seed graph
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return;
@@ -70,7 +71,7 @@ export default function GraphView({ artifact, onClose }) {
       { id: artifact.slug, label: artifact.title, type: 'artifact', x: W / 2, y: H / 2, fx: W / 2, fy: H / 2 },
       ...(artifact.constellation || []).map(c => ({
         id: c.label, label: c.label, fullLabel: c.fullLabel || c.label,
-        type: 'concept', color: c.color || '#999', expandable: true,
+        type: 'concept', color: c.color || '#999', expandable: true, depth: 1,
       })),
     ];
     const seedLinks = (artifact.constellation || []).map(c => ({
@@ -86,40 +87,39 @@ export default function GraphView({ artifact, onClose }) {
 
     const svg = d3.select(el);
     const g = svg.select('g.zoom-layer');
-    svg.call(d3.zoom().scaleExtent([0.1, 6]).on('zoom', e => g.attr('transform', e.transform)));
+    svg.call(d3.zoom().scaleExtent([0.08, 8]).on('zoom', e => g.attr('transform', e.transform)));
 
-    return () => {
-      simRef.current?.stop();
-      window.removeEventListener('keydown', fn);
-    };
+    return () => { simRef.current?.stop(); window.removeEventListener('keydown', fn); };
   }, []);
 
-  function startSim(seedNodes, seedLinks, W, H) {
+  function startSim(allNodes, allLinks, W, H) {
     if (simRef.current) simRef.current.stop();
-    const sim = d3.forceSimulation(seedNodes)
-      .force('link', d3.forceLink(seedLinks).id(d => d.id)
-        .distance(d => (d.source?.type === 'artifact' || d.source === artifact.slug) ? 170 : 90)
-        .strength(0.5))
+    const sim = d3.forceSimulation(allNodes)
+      .force('link', d3.forceLink(allLinks).id(d => d.id)
+        .distance(d => {
+          const sid = typeof d.source === 'object' ? d.source.id : d.source;
+          return sid === artifact.slug ? 200 : 110;
+        })
+        .strength(0.45))
       .force('charge', d3.forceManyBody().strength(d =>
-        d.type === 'artifact' ? -900 : d.type === 'concept' ? -300 : -160))
+        d.type === 'artifact' ? -1200 : d.type === 'concept' ? -400 : -200))
       .force('collision', d3.forceCollide(d =>
-        d.type === 'artifact' ? 60 : d.type === 'concept' ? 36 : 22))
+        d.type === 'artifact' ? 64 : d.type === 'concept' ? 40 : 26))
       .on('tick', () => {
         const pos = {};
-        seedNodes.forEach(n => { pos[n.id] = { x: n.x ?? 0, y: n.y ?? 0 }; });
+        allNodes.forEach(n => { pos[n.id] = { x: n.x ?? 0, y: n.y ?? 0 }; });
         positionsRef.current = pos;
         setPositions({ ...pos });
       });
     simRef.current = sim;
-    setNodes([...seedNodes]);
-    setLinks([...seedLinks]);
+    setNodes([...allNodes]);
+    setLinks([...allLinks]);
   }
 
   const doExpand = useCallback(async (nodeId, label) => {
     if (expandedRef.current.has(nodeId)) {
-      // Already expanded — just select it
       const node = nodesRef.current.find(n => n.id === nodeId);
-      setSelectedNode(node);
+      if (node) setSelectedNode({ ...node, ...expandData[nodeId] });
       return;
     }
     expandedRef.current.add(nodeId);
@@ -127,28 +127,27 @@ export default function GraphView({ artifact, onClose }) {
     const parent = nodesRef.current.find(n => n.id === nodeId);
     const px = parent?.x ?? 400;
     const py = parent?.y ?? 300;
+    const parentDepth = parent?.depth ?? 1;
 
     try {
       const res = await fetch(`/api/expand?concept=${encodeURIComponent(label)}&context=${encodeURIComponent(artifact.title)}`);
       const { connections = [], description } = await res.json();
 
-      // Store expand data for the info panel
       setExpandData(prev => ({ ...prev, [nodeId]: { connections, description, label } }));
 
-      const added = [];
       connections.forEach(c => {
         const nodeLabel = c.label;
         if (!nodesRef.current.find(n => n.id === nodeLabel)) {
           const angle = Math.random() * 2 * Math.PI;
-          const dist = 95 + Math.random() * 40;
-          const newNode = {
-            id: nodeLabel, label: nodeLabel, type: 'sub-concept',
-            color: c.color || '#888', expandable: false,
+          const dist = 110 + Math.random() * 50;
+          nodesRef.current.push({
+            id: nodeLabel, label: nodeLabel, fullLabel: c.fullLabel || nodeLabel,
+            type: 'sub-concept', color: c.color || '#888',
+            expandable: true,
+            depth: parentDepth + 1,
             x: px + Math.cos(angle) * dist,
             y: py + Math.sin(angle) * dist,
-          };
-          nodesRef.current.push(newNode);
-          added.push(newNode);
+          });
         }
         const lkId = `${nodeId}--${nodeLabel}`;
         if (!linksRef.current.find(l => l.id === lkId)) {
@@ -158,19 +157,17 @@ export default function GraphView({ artifact, onClose }) {
 
       simRef.current.nodes(nodesRef.current);
       simRef.current.force('link').links(linksRef.current);
-      simRef.current.alpha(0.6).restart();
+      simRef.current.alpha(0.7).restart();
       setNodes([...nodesRef.current]);
       setLinks([...linksRef.current]);
       setExpandCount(n => n + 1);
-
-      // Select the node to show info panel
       setSelectedNode({ ...parent, description, connections });
     } catch (err) {
       console.error('expand failed:', err);
     } finally {
       setLoading(false);
     }
-  }, [artifact]);
+  }, [artifact, expandData]);
 
   const handleDragStart = useCallback((e, nodeId) => {
     e.preventDefault();
@@ -194,7 +191,12 @@ export default function GraphView({ artifact, onClose }) {
     const s = getPos(sid); const t = getPos(tid);
     return { x1: s.x, y1: s.y, x2: t.x, y2: t.y };
   };
-  const r = type => type === 'artifact' ? 46 : type === 'concept' ? 28 : 14;
+
+  const r = (type, depth = 1) => {
+    if (type === 'artifact') return 50;
+    if (type === 'concept') return 30;
+    return Math.max(16, 22 - (depth - 2) * 2);
+  };
 
   const wrapLabel = label => {
     const words = label.split(' ');
@@ -205,64 +207,61 @@ export default function GraphView({ artifact, onClose }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(247,245,241,0.97)', backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: P.espresso, display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 32px', borderBottom: '1px solid #e8e4de', background: 'white', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.2em', color: '#B94932', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
-          <span style={{ color: '#e0dcd8' }}>·</span>
-          <span style={{ fontSize: 14, color: '#1a1816', fontFamily: 'var(--font-display)' }}>{artifact.title}</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 36px', borderBottom: `1px solid rgba(255,255,255,0.07)`, background: 'rgba(17,10,8,0.7)', backdropFilter: 'blur(12px)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
+          <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+          <span style={{ fontSize: 14, color: 'rgba(245,243,239,0.7)', fontFamily: 'var(--font-display)' }}>{artifact.title}</span>
           {expandCount > 0 && (
-            <span style={{ fontSize: 10, color: '#B94932', background: '#f5ece8', padding: '2px 9px', borderRadius: 10, marginLeft: 4, fontFamily: 'var(--font-body)' }}>
+            <span style={{ fontSize: 9, color: P.brand, background: 'rgba(179,27,27,0.15)', padding: '2px 10px', borderRadius: 2, marginLeft: 4, fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {expandCount} expansion{expandCount > 1 ? 's' : ''}
             </span>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           {loading && (
-            <span style={{ fontSize: 12, color: '#B94932', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-body)' }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#B94932', display: 'inline-block', animation: 'pulse 1s infinite' }} />
+            <span style={{ fontSize: 11, color: P.brand, display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: P.brand, display: 'inline-block', animation: 'pulse 1s infinite' }} />
               Expanding...
             </span>
           )}
-          <span style={{ fontSize: 11, color: '#c0bdb8', fontFamily: 'var(--font-body)' }}>Click nodes · Drag · Scroll to zoom · Esc to close</span>
+          <span style={{ fontSize: 10, color: 'rgba(245,243,239,0.2)', fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>Click to expand · Drag · Scroll to zoom · Esc</span>
           <button onClick={onClose}
-            style={{ border: '1px solid #d8d4ce', borderRadius: 7, background: 'transparent', padding: '7px 16px', fontSize: 12, cursor: 'pointer', color: '#6b6860', fontFamily: 'var(--font-body)', letterSpacing: '0.04em' }}>
+            style={{ border: `1px solid rgba(255,255,255,0.12)`, borderRadius: 2, background: 'transparent', padding: '8px 20px', fontSize: 11, cursor: 'pointer', color: 'rgba(245,243,239,0.5)', fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase', transition: 'all 0.15s' }}
+            onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
+            onMouseLeave={e => { e.target.style.borderColor = 'rgba(255,255,255,0.12)'; e.target.style.color = 'rgba(245,243,239,0.5)'; }}>
             ← Close
           </button>
         </div>
       </div>
 
-      {/* Body: graph + info panel */}
+      {/* Body */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
-        {/* SVG */}
+        {/* Graph canvas */}
         <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           <svg ref={svgRef} width="100%" height="100%" style={{ cursor: 'grab', display: 'block' }}>
             <defs>
-              {/* ClipPaths for node images */}
               {nodes.map(n => (
-                <clipPath key={`clip-${n.id}`} id={`clip-${CSS.escape ? CSS.escape(n.id) : n.id.replace(/[^a-zA-Z0-9-_]/g, '-')}`}>
-                  <circle cx={0} cy={0} r={r(n.type)} />
+                <clipPath key={`clip-${n.id}`} id={`clip-${n.id.replace(/[^a-zA-Z0-9-_]/g, '-')}`}>
+                  <circle cx={0} cy={0} r={r(n.type, n.depth)} />
                 </clipPath>
               ))}
-              {/* Artifact node shadow */}
-              <filter id="artifact-shadow" x="-30%" y="-30%" width="160%" height="160%">
-                <feDropShadow dx="0" dy="2" stdDeviation="8" floodColor="#B94932" floodOpacity="0.3" />
-              </filter>
             </defs>
             <g className="zoom-layer">
               {/* Links */}
               {links.map(lk => {
                 const { x1, y1, x2, y2 } = getLinkPos(lk);
                 const sid = typeof lk.source === 'object' ? lk.source.id : lk.source;
+                const isPrimary = sid === artifact.slug;
                 return (
                   <line key={lk.id || `${sid}--${typeof lk.target === 'object' ? lk.target.id : lk.target}`}
                     x1={x1} y1={y1} x2={x2} y2={y2}
-                    stroke={sid === artifact.slug ? '#d8d4ce' : '#e4e0da'}
-                    strokeWidth={sid === artifact.slug ? 1 : 0.7}
-                    strokeDasharray={sid === artifact.slug ? '' : ''}
+                    stroke={isPrimary ? 'rgba(245,243,239,0.12)' : 'rgba(245,243,239,0.06)'}
+                    strokeWidth={isPrimary ? 1 : 0.6}
                   />
                 );
               })}
@@ -270,97 +269,72 @@ export default function GraphView({ artifact, onClose }) {
               {/* Non-artifact nodes */}
               {nodes.filter(n => n.type !== 'artifact').map(n => {
                 const pos = getPos(n.id);
-                const nr = r(n.type);
+                const nr = r(n.type, n.depth);
                 const expanded = expandedRef.current.has(n.id);
                 const imgUrl = nodeImages[n.id];
                 const isSelected = selectedNode?.id === n.id;
                 const clipId = `clip-${n.id.replace(/[^a-zA-Z0-9-_]/g, '-')}`;
-                const badge = getTypeBadge(n.color);
 
                 return (
                   <g key={n.id}
                     transform={`translate(${pos.x},${pos.y})`}
                     style={{ cursor: 'pointer' }}
-                    onClick={() => n.expandable && !expanded ? doExpand(n.id, n.fullLabel || n.label) : setSelectedNode(n)}
+                    onClick={() => !expanded ? doExpand(n.id, n.fullLabel || n.label) : setSelectedNode({ ...n, ...expandData[n.id] })}
                     onMouseDown={e => handleDragStart(e, n.id)}>
 
-                    {/* Selection ring */}
-                    {isSelected && (
-                      <circle r={nr + 6} fill="none" stroke="#B94932" strokeWidth={1.5} opacity={0.6} />
-                    )}
+                    {isSelected && <circle r={nr + 7} fill="none" stroke={P.brand} strokeWidth={1.5} opacity={0.5} />}
+                    {!expanded && <circle r={nr + 11} fill="none" stroke={n.color} strokeWidth={0.7} strokeDasharray="4,4" opacity={0.2} />}
 
-                    {/* Expandable pulse ring */}
-                    {n.expandable && !expanded && (
-                      <circle r={nr + 10} fill="none" stroke={n.color} strokeWidth={0.8} strokeDasharray="3,3" opacity={0.25} />
-                    )}
+                    <circle r={nr} fill={imgUrl ? '#1a1410' : n.color} opacity={imgUrl ? 1 : 0.75} />
 
-                    {/* Background circle */}
-                    <circle r={nr} fill={imgUrl ? '#f0ece6' : n.color} opacity={imgUrl ? 1 : 0.85} />
-
-                    {/* Image */}
                     {imgUrl && (
-                      <image
-                        href={imgUrl}
-                        x={-nr} y={-nr}
-                        width={nr * 2} height={nr * 2}
-                        clipPath={`url(#${clipId})`}
-                        preserveAspectRatio="xMidYMid slice"
-                        opacity={0.9}
-                      />
+                      <>
+                        <image href={imgUrl} x={-nr} y={-nr} width={nr * 2} height={nr * 2}
+                          clipPath={`url(#${clipId})`} preserveAspectRatio="xMidYMid slice" opacity={0.85} />
+                        <circle r={nr} fill="none" stroke={n.color} strokeWidth={2} opacity={0.6} />
+                      </>
                     )}
 
-                    {/* Color rim over image */}
-                    {imgUrl && (
-                      <circle r={nr} fill="none" stroke={n.color} strokeWidth={2.5} opacity={0.7} />
+                    {!imgUrl && !expanded && (
+                      <text textAnchor="middle" y={0} dominantBaseline="middle"
+                        fontSize={nr > 22 ? 12 : 9} fontFamily="var(--font-body, system-ui)"
+                        fill="rgba(255,255,255,0.5)" style={{ pointerEvents: 'none', userSelect: 'none' }}>+</text>
                     )}
 
-                    {/* Label */}
-                    <text textAnchor="middle" y={nr + 14}
+                    {n.type === 'concept' && (
+                      <text textAnchor="middle" y={-nr - 8} fontSize={8}
+                        fontFamily="var(--font-body, system-ui)" fill={n.color} opacity={0.7} fontWeight={500}
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                        {getTypeLabel(n.color).toUpperCase()}
+                      </text>
+                    )}
+
+                    <text textAnchor="middle" y={nr + 15}
                       fontSize={n.type === 'concept' ? 11 : 9}
                       fontFamily="var(--font-body, system-ui)"
-                      fill="#706d68"
+                      fill="rgba(245,243,239,0.45)"
                       style={{ pointerEvents: 'none', userSelect: 'none' }}>
                       {n.label}
                     </text>
-
-                    {/* Type badge on concept nodes */}
-                    {n.type === 'concept' && (
-                      <text textAnchor="middle" y={-nr - 7}
-                        fontSize={7.5} fontFamily="var(--font-body, system-ui)"
-                        fill={n.color} opacity={0.8} fontWeight={500}
-                        style={{ pointerEvents: 'none', userSelect: 'none', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        {getTypeLabel(n.color)}
-                      </text>
-                    )}
-
-                    {/* Expand hint */}
-                    {n.expandable && !expanded && !imgUrl && (
-                      <text textAnchor="middle" y={0} dominantBaseline="middle"
-                        fontSize={nr > 20 ? 10 : 8} fontFamily="var(--font-body, system-ui)"
-                        fill="white" opacity={0.7}
-                        style={{ pointerEvents: 'none', userSelect: 'none' }}>
-                        +
-                      </text>
-                    )}
                   </g>
                 );
               })}
 
-              {/* Artifact node — on top */}
+              {/* Artifact node */}
               {nodes.filter(n => n.type === 'artifact').map(n => {
                 const pos = getPos(n.id);
                 const nr = r(n.type);
                 const lines = wrapLabel(n.label);
                 return (
                   <g key={n.id} transform={`translate(${pos.x},${pos.y})`} style={{ cursor: 'default' }}>
-                    <circle r={nr + 2} fill="#B94932" opacity={0.15} />
-                    <circle r={nr} fill="#B94932" filter="url(#artifact-shadow)" />
+                    <circle r={nr + 16} fill={P.brand} opacity={0.08} />
+                    <circle r={nr + 6} fill={P.brand} opacity={0.12} />
+                    <circle r={nr} fill={P.brand} />
                     {lines.map((line, i) => (
-                      <text key={i}
-                        textAnchor="middle"
-                        y={-(lines.length - 1) * 7.5 + i * 15}
+                      <text key={i} textAnchor="middle"
+                        y={-(lines.length - 1) * 8 + i * 16}
                         dominantBaseline="middle"
-                        fontSize={10} fontWeight={500}
+                        fontSize={11} fontWeight={600}
                         fontFamily="var(--font-body, system-ui)"
                         fill="white"
                         style={{ pointerEvents: 'none', userSelect: 'none' }}>
@@ -374,83 +348,92 @@ export default function GraphView({ artifact, onClose }) {
           </svg>
 
           {/* Legend */}
-          <div style={{ position: 'absolute', bottom: 20, left: 24, display: 'flex', gap: 18, fontSize: 10, color: '#b0ada8', fontFamily: 'var(--font-body)', alignItems: 'center' }}>
-            {Object.entries(TYPE_COLORS).slice(0, 4).map(([color, { label }]) => (
-              <span key={color} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block' }} /> {label}
+          <div style={{ position: 'absolute', bottom: 24, left: 28, display: 'flex', gap: 20, fontFamily: 'var(--font-body)', alignItems: 'center' }}>
+            {Object.entries(TYPE_COLORS).map(([color, { label }]) => (
+              <span key={color} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9, color: 'rgba(245,243,239,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, display: 'inline-block', opacity: 0.7 }} />{label}
               </span>
             ))}
           </div>
+
+          {expandCount > 0 && (
+            <div style={{ position: 'absolute', bottom: 24, right: selectedNode ? 396 : 28, fontSize: 9, color: 'rgba(245,243,239,0.18)', fontFamily: 'var(--font-body)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              {nodes.length} nodes · {links.length} connections
+            </div>
+          )}
         </div>
 
         {/* Info panel */}
         {selectedNode && selectedNode.type !== 'artifact' && (
-          <div style={{ width: 320, borderLeft: '1px solid #e8e4de', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
-            {/* Panel image */}
-            <div style={{ height: 200, background: '#f0ece6', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+          <div style={{ width: 380, borderLeft: `1px solid rgba(255,255,255,0.07)`, background: '#141010', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
+
+            {/* Thumbnail strip */}
+            <div style={{ height: 140, background: '#0d0b0a', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
               {nodeImages[selectedNode.id] ? (
-                <img
-                  src={nodeImages[selectedNode.id]}
-                  alt={selectedNode.fullLabel || selectedNode.label}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={e => e.target.style.display = 'none'}
-                />
+                <img src={nodeImages[selectedNode.id]} alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55, filter: 'grayscale(15%)' }}
+                  onError={e => e.target.style.display = 'none'} />
               ) : (
-                <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${selectedNode.color}22, ${selectedNode.color}44)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: selectedNode.color, opacity: 0.5 }} />
-                </div>
+                <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${selectedNode.color}10, ${selectedNode.color}24)` }} />
               )}
-              {/* Close panel */}
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #141010 0%, transparent 55%)' }} />
+
               <button onClick={() => setSelectedNode(null)}
-                style={{ position: 'absolute', top: 10, right: 10, width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', border: 'none', cursor: 'pointer', fontSize: 14, color: '#6b6860', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', border: 'none', cursor: 'pointer', fontSize: 15, color: 'rgba(245,243,239,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 ×
               </button>
-              {/* Type badge */}
+
               {(() => {
                 const badge = getTypeBadge(selectedNode.color);
                 return (
-                  <div style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 9px', borderRadius: 10, background: badge.bg, color: badge.text, fontFamily: 'var(--font-body)' }}>
+                  <div style={{ position: 'absolute', top: 12, left: 14, fontSize: 8, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 9px', borderRadius: 2, background: badge.bg, color: badge.text, fontFamily: 'var(--font-body)' }}>
                     {badge.label}
                   </div>
                 );
               })()}
             </div>
 
-            {/* Panel content */}
-            <div style={{ flex: 1, overflow: 'auto', padding: '24px 24px 32px' }}>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 400, color: '#1a1816', lineHeight: 1.15, marginBottom: 12 }}>
+            {/* Content */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '24px 28px 40px' }}>
+
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 400, color: 'rgba(245,243,239,0.92)', lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 8 }}>
                 {selectedNode.fullLabel || selectedNode.label}
               </h3>
 
-              {/* Description from expand */}
-              {expandData[selectedNode.id]?.description && (
-                <p style={{ fontSize: 13, color: '#6b6860', lineHeight: 1.75, marginBottom: 20, fontFamily: 'var(--font-body)' }}>
+              <div style={{ fontSize: 11, color: P.brand, fontFamily: 'var(--font-body)', letterSpacing: '0.06em', marginBottom: 24, opacity: 0.75 }}>
+                ↳ connected to {artifact.title}
+              </div>
+
+              {/* Description */}
+              {expandData[selectedNode.id]?.description ? (
+                <p style={{ fontSize: 15, color: 'rgba(245,243,239,0.58)', lineHeight: 1.85, fontFamily: 'var(--font-body)', fontWeight: 300, marginBottom: 32 }}>
                   {expandData[selectedNode.id].description}
+                </p>
+              ) : (
+                <p style={{ fontSize: 13, color: 'rgba(245,243,239,0.22)', lineHeight: 1.8, fontFamily: 'var(--font-body)', fontStyle: 'italic', marginBottom: 32 }}>
+                  Click "Expand" to load context and connections.
                 </p>
               )}
 
-              {/* Connected to this artifact */}
-              <div style={{ fontSize: 9, letterSpacing: '0.14em', color: '#a0a8a0', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 10 }}>
-                Connection
-              </div>
-              <div style={{ fontSize: 12, color: '#B94932', fontFamily: 'var(--font-body)', marginBottom: 24, fontStyle: 'italic' }}>
-                {artifact.title}
-              </div>
-
-              {/* Sub-connections from expand */}
+              {/* Sub-connections */}
               {expandData[selectedNode.id]?.connections?.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 9, letterSpacing: '0.14em', color: '#a0a8a0', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>
-                    Connects to
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ marginBottom: 32 }}>
+                  <div style={{ fontSize: 8, letterSpacing: '0.18em', color: 'rgba(245,243,239,0.2)', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Also connects to</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {expandData[selectedNode.id].connections.map((c, i) => {
                       const badge = getTypeBadge(c.color);
                       return (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#f9f7f5', borderRadius: 7 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: c.color || '#aaa', flexShrink: 0 }} />
-                          <span style={{ fontSize: 12, color: '#1a1816', fontFamily: 'var(--font-body)', flex: 1 }}>{c.label}</span>
-                          <span style={{ fontSize: 8, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 8, background: badge.bg, color: badge.text, fontFamily: 'var(--font-body)' }}>{badge.label}</span>
+                        <div key={i}
+                          onClick={() => {
+                            const target = nodesRef.current.find(n => n.id === c.label);
+                            if (target) setSelectedNode({ ...target, ...expandData[c.label] });
+                          }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 3, cursor: 'pointer', transition: 'background 0.12s' }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                          <div style={{ width: 7, height: 7, borderRadius: '50%', background: c.color || '#888', flexShrink: 0 }} />
+                          <span style={{ fontSize: 13, color: 'rgba(245,243,239,0.55)', fontFamily: 'var(--font-body)', flex: 1 }}>{c.label}</span>
+                          <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 2, background: badge.bg, color: badge.text, fontFamily: 'var(--font-body)', flexShrink: 0 }}>{badge.label}</span>
                         </div>
                       );
                     })}
@@ -458,13 +441,33 @@ export default function GraphView({ artifact, onClose }) {
                 </div>
               )}
 
-              {/* Expand button if not yet expanded */}
-              {selectedNode.expandable && !expandedRef.current.has(selectedNode.id) && (
+              <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 28 }} />
+
+              {/* Discover more */}
+              <div style={{ marginBottom: 28 }}>
+                <div style={{ fontSize: 8, letterSpacing: '0.18em', color: 'rgba(245,243,239,0.2)', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Discover more</div>
+                {[
+                  { label: 'Search on Are.na', url: `https://www.are.na/search/${encodeURIComponent(selectedNode.fullLabel || selectedNode.label)}` },
+                  { label: 'Read on Wikipedia', url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(selectedNode.fullLabel || selectedNode.label)}` },
+                  { label: 'Explore on Google', url: `https://www.google.com/search?q=${encodeURIComponent((selectedNode.fullLabel || selectedNode.label) + ' ' + artifact.title)}` },
+                ].map((link, i) => (
+                  <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 12px', borderRadius: 3, textDecoration: 'none', transition: 'background 0.12s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <span style={{ fontSize: 13, color: 'rgba(245,243,239,0.45)', fontFamily: 'var(--font-body)' }}>{link.label}</span>
+                    <span style={{ fontSize: 12, color: P.brand, opacity: 0.65 }}>↗</span>
+                  </a>
+                ))}
+              </div>
+
+              {/* Expand button */}
+              {!expandedRef.current.has(selectedNode.id) && (
                 <button
                   onClick={() => doExpand(selectedNode.id, selectedNode.fullLabel || selectedNode.label)}
-                  style={{ marginTop: 24, width: '100%', padding: '10px', border: '1px solid #d4cfc9', borderRadius: 7, background: 'transparent', fontSize: 11, color: '#1a1816', cursor: 'pointer', fontFamily: 'var(--font-body)', letterSpacing: '0.06em', textTransform: 'uppercase', transition: 'all 0.15s' }}
-                  onMouseEnter={e => { e.target.style.borderColor = '#B94932'; e.target.style.color = '#B94932'; }}
-                  onMouseLeave={e => { e.target.style.borderColor = '#d4cfc9'; e.target.style.color = '#1a1816'; }}>
+                  style={{ width: '100%', padding: '13px', border: `1px solid rgba(255,255,255,0.1)`, borderRadius: 2, background: 'transparent', fontSize: 10, color: 'rgba(245,243,239,0.45)', cursor: 'pointer', fontFamily: 'var(--font-body)', letterSpacing: '0.12em', textTransform: 'uppercase', transition: 'all 0.15s' }}
+                  onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
+                  onMouseLeave={e => { e.target.style.borderColor = 'rgba(255,255,255,0.1)'; e.target.style.color = 'rgba(245,243,239,0.45)'; }}>
                   Expand this node →
                 </button>
               )}
