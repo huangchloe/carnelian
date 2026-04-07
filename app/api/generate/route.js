@@ -14,7 +14,7 @@ export async function GET(request) {
 
   try {
     const msg = await client.messages.create({
-      model: 'claude-sonnet-4-5-20251022',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2000,
       system: `You are Carnelian — a cultural knowledge platform with an editorial voice. Generate artifact entries that are factually precise, culturally insightful, and use interpretation not just description.
 
