@@ -207,16 +207,16 @@ export default function GraphView({ artifact, onClose }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: P.espresso, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(247,245,241,0.97)', backdropFilter: 'blur(6px)', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 36px', borderBottom: `1px solid rgba(255,255,255,0.07)`, background: 'rgba(17,10,8,0.7)', backdropFilter: 'blur(12px)', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 36px', borderBottom: '1px solid #e8e4de', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
-          <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
-          <span style={{ fontSize: 14, color: 'rgba(245,243,239,0.7)', fontFamily: 'var(--font-display)' }}>{artifact.title}</span>
+          <span style={{ color: '#e0dcd8' }}>·</span>
+          <span style={{ fontSize: 14, color: P.ink, fontFamily: 'var(--font-display)' }}>{artifact.title}</span>
           {expandCount > 0 && (
-            <span style={{ fontSize: 9, color: P.brand, background: 'rgba(179,27,27,0.15)', padding: '2px 10px', borderRadius: 2, marginLeft: 4, fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 9, color: P.brand, background: '#f5ece8', padding: '2px 10px', borderRadius: 2, marginLeft: 4, fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {expandCount} expansion{expandCount > 1 ? 's' : ''}
             </span>
           )}
@@ -228,11 +228,11 @@ export default function GraphView({ artifact, onClose }) {
               Expanding...
             </span>
           )}
-          <span style={{ fontSize: 10, color: 'rgba(245,243,239,0.2)', fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>Click to expand · Drag · Scroll to zoom · Esc</span>
+          <span style={{ fontSize: 10, color: '#c0bdb8', fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>Click to expand · Drag · Scroll to zoom · Esc</span>
           <button onClick={onClose}
-            style={{ border: `1px solid rgba(255,255,255,0.12)`, borderRadius: 2, background: 'transparent', padding: '8px 20px', fontSize: 11, cursor: 'pointer', color: 'rgba(245,243,239,0.5)', fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase', transition: 'all 0.15s' }}
+            style={{ border: '1px solid #d8d4ce', borderRadius: 2, background: 'transparent', padding: '8px 20px', fontSize: 11, cursor: 'pointer', color: P.muted, fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase', transition: 'all 0.15s' }}
             onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
-            onMouseLeave={e => { e.target.style.borderColor = 'rgba(255,255,255,0.12)'; e.target.style.color = 'rgba(245,243,239,0.5)'; }}>
+            onMouseLeave={e => { e.target.style.borderColor = '#d8d4ce'; e.target.style.color = P.muted; }}>
             ← Close
           </button>
         </div>
@@ -260,8 +260,8 @@ export default function GraphView({ artifact, onClose }) {
                 return (
                   <line key={lk.id || `${sid}--${typeof lk.target === 'object' ? lk.target.id : lk.target}`}
                     x1={x1} y1={y1} x2={x2} y2={y2}
-                    stroke={isPrimary ? 'rgba(245,243,239,0.12)' : 'rgba(245,243,239,0.06)'}
-                    strokeWidth={isPrimary ? 1 : 0.6}
+                    stroke={isPrimary ? '#d8d4ce' : '#e8e4de'}
+                    strokeWidth={isPrimary ? 1 : 0.7}
                   />
                 );
               })}
@@ -283,27 +283,27 @@ export default function GraphView({ artifact, onClose }) {
                     onMouseDown={e => handleDragStart(e, n.id)}>
 
                     {isSelected && <circle r={nr + 7} fill="none" stroke={P.brand} strokeWidth={1.5} opacity={0.5} />}
-                    {!expanded && <circle r={nr + 11} fill="none" stroke={n.color} strokeWidth={0.7} strokeDasharray="4,4" opacity={0.2} />}
+                    {!expanded && <circle r={nr + 11} fill="none" stroke={n.color} strokeWidth={0.7} strokeDasharray="4,4" opacity={0.25} />}
 
-                    <circle r={nr} fill={imgUrl ? '#1a1410' : n.color} opacity={imgUrl ? 1 : 0.75} />
+                    <circle r={nr} fill={imgUrl ? '#f0ece6' : n.color} opacity={imgUrl ? 1 : 0.85} />
 
                     {imgUrl && (
                       <>
                         <image href={imgUrl} x={-nr} y={-nr} width={nr * 2} height={nr * 2}
-                          clipPath={`url(#${clipId})`} preserveAspectRatio="xMidYMid slice" opacity={0.85} />
-                        <circle r={nr} fill="none" stroke={n.color} strokeWidth={2} opacity={0.6} />
+                          clipPath={`url(#${clipId})`} preserveAspectRatio="xMidYMid slice" opacity={0.9} />
+                        <circle r={nr} fill="none" stroke={n.color} strokeWidth={2.5} opacity={0.7} />
                       </>
                     )}
 
                     {!imgUrl && !expanded && (
                       <text textAnchor="middle" y={0} dominantBaseline="middle"
                         fontSize={nr > 22 ? 12 : 9} fontFamily="var(--font-body, system-ui)"
-                        fill="rgba(255,255,255,0.5)" style={{ pointerEvents: 'none', userSelect: 'none' }}>+</text>
+                        fill="white" opacity={0.7} style={{ pointerEvents: 'none', userSelect: 'none' }}>+</text>
                     )}
 
                     {n.type === 'concept' && (
                       <text textAnchor="middle" y={-nr - 8} fontSize={8}
-                        fontFamily="var(--font-body, system-ui)" fill={n.color} opacity={0.7} fontWeight={500}
+                        fontFamily="var(--font-body, system-ui)" fill={n.color} opacity={0.8} fontWeight={500}
                         style={{ pointerEvents: 'none', userSelect: 'none' }}>
                         {getTypeLabel(n.color).toUpperCase()}
                       </text>
@@ -312,7 +312,7 @@ export default function GraphView({ artifact, onClose }) {
                     <text textAnchor="middle" y={nr + 15}
                       fontSize={n.type === 'concept' ? 11 : 9}
                       fontFamily="var(--font-body, system-ui)"
-                      fill="rgba(245,243,239,0.45)"
+                      fill="#908d88"
                       style={{ pointerEvents: 'none', userSelect: 'none' }}>
                       {n.label}
                     </text>
@@ -350,14 +350,14 @@ export default function GraphView({ artifact, onClose }) {
           {/* Legend */}
           <div style={{ position: 'absolute', bottom: 24, left: 28, display: 'flex', gap: 20, fontFamily: 'var(--font-body)', alignItems: 'center' }}>
             {Object.entries(TYPE_COLORS).map(([color, { label }]) => (
-              <span key={color} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9, color: 'rgba(245,243,239,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, display: 'inline-block', opacity: 0.7 }} />{label}
+              <span key={color} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9, color: '#b0ada8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, display: 'inline-block' }} />{label}
               </span>
             ))}
           </div>
 
           {expandCount > 0 && (
-            <div style={{ position: 'absolute', bottom: 24, right: selectedNode ? 396 : 28, fontSize: 9, color: 'rgba(245,243,239,0.18)', fontFamily: 'var(--font-body)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <div style={{ position: 'absolute', bottom: 24, right: selectedNode ? 396 : 28, fontSize: 9, color: '#c0bdb8', fontFamily: 'var(--font-body)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               {nodes.length} nodes · {links.length} connections
             </div>
           )}
@@ -365,21 +365,21 @@ export default function GraphView({ artifact, onClose }) {
 
         {/* Info panel */}
         {selectedNode && selectedNode.type !== 'artifact' && (
-          <div style={{ width: 380, borderLeft: `1px solid rgba(255,255,255,0.07)`, background: '#141010', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
+          <div style={{ width: 380, borderLeft: '1px solid #e8e4de', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
             {/* Thumbnail strip */}
-            <div style={{ height: 140, background: '#0d0b0a', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+            <div style={{ height: 140, background: '#f0ece6', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
               {nodeImages[selectedNode.id] ? (
                 <img src={nodeImages[selectedNode.id]} alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55, filter: 'grayscale(15%)' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.75 }}
                   onError={e => e.target.style.display = 'none'} />
               ) : (
-                <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${selectedNode.color}10, ${selectedNode.color}24)` }} />
+                <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${selectedNode.color}18, ${selectedNode.color}32)` }} />
               )}
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #141010 0%, transparent 55%)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, white 0%, transparent 55%)' }} />
 
               <button onClick={() => setSelectedNode(null)}
-                style={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', border: 'none', cursor: 'pointer', fontSize: 15, color: 'rgba(245,243,239,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', border: 'none', cursor: 'pointer', fontSize: 15, color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 ×
               </button>
 
@@ -396,29 +396,29 @@ export default function GraphView({ artifact, onClose }) {
             {/* Content */}
             <div style={{ flex: 1, overflow: 'auto', padding: '24px 28px 40px' }}>
 
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 400, color: 'rgba(245,243,239,0.92)', lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 8 }}>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 400, color: P.ink, lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 6 }}>
                 {selectedNode.fullLabel || selectedNode.label}
               </h3>
 
-              <div style={{ fontSize: 11, color: P.brand, fontFamily: 'var(--font-body)', letterSpacing: '0.06em', marginBottom: 24, opacity: 0.75 }}>
+              <div style={{ fontSize: 11, color: P.brand, fontFamily: 'var(--font-body)', letterSpacing: '0.06em', marginBottom: 20, opacity: 0.8 }}>
                 ↳ connected to {artifact.title}
               </div>
 
-              {/* Description */}
+              {/* Description — editorial interpretation of the connection */}
               {expandData[selectedNode.id]?.description ? (
-                <p style={{ fontSize: 15, color: 'rgba(245,243,239,0.58)', lineHeight: 1.85, fontFamily: 'var(--font-body)', fontWeight: 300, marginBottom: 32 }}>
+                <p style={{ fontSize: 15, color: P.muted, lineHeight: 1.85, fontFamily: 'var(--font-body)', fontWeight: 300, marginBottom: 28 }}>
                   {expandData[selectedNode.id].description}
                 </p>
               ) : (
-                <p style={{ fontSize: 13, color: 'rgba(245,243,239,0.22)', lineHeight: 1.8, fontFamily: 'var(--font-body)', fontStyle: 'italic', marginBottom: 32 }}>
-                  Click "Expand" to load context and connections.
+                <p style={{ fontSize: 13, color: '#c0bdb8', lineHeight: 1.8, fontFamily: 'var(--font-body)', fontStyle: 'italic', marginBottom: 28 }}>
+                  Click "Expand" to load cultural context.
                 </p>
               )}
 
               {/* Sub-connections */}
               {expandData[selectedNode.id]?.connections?.length > 0 && (
-                <div style={{ marginBottom: 32 }}>
-                  <div style={{ fontSize: 8, letterSpacing: '0.18em', color: 'rgba(245,243,239,0.2)', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Also connects to</div>
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ fontSize: 8, letterSpacing: '0.18em', color: '#c0bdb8', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Also connects to</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {expandData[selectedNode.id].connections.map((c, i) => {
                       const badge = getTypeBadge(c.color);
@@ -428,11 +428,11 @@ export default function GraphView({ artifact, onClose }) {
                             const target = nodesRef.current.find(n => n.id === c.label);
                             if (target) setSelectedNode({ ...target, ...expandData[c.label] });
                           }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 3, cursor: 'pointer', transition: 'background 0.12s' }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 12px', borderRadius: 3, cursor: 'pointer', transition: 'background 0.12s' }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#f9f7f5'}
                           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                           <div style={{ width: 7, height: 7, borderRadius: '50%', background: c.color || '#888', flexShrink: 0 }} />
-                          <span style={{ fontSize: 13, color: 'rgba(245,243,239,0.55)', fontFamily: 'var(--font-body)', flex: 1 }}>{c.label}</span>
+                          <span style={{ fontSize: 13, color: P.ink, fontFamily: 'var(--font-body)', flex: 1 }}>{c.label}</span>
                           <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 2, background: badge.bg, color: badge.text, fontFamily: 'var(--font-body)', flexShrink: 0 }}>{badge.label}</span>
                         </div>
                       );
@@ -441,22 +441,22 @@ export default function GraphView({ artifact, onClose }) {
                 </div>
               )}
 
-              <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 28 }} />
+              <div style={{ height: 1, background: '#f0ece6', marginBottom: 24 }} />
 
               {/* Discover more */}
-              <div style={{ marginBottom: 28 }}>
-                <div style={{ fontSize: 8, letterSpacing: '0.18em', color: 'rgba(245,243,239,0.2)', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Discover more</div>
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ fontSize: 8, letterSpacing: '0.18em', color: '#c0bdb8', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Discover more</div>
                 {[
                   { label: 'Search on Are.na', url: `https://www.are.na/search/${encodeURIComponent(selectedNode.fullLabel || selectedNode.label)}` },
                   { label: 'Read on Wikipedia', url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(selectedNode.fullLabel || selectedNode.label)}` },
                   { label: 'Explore on Google', url: `https://www.google.com/search?q=${encodeURIComponent((selectedNode.fullLabel || selectedNode.label) + ' ' + artifact.title)}` },
                 ].map((link, i) => (
                   <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 12px', borderRadius: 3, textDecoration: 'none', transition: 'background 0.12s' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 3, textDecoration: 'none', transition: 'background 0.12s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#f9f7f5'}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <span style={{ fontSize: 13, color: 'rgba(245,243,239,0.45)', fontFamily: 'var(--font-body)' }}>{link.label}</span>
-                    <span style={{ fontSize: 12, color: P.brand, opacity: 0.65 }}>↗</span>
+                    <span style={{ fontSize: 13, color: P.muted, fontFamily: 'var(--font-body)' }}>{link.label}</span>
+                    <span style={{ fontSize: 12, color: P.brand }}>↗</span>
                   </a>
                 ))}
               </div>
@@ -465,9 +465,9 @@ export default function GraphView({ artifact, onClose }) {
               {!expandedRef.current.has(selectedNode.id) && (
                 <button
                   onClick={() => doExpand(selectedNode.id, selectedNode.fullLabel || selectedNode.label)}
-                  style={{ width: '100%', padding: '13px', border: `1px solid rgba(255,255,255,0.1)`, borderRadius: 2, background: 'transparent', fontSize: 10, color: 'rgba(245,243,239,0.45)', cursor: 'pointer', fontFamily: 'var(--font-body)', letterSpacing: '0.12em', textTransform: 'uppercase', transition: 'all 0.15s' }}
+                  style={{ width: '100%', padding: '12px', border: '1px solid #d8d4ce', borderRadius: 2, background: 'transparent', fontSize: 10, color: P.ink, cursor: 'pointer', fontFamily: 'var(--font-body)', letterSpacing: '0.12em', textTransform: 'uppercase', transition: 'all 0.15s' }}
                   onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
-                  onMouseLeave={e => { e.target.style.borderColor = 'rgba(255,255,255,0.1)'; e.target.style.color = 'rgba(245,243,239,0.45)'; }}>
+                  onMouseLeave={e => { e.target.style.borderColor = '#d8d4ce'; e.target.style.color = P.ink; }}>
                   Expand this node →
                 </button>
               )}
