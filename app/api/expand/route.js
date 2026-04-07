@@ -34,7 +34,7 @@ export async function GET(request) {
 
 Return ONLY valid JSON, no markdown, no explanation:
 {
-  "description": "2-3 sentences. Do NOT describe what this concept is in isolation. Instead explain WHY this specific concept connects to the artifact in question — what does this connection reveal culturally, historically, or symbolically? Be interpretive and specific, not encyclopedic. Write with the authority of a cultural critic, not a textbook.",
+  "description": "2-3 sentences. Do NOT describe what this concept is in isolation. Explain WHY this specific concept connects to the artifact — what does this connection reveal culturally, historically, or symbolically? Be interpretive and specific. Write with the authority of a cultural critic, not a textbook.",
   "connections": [{"label": "Short name", "type": "person|place|movement|work|concept", "color": "#hex"}]
 }
 
@@ -45,14 +45,16 @@ Labels under 14 characters. Be specific, not generic.`,
         content: `Concept: "${concept}"
 Artifact: "${context}"
 
-Explain the cultural/symbolic significance of why "${concept}" connects to "${context}". Then return 4-5 closely related concepts for the knowledge graph.`,
+Explain the cultural/symbolic significance of why "${concept}" connects to "${context}". Then return 4-5 closely related concepts.`,
       }],
     });
 
     const text = msg.content[0].text.trim();
-    const data = JSON.parse(text);
+    const cleaned = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+    const data = JSON.parse(cleaned);
     return NextResponse.json(data);
-  } catch {
+  } catch (err) {
+    console.error('expand error:', err.message);
     return NextResponse.json({ connections: [] });
   }
 }
