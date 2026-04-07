@@ -4,9 +4,7 @@ import { NextResponse } from 'next/server';
 const client = new Anthropic();
 
 function extractJSON(text) {
-  // 1. Strip markdown fences
-  let cleaned = text.trim().replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/,'').trim();
-  // 2. Find the outermost { } block in case Claude added preamble
+  let cleaned = text.trim().replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/, '').trim();
   const start = cleaned.indexOf('{');
   const end = cleaned.lastIndexOf('}');
   if (start !== -1 && end !== -1 && end > start) {
@@ -23,13 +21,20 @@ export async function GET(request) {
   try {
     const message = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
-      system: `You are Carnelian — a cultural knowledge platform with an editorial voice. Generate artifact entries that are factually precise, culturally insightful, and use interpretation not just description.
+      max_tokens: 4000,
+      tools: [
+        {
+          type: 'web_search_20250305',
+          name: 'web_search',
+        }
+      ],
+      system: `You are Carnelian — a cultural knowledge platform with a sharp editorial voice. Before writing an entry, search the web to get current, accurate information about the subject. Pull from reviews, interviews, critical writing, and cultural discourse — not just Wikipedia.
+
 Return ONLY valid JSON — no preamble, no markdown fences, no commentary — with this exact schema:
 {
   "slug": "url-slug-no-spaces",
   "title": "Exact artifact title",
-  "type": "Object|Painting|Song|Film|Movement|Performance|Building|Photograph|etc",
+  "type": "Object|Painting|Song|Film|Movement|Performance|Building|Photograph|Designer|Artist|etc",
   "medium": "Specific medium",
   "origin": "Country or City",
   "year": 1234,
@@ -72,11 +77,13 @@ For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences of
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 carnelianReads must be genuinely interpretive — what does this artifact reveal about culture that isn't obvious?`,
-      messages: [{ role: 'user', content: `Generate a Carnelian entry for: "${q}"` }],
+      messages: [{ role: 'user', content: `Search for current information about "${q}", then generate a Carnelian entry for it.` }],
     });
 
-    const raw = message.content[0]?.text ?? '';
-    const artifact = extractJSON(raw);
+    const textBlock = message.content.filter(b => b.type === 'text').pop();
+    if (!textBlock) throw new Error('No text in response');
+
+    const artifact = extractJSON(textBlock.text);
     return NextResponse.json({ artifact, generated: true });
   } catch (err) {
     console.error('Generate error:', err.message);
