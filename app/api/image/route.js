@@ -1,66 +1,37 @@
 import { NextResponse } from 'next/server';
 
-async function tryWikipedia(query) {
-  // Search Wikipedia for the page
-  const searchRes = await fetch(
-    `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=3&format=json&origin=*`
-  );
-  const searchData = await searchRes.json();
-  const results = searchData?.query?.search || [];
-
-  for (const result of results) {
-    const pageTitle = result.title;
-    const imgRes = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&pithumbsize=800&format=json&origin=*`
-    );
-    const imgData = await imgRes.json();
-    const pages = imgData?.query?.pages || {};
-    const page = Object.values(pages)[0];
-    const url = page?.thumbnail?.source || null;
-    // Skip images that are flags, icons, or tiny decorative graphics
-    if (url && !url.includes('Flag_of') && !url.includes('icon') && !url.includes('logo') && !url.includes('Logo')) {
-      return { url, title: pageTitle };
-    }
-  }
-  return null;
-}
-
-async function tryWikimediaCommons(query) {
-  // Search Wikimedia Commons for images directly
-  const res = await fetch(
-    `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrnamespace=6&prop=imageinfo&iiprop=url|size&iiurlwidth=800&gsrlimit=5&format=json&origin=*`
-  );
-  const data = await res.json();
-  const pages = data?.query?.pages || {};
-  const imagePages = Object.values(pages);
-
-  for (const p of imagePages) {
-    const url = p?.imageinfo?.[0]?.thumburl || p?.imageinfo?.[0]?.url;
-    const title = p.title?.replace('File:', '') || '';
-    // Skip SVGs, icons, flags
-    if (url && !url.endsWith('.svg') && !title.toLowerCase().includes('flag') && !title.toLowerCase().includes('icon')) {
-      return { url, title };
-    }
-  }
-  return null;
-}
-
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || '';
-  if (!q) return NextResponse.json({ url: null });
+  const num = Math.min(parseInt(searchParams.get('num') || '9'), 10);
+
+  if (!q) return NextResponse.json({ images: [] });
+
+  const key = process.env.GOOGLE_API_KEY;
+  const cx = process.env.GOOGLE_CSE_ID;
+
+  if (!key || !cx) {
+    return NextResponse.json({ images: [], error: 'Missing API keys' });
+  }
 
   try {
-    // Try Wikipedia first (most authoritative)
-    const wikiResult = await tryWikipedia(q);
-    if (wikiResult) return NextResponse.json(wikiResult);
+    const url = `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${encodeURIComponent(q)}&searchType=image&num=${num}&safe=active&imgSize=large`;
+    const res = await fetch(url, { next: { revalidate: 86400 } }); // cache 24h
+    const data = await res.json();
 
-    // Fall back to Wikimedia Commons
-    const commonsResult = await tryWikimediaCommons(q);
-    if (commonsResult) return NextResponse.json(commonsResult);
+    const images = (data.items || []).map(item => ({
+      url: item.link,
+      title: item.title,
+      contextLink: item.image?.contextLink,
+      thumbnail: item.image?.thumbnailLink,
+      width: item.image?.width,
+      height: item.image?.height,
+    }));
 
-    return NextResponse.json({ url: null });
-  } catch {
-    return NextResponse.json({ url: null });
+    return NextResponse.json({ images }, {
+      headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=3600' }
+    });
+  } catch (err) {
+    return NextResponse.json({ images: [], error: err.message });
   }
 }
