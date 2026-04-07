@@ -15,9 +15,9 @@ export async function GET(request) {
 
   if (!concept) return NextResponse.json({ connections: [] });
 
-  // Graceful fallback if no API key
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({
+      description: 'No API key configured.',
       connections: [
         { label: 'Related concept', color: COLOR_MAP.concept },
         { label: 'Historical context', color: COLOR_MAP.movement },
@@ -29,17 +29,23 @@ export async function GET(request) {
   try {
     const msg = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 400,
-      system: `You are a cultural knowledge graph. Given a concept and its context, return 4-5 closely related concepts as JSON.
-Return ONLY valid JSON, no markdown, no explanation. Format:
-{"connections": [{"label": "Short name", "type": "person|place|movement|work|concept", "color": "#hex"}]}
+      max_tokens: 600,
+      system: `You are Carnelian — a cultural knowledge platform with a sharp editorial voice. You map symbolic and cultural significance between ideas, people, objects, and movements.
 
-Use these colors: person=#378ADD, place=#1D9E75, movement=#BA7517, work=#7F77DD, concept=#993C1D
-Keep labels under 12 characters. Be specific and culturally precise, not generic.`,
+Return ONLY valid JSON, no markdown, no explanation:
+{
+  "description": "2-3 sentences. Do NOT describe what this concept is in isolation. Instead explain WHY this specific concept connects to the artifact in question — what does this connection reveal culturally, historically, or symbolically? Be interpretive and specific, not encyclopedic. Write with the authority of a cultural critic, not a textbook.",
+  "connections": [{"label": "Short name", "type": "person|place|movement|work|concept", "color": "#hex"}]
+}
+
+Colors: person=#378ADD, place=#1D9E75, movement=#BA7517, work=#7F77DD, concept=#993C1D
+Labels under 14 characters. Be specific, not generic.`,
       messages: [{
         role: 'user',
-        content: `Concept: "${concept}" (in the context of: "${context}")
-Return 4-5 closely related concepts that would appear in a cultural knowledge graph.`,
+        content: `Concept: "${concept}"
+Artifact: "${context}"
+
+Explain the cultural/symbolic significance of why "${concept}" connects to "${context}". Then return 4-5 closely related concepts for the knowledge graph.`,
       }],
     });
 
