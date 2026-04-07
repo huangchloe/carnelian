@@ -1,22 +1,25 @@
-import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+
+export const runtime = 'edge';
 
 const client = new Anthropic();
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || '';
-  if (!q) return NextResponse.json({ error: 'No query' }, { status: 400 });
+  if (!q) return new Response(JSON.stringify({ error: 'No query' }), { status: 400 });
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'ANTHROPIC_API_KEY not set' }, { status: 503 });
-  }
+  const encoder = new TextEncoder();
 
-  try {
-    const msg = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
-      system: `You are Carnelian — a cultural knowledge platform with an editorial voice. Generate artifact entries that are factually precise, culturally insightful, and use interpretation not just description.
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        let fullText = '';
+        const response = await client.messages.create({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 2000,
+          stream: true,
+          system: `You are Carnelian — a cultural knowledge platform with an editorial voice. Generate artifact entries that are factually precise, culturally insightful, and use interpretation not just description.
 
 Return ONLY valid JSON with this exact schema:
 {
@@ -68,16 +71,26 @@ For "see" type "references": items = [{"category": "Fashion|Music|Place|Historic
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 
 The carnelianReads must be genuinely interpretive, not descriptive. Think: what does this artifact reveal about culture that isn't obvious?`,
-      messages: [{
-        role: 'user',
-        content: `Generate a Carnelian entry for: "${q}"`,
-      }],
-    });
+          messages: [{ role: 'user', content: `Generate a Carnelian entry for: "${q}"` }],
+        });
 
-    const text = msg.content[0].text.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '');
-    const artifact = JSON.parse(text);
-    return NextResponse.json({ artifact, generated: true });
-  } catch (err) {
-    return NextResponse.json({ error: 'Generation failed', detail: err.message }, { status: 500 });
-  }
+        for await (const event of response) {
+          if (event.type === 'content_block_delta' && event.delta?.text) {
+            fullText += event.delta.text;
+          }
+        }
+
+        const cleaned = fullText.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+        const artifact = JSON.parse(cleaned);
+        controller.enqueue(encoder.encode(JSON.stringify({ artifact, generated: true })));
+      } catch (err) {
+        controller.enqueue(encoder.encode(JSON.stringify({ error: 'Generation failed', detail: err.message })));
+      }
+      controller.close();
+    }
+  });
+
+  return new Response(stream, {
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
