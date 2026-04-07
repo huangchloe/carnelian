@@ -212,7 +212,7 @@ export default function GraphView({ artifact, onClose }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 36px', borderBottom: '1px solid #e8e4de', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
+          <a href="/" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)', textDecoration: 'none', cursor: 'pointer' }}>Carnelian</a>
           <span style={{ color: '#e0dcd8' }}>·</span>
           <span style={{ fontSize: 14, color: P.ink, fontFamily: 'var(--font-display)' }}>{artifact.title}</span>
           {expandCount > 0 && (
@@ -252,7 +252,6 @@ export default function GraphView({ artifact, onClose }) {
               ))}
             </defs>
             <g className="zoom-layer">
-              {/* Links */}
               {links.map(lk => {
                 const { x1, y1, x2, y2 } = getLinkPos(lk);
                 const sid = typeof lk.source === 'object' ? lk.source.id : lk.source;
@@ -266,7 +265,6 @@ export default function GraphView({ artifact, onClose }) {
                 );
               })}
 
-              {/* Non-artifact nodes */}
               {nodes.filter(n => n.type !== 'artifact').map(n => {
                 const pos = getPos(n.id);
                 const nr = r(n.type, n.depth);
@@ -284,7 +282,6 @@ export default function GraphView({ artifact, onClose }) {
 
                     {isSelected && <circle r={nr + 7} fill="none" stroke={P.brand} strokeWidth={1.5} opacity={0.5} />}
                     {!expanded && <circle r={nr + 11} fill="none" stroke={n.color} strokeWidth={0.7} strokeDasharray="4,4" opacity={0.25} />}
-
                     <circle r={nr} fill={imgUrl ? '#f0ece6' : n.color} opacity={imgUrl ? 1 : 0.85} />
 
                     {imgUrl && (
@@ -320,7 +317,6 @@ export default function GraphView({ artifact, onClose }) {
                 );
               })}
 
-              {/* Artifact node */}
               {nodes.filter(n => n.type === 'artifact').map(n => {
                 const pos = getPos(n.id);
                 const nr = r(n.type);
@@ -347,7 +343,6 @@ export default function GraphView({ artifact, onClose }) {
             </g>
           </svg>
 
-          {/* Legend */}
           <div style={{ position: 'absolute', bottom: 24, left: 28, display: 'flex', gap: 20, fontFamily: 'var(--font-body)', alignItems: 'center' }}>
             {Object.entries(TYPE_COLORS).map(([color, { label }]) => (
               <span key={color} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9, color: '#b0ada8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
@@ -367,7 +362,6 @@ export default function GraphView({ artifact, onClose }) {
         {selectedNode && selectedNode.type !== 'artifact' && (
           <div style={{ width: 380, borderLeft: '1px solid #e8e4de', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
-            {/* Thumbnail strip */}
             <div style={{ height: 140, background: '#f0ece6', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
               {nodeImages[selectedNode.id] ? (
                 <img src={nodeImages[selectedNode.id]} alt=""
@@ -393,9 +387,7 @@ export default function GraphView({ artifact, onClose }) {
               })()}
             </div>
 
-            {/* Content */}
             <div style={{ flex: 1, overflow: 'auto', padding: '24px 28px 40px' }}>
-
               <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 400, color: P.ink, lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 6 }}>
                 {selectedNode.fullLabel || selectedNode.label}
               </h3>
@@ -404,7 +396,6 @@ export default function GraphView({ artifact, onClose }) {
                 ↳ connected to {artifact.title}
               </div>
 
-              {/* Description — editorial interpretation of the connection */}
               {expandData[selectedNode.id]?.description ? (
                 <p style={{ fontSize: 15, color: P.muted, lineHeight: 1.85, fontFamily: 'var(--font-body)', fontWeight: 300, marginBottom: 28 }}>
                   {expandData[selectedNode.id].description}
@@ -415,7 +406,6 @@ export default function GraphView({ artifact, onClose }) {
                 </p>
               )}
 
-              {/* Sub-connections */}
               {expandData[selectedNode.id]?.connections?.length > 0 && (
                 <div style={{ marginBottom: 28 }}>
                   <div style={{ fontSize: 8, letterSpacing: '0.18em', color: '#c0bdb8', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Also connects to</div>
@@ -443,7 +433,6 @@ export default function GraphView({ artifact, onClose }) {
 
               <div style={{ height: 1, background: '#f0ece6', marginBottom: 24 }} />
 
-              {/* Discover more */}
               <div style={{ marginBottom: 24 }}>
                 <div style={{ fontSize: 8, letterSpacing: '0.18em', color: '#c0bdb8', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 12 }}>Discover more</div>
                 {[
@@ -461,7 +450,6 @@ export default function GraphView({ artifact, onClose }) {
                 ))}
               </div>
 
-              {/* Expand button */}
               {!expandedRef.current.has(selectedNode.id) && (
                 <button
                   onClick={() => doExpand(selectedNode.id, selectedNode.fullLabel || selectedNode.label)}
