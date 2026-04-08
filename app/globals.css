@@ -135,11 +135,3 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d0cdc8; border-radius: 2px; }
 
-@media (prefers-color-scheme: dark) {
-  body { background: #111008; color: #e4e0d6; }
-  .search-input { border-bottom-color: #3a3732; }
-  .depth-pill { border-color: #3a3732; color: #908d88; }
-  .k-pill { border-color: #3a3732; color: #908d88; background: transparent; }
-  .source-row { border-bottom-color: #2a2724; }
-  .thread-card, .look-card { background: #1c1a18; }
-}
