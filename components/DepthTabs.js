@@ -167,6 +167,59 @@ function ThreadsPanel({ data }) {
   );
 }
 
+// Get a favicon URL for a given article URL (via Google's free service)
+function faviconFor(url) {
+  try {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  } catch {
+    return null;
+  }
+}
+
+function SourceThumbnail({ source }) {
+  // Fallback chain state: 0 = try og:image, 1 = try favicon, 2 = text abbr
+  const [stage, setStage] = useState(source.image ? 0 : 1);
+
+  const faviconUrl = source.url ? faviconFor(source.url) : null;
+
+  if (stage === 2 || (stage === 1 && !faviconUrl)) {
+    return (
+      <div
+        className="w-12 h-12 rounded-md bg-stone-100 shrink-0 flex items-center justify-center overflow-hidden"
+        style={{ fontSize: '10px', color: '#a0a0a0' }}
+      >
+        {source.abbr}
+      </div>
+    );
+  }
+
+  const src = stage === 0 ? source.image : faviconUrl;
+  const fit = stage === 0 ? 'cover' : 'contain';
+  const padding = stage === 0 ? 0 : 8;
+
+  return (
+    <div
+      className="w-12 h-12 rounded-md bg-stone-100 shrink-0 overflow-hidden flex items-center justify-center"
+      style={{ padding }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        onError={() => setStage((s) => s + 1)}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: fit,
+          display: 'block',
+        }}
+        referrerPolicy="no-referrer"
+      />
+    </div>
+  );
+}
+
 function ReadPanel({ data }) {
   return (
     <div>
@@ -179,12 +232,7 @@ function ReadPanel({ data }) {
       <div className="divide-y divide-stone-100 max-w-xl">
         {data.sources.map((s) => (
           <div key={s.outlet} className="source-row">
-            <div
-              className="w-7 h-7 rounded-md bg-stone-100 shrink-0 flex items-center justify-center"
-              style={{ fontSize: '9px', color: '#a0a0a0' }}
-            >
-              {s.abbr}
-            </div>
+            <SourceThumbnail source={s} />
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium text-stone-800">
                 {s.outlet}{s.year ? `, ${s.year}` : ''}
