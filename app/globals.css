@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +8,8 @@
   --cr-light: #f5ece8;
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'DM Sans', 'Helvetica Neue', system-ui, sans-serif;
+  --nav-height: 56px;
+  --footer-height: 44px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +23,7 @@ html {
 body {
   background: #f7f5f1;
   color: #1a1816;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* --- Brand --- */
@@ -135,3 +136,72 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d0cdc8; border-radius: 2px; }
 
+/* --- Homepage layout --- */
+.home-main {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: calc(var(--nav-height) + clamp(24px, 5vh, 64px));
+  padding-bottom: calc(var(--footer-height) + clamp(16px, 3vh, 40px));
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.home-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  z-index: 50;
+  background: #f7f5f1;
+  border-bottom: 1px solid rgba(26, 24, 22, 0.04);
+}
+
+.home-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 0 auto;
+}
+
+.home-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #c8c4bc;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(to bottom, rgba(247, 245, 241, 0) 0%, rgba(247, 245, 241, 0.95) 40%, #f7f5f1 100%);
+  pointer-events: none;
+  z-index: 40;
+}
+
+/* Short viewport: tighten nav + top padding so hero + search fit without scroll */
+@media (max-height: 760px) {
+  :root {
+    --nav-height: 50px;
+    --footer-height: 36px;
+  }
+  .home-main {
+    padding-top: calc(var(--nav-height) + 16px);
+  }
+}
+
+/* Very short viewport: hide decorative footer entirely */
+@media (max-height: 600px) {
+  .home-footer { display: none; }
+  .home-main { padding-bottom: 24px; }
+}
