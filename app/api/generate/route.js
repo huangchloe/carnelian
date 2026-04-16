@@ -57,7 +57,7 @@ Return ONLY valid JSON — no preamble, no markdown fences, no commentary — wi
     "items": [{"year": "Year or era", "title": "Event name", "description": "1-2 sentences"}]
   },
   "read": {
-    "sources": [{"outlet": "Publication", "year": "2024", "title": "Article title", "url": "https://example.com", "abbr": "4chr"}]
+    "sources": [{"outlet": "Publication", "year": "2024", "title": "Article title", "url": "https://example.com", "abbr": "4chr", "image": "https://direct-url-to-article-hero-image.jpg"}]
   },
   "constellation": [
     {"label": "Short", "x": 80, "y": 12, "color": "#378ADD", "fullLabel": "Full name"},
@@ -75,6 +75,9 @@ Return ONLY valid JSON — no preamble, no markdown fences, no commentary — wi
 For "see" type "motifs": items = [{"name": "Motif name", "color": "#hex", "textColor": "#hex"}] (8 items)
 For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences of analysis"}] (3 items)
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
+
+For each source in "read.sources", include an "image" field with a direct URL to the article's hero image (the one you'd see on Google News next to that headline). Look for og:image, twitter:image, or the article's featured image. The URL must end in .jpg, .jpeg, .png, or .webp and load publicly without auth. If you cannot find a reliable hero image for a source, omit the "image" field entirely rather than guessing — a missing field is better than a broken link.
+
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 carnelianReads must be genuinely interpretive — what does this artifact reveal about culture that isn't obvious?`,
       messages: [{ role: 'user', content: `Search for current information about "${q}", then generate a Carnelian entry for it.` }],
