@@ -18,7 +18,7 @@ const QUICK = [
 function ResultCard({ artifact, generated }) {
   const router = useRouter();
   return (
-    <div style={{ border: '1px solid #e0dcd6', borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+    <div className="result-card" style={{ border: '1px solid #e0dcd6', borderRadius: 14, overflow: 'hidden', background: 'white', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
       {generated && (
         <div style={{ padding: '8px 20px', background: '#f5ece8', borderBottom: '1px solid #ebe7e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -28,12 +28,12 @@ function ResultCard({ artifact, generated }) {
           <span style={{ fontSize: 11, color: '#b0ada8' }}>Not yet in catalog</span>
         </div>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: 0 }}>
-        <div style={{ padding: '24px 28px', borderRight: '1px solid #ebe7e0' }}>
+      <div className="result-card-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: 0 }}>
+        <div className="result-card-main" style={{ padding: '24px 28px', borderRight: '1px solid #ebe7e0' }}>
           <div style={{ fontSize: 10, color: '#a0a8a0', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
             {artifact.type} · {artifact.origin} · {artifact.year}
           </div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 400, color: '#1a1816', marginBottom: 10, lineHeight: 1.1 }}>
+          <h2 className="result-card-main-title" style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 400, color: '#1a1816', marginBottom: 10, lineHeight: 1.1 }}>
             {artifact.title}
           </h2>
           <p style={{ fontSize: 14, color: '#6b6860', lineHeight: 1.75, marginBottom: 10 }}>{artifact.hook}</p>
@@ -52,7 +52,7 @@ function ResultCard({ artifact, generated }) {
             </button>
           </div>
         </div>
-        <div style={{ padding: '18px 14px', display: 'flex', flexDirection: 'column' }}>
+        <div className="result-card-side" style={{ padding: '18px 14px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontSize: 10, color: '#a0a8a0', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Connects to</div>
           <Constellation nodes={artifact.constellation} currentSlug={artifact.slug} artifact={artifact} />
         </div>
