@@ -34,14 +34,14 @@ function useImages(query, num = 9, enabled = true) {
 // ─── KNOW ─────────────────────────────────────────────────────────────────────
 function KnowSection({ data }) {
   return (
-    <section style={{ background: P.bone, padding: '140px 0' }}>
-      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
-        <div style={{ position: 'sticky', top: 120 }}>
+    <section className="artifact-section" style={{ background: P.bone, padding: '140px 0' }}>
+      <div className="artifact-section-inner" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
+        <div className="artifact-section-label" style={{ position: 'sticky', top: 120 }}>
           <span style={{ fontSize: 9, letterSpacing: '0.28em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Know</span>
         </div>
         <div style={{ maxWidth: 760 }}>
           {data.paragraphs?.map((p, i) => (
-            <p key={i} style={{ fontSize: 22, lineHeight: 2.0, color: P.ink, marginBottom: 40, fontFamily: 'var(--font-body)', fontWeight: 300, letterSpacing: '-0.01em' }}>{p}</p>
+            <p key={i} className="artifact-know-para" style={{ fontSize: 22, lineHeight: 2.0, color: P.ink, marginBottom: 40, fontFamily: 'var(--font-body)', fontWeight: 300, letterSpacing: '-0.01em' }}>{p}</p>
           ))}
           {data.relatedNodes?.length > 0 && (
             <div style={{ marginTop: 64, paddingTop: 40, borderTop: `1px solid ${P.stone}`, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -64,11 +64,11 @@ function SeeSection({ data, artifact }) {
   const [lightbox, setLightbox] = useState(null);
 
   return (
-    <section style={{ background: P.espresso, padding: '140px 0' }}>
-      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px' }}>
+    <section className="artifact-section" style={{ background: P.espresso, padding: '140px 0' }}>
+      <div className="artifact-section-outer" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px' }}>
 
         {/* Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', marginBottom: 80, alignItems: 'end' }}>
+        <div className="artifact-see-header" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', marginBottom: 80, alignItems: 'end' }}>
           <span style={{ fontSize: 9, letterSpacing: '0.28em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>See</span>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 13, letterSpacing: '0.12em', color: 'rgba(245,243,239,0.4)', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>{data.label}</span>
@@ -77,14 +77,14 @@ function SeeSection({ data, artifact }) {
         </div>
 
         {loading && (
-          <div style={{ paddingLeft: 340, fontSize: 11, color: 'rgba(245,243,239,0.2)', fontFamily: 'var(--font-body)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <div className="artifact-see-loading" style={{ paddingLeft: 340, fontSize: 11, color: 'rgba(245,243,239,0.2)', fontFamily: 'var(--font-body)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Loading visual references...
           </div>
         )}
 
         {/* Full-bleed masonry — images replace structured blocks */}
         {images.length > 0 ? (
-          <div style={{ columns: 3, gap: 10, columnFill: 'balance' }}>
+          <div className="artifact-see-masonry" style={{ columns: 3, gap: 10, columnFill: 'balance' }}>
             {images.map((img, i) => (
               <div key={i} onClick={() => setLightbox(img)}
                 style={{ marginBottom: 10, breakInside: 'avoid', cursor: 'zoom-in', overflow: 'hidden', borderRadius: 2, background: '#1a1410', position: 'relative' }}>
@@ -99,9 +99,9 @@ function SeeSection({ data, artifact }) {
           </div>
         ) : !loading && (
           // Fallback structured blocks only if no images
-          <div style={{ paddingLeft: 340 }}>
+          <div className="artifact-see-fallback" style={{ paddingLeft: 340 }}>
             {data.type === 'motifs' && data.items?.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+              <div className="artifact-see-motifs" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
                 {data.items.map((item, i) => (
                   <div key={i} style={{ aspectRatio: '1', borderRadius: 4, background: item.color, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0 8px 14px' }}>
                     <span style={{ fontSize: 10, color: item.textColor, fontFamily: 'var(--font-body)', textAlign: 'center', letterSpacing: '0.06em' }}>{item.name}</span>
@@ -110,7 +110,7 @@ function SeeSection({ data, artifact }) {
               </div>
             )}
             {data.type === 'analysis' && data.items?.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0 60px' }}>
+              <div className="artifact-see-analysis" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0 60px' }}>
                 {data.items.map((item, i) => (
                   <div key={i}>
                     <div style={{ fontSize: 13, fontWeight: 500, color: 'rgba(245,243,239,0.7)', marginBottom: 14, fontFamily: 'var(--font-body)', letterSpacing: '0.04em' }}>{item.title}</div>
@@ -141,9 +141,9 @@ function SeeSection({ data, artifact }) {
 // ─── TRACE ────────────────────────────────────────────────────────────────────
 function TraceSection({ data }) {
   return (
-    <section style={{ background: P.bone, padding: '140px 0', borderTop: `1px solid ${P.stone}` }}>
-      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
-        <div style={{ position: 'sticky', top: 120 }}>
+    <section className="artifact-section" style={{ background: P.bone, padding: '140px 0', borderTop: `1px solid ${P.stone}` }}>
+      <div className="artifact-section-inner" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
+        <div className="artifact-section-label" style={{ position: 'sticky', top: 120 }}>
           <span style={{ fontSize: 9, letterSpacing: '0.28em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Trace</span>
         </div>
         <div style={{ maxWidth: 760 }}>
@@ -154,7 +154,7 @@ function TraceSection({ data }) {
                 <div key={i} style={{ marginBottom: 72, position: 'relative' }}>
                   <div style={{ position: 'absolute', left: -46, top: 8, width: 13, height: 13, borderRadius: '50%', background: P.brand, border: `3px solid ${P.bone}` }} />
                   <div style={{ fontSize: 10, color: P.brand, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 12, fontFamily: 'var(--font-body)' }}>{item.year}</div>
-                  <div style={{ fontSize: 26, fontWeight: 400, color: P.ink, marginBottom: 14, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>{item.title}</div>
+                  <div className="artifact-trace-title" style={{ fontSize: 26, fontWeight: 400, color: P.ink, marginBottom: 14, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>{item.title}</div>
                   <div style={{ fontSize: 16, color: P.muted, lineHeight: 1.9, fontFamily: 'var(--font-body)', fontWeight: 300 }}>{item.description}</div>
                 </div>
               ))}
@@ -164,7 +164,7 @@ function TraceSection({ data }) {
             <div>
               {data.items?.map((item, i) => (
                 <div key={i} style={{ paddingLeft: 32, borderLeft: `2px solid ${item.color || P.brand}`, marginBottom: 56 }}>
-                  <div style={{ fontSize: 24, fontWeight: 400, color: P.ink, marginBottom: 12, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{item.title}</div>
+                  <div className="artifact-trace-title" style={{ fontSize: 24, fontWeight: 400, color: P.ink, marginBottom: 12, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{item.title}</div>
                   <div style={{ fontSize: 16, color: P.muted, lineHeight: 1.9, fontFamily: 'var(--font-body)', fontWeight: 300 }}>{item.body}</div>
                 </div>
               ))}
@@ -179,9 +179,9 @@ function TraceSection({ data }) {
 // ─── READ ─────────────────────────────────────────────────────────────────────
 function ReadSection({ data }) {
   return (
-    <section style={{ background: P.stone, padding: '140px 0' }}>
-      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
-        <div style={{ position: 'sticky', top: 120 }}>
+    <section className="artifact-section" style={{ background: P.stone, padding: '140px 0' }}>
+      <div className="artifact-section-inner" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
+        <div className="artifact-section-label" style={{ position: 'sticky', top: 120 }}>
           <span style={{ fontSize: 9, letterSpacing: '0.28em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Read</span>
         </div>
         <div style={{ maxWidth: 640 }}>
@@ -236,9 +236,9 @@ function MiniConstellation({ nodes }) {
 // ─── NOW / Live context ───────────────────────────────────────────────────────
 function NowSection({ slug, artifact }) {
   return (
-    <section style={{ padding: '140px 0', background: P.bone, borderTop: `1px solid ${P.stone}` }}>
-      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
-        <div style={{ position: 'sticky', top: 120 }}>
+    <section className="artifact-section" style={{ padding: '140px 0', background: P.bone, borderTop: `1px solid ${P.stone}` }}>
+      <div className="artifact-section-inner" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
+        <div className="artifact-section-label" style={{ position: 'sticky', top: 120 }}>
           <span style={{ fontSize: 9, letterSpacing: '0.28em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Now</span>
         </div>
         <LiveContext slug={slug} artifact={artifact} />
@@ -301,12 +301,12 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
     <div style={{ minHeight: '100vh', background: P.bone }}>
 
       {/* Nav */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 52px', background: `rgba(245,243,239,0.92)`, backdropFilter: 'blur(20px)', borderBottom: `1px solid rgba(231,227,220,0.7)` }}>
+      <nav className="artifact-nav" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 52px', background: `rgba(245,243,239,0.92)`, backdropFilter: 'blur(20px)', borderBottom: `1px solid rgba(231,227,220,0.7)` }}>
         <Link href="/" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.26em', color: P.brand, textTransform: 'uppercase', textDecoration: 'none', fontFamily: 'var(--font-body)' }}>Carnelian</Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 9, color: P.muted, fontFamily: 'var(--font-body)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-          <span>{artifact.type}</span>
-          <span style={{ color: '#D4CFC9' }}>·</span>
-          <span>{artifact.medium}</span>
+          <span className="artifact-nav-meta-item">{artifact.type}</span>
+          <span className="artifact-nav-meta-item" style={{ color: '#D4CFC9' }}>·</span>
+          <span className="artifact-nav-meta-item">{artifact.medium}</span>
           {!catalogArtifact && (
             <span style={{ marginLeft: 10, padding: '2px 10px', borderRadius: 2, background: '#F5ECE8', color: P.brand, fontWeight: 600, fontSize: 8, letterSpacing: '0.1em' }}>Generated</span>
           )}
@@ -314,11 +314,11 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
         <Link href="/" style={{ fontSize: 11, color: P.muted, textDecoration: 'none', fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>← Back</Link>
       </nav>
 
-      {/* Hero — full viewport, 52/48 split */}
-      <section style={{ height: '100vh', display: 'grid', gridTemplateColumns: '54% 46%' }}>
+      {/* Hero — full viewport, 54/46 split on desktop, stacked on mobile */}
+      <section className="artifact-hero" style={{ height: '100vh', display: 'grid', gridTemplateColumns: '54% 46%' }}>
 
         {/* Image side */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: P.espresso }}>
+        <div className="artifact-hero-image" style={{ position: 'relative', overflow: 'hidden', background: P.espresso }}>
           {heroImage ? (
             <img
               src={heroImage.url}
@@ -335,26 +335,26 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
           )}
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 50%, rgba(245,243,239,0.04) 100%)' }} />
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '28%', background: `linear-gradient(to top, rgba(42,30,26,0.5), transparent)` }} />
-          <div style={{ position: 'absolute', bottom: 44, left: 56, fontSize: 9, color: 'rgba(245,243,239,0.38)', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
+          <div className="artifact-hero-caption" style={{ position: 'absolute', bottom: 44, left: 56, fontSize: 9, color: 'rgba(245,243,239,0.38)', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
             {artifact.origin} · {artifact.year}
           </div>
         </div>
 
         {/* Text side */}
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '110px 80px 80px 72px', background: P.bone, overflowY: 'auto' }}>
+        <div className="artifact-hero-text" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '110px 80px 80px 72px', background: P.bone, overflowY: 'auto' }}>
           <div style={{ fontSize: 9, letterSpacing: '0.24em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 22 }}>
             {artifact.era}
           </div>
 
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(3rem, 4.2vw, 5.8rem)', fontWeight: 400, lineHeight: 0.93, letterSpacing: '-0.03em', color: P.ink, marginBottom: 40 }}>
+          <h1 className="artifact-hero-title" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(3rem, 4.2vw, 5.8rem)', fontWeight: 400, lineHeight: 0.93, letterSpacing: '-0.03em', color: P.ink, marginBottom: 40 }}>
             {artifact.title}
           </h1>
 
-          <p style={{ fontSize: 18, color: P.muted, lineHeight: 1.9, marginBottom: 36, fontFamily: 'var(--font-body)', fontWeight: 300, maxWidth: 420 }}>
+          <p className="artifact-hero-hook" style={{ fontSize: 18, color: P.muted, lineHeight: 1.9, marginBottom: 36, fontFamily: 'var(--font-body)', fontWeight: 300, maxWidth: 420 }}>
             {artifact.hook}
           </p>
 
-          <div style={{ fontSize: 16, fontFamily: 'var(--font-display)', fontStyle: 'italic', color: P.brand, lineHeight: 1.75, paddingTop: 30, borderTop: `1px solid ${P.stone}`, marginBottom: 48, maxWidth: 420 }}>
+          <div className="artifact-hero-reads" style={{ fontSize: 16, fontFamily: 'var(--font-display)', fontStyle: 'italic', color: P.brand, lineHeight: 1.75, paddingTop: 30, borderTop: `1px solid ${P.stone}`, marginBottom: 48, maxWidth: 420 }}>
             {artifact.carnelianReads}
           </div>
 
@@ -363,7 +363,7 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
             <MiniConstellation nodes={artifact.constellation} />
           </div>
 
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
             <button onClick={() => setShowGraph(true)}
               style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: P.ink, background: 'none', border: `1px solid #C8C3BB`, borderRadius: 2, padding: '13px 26px', cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'all 0.15s' }}
               onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
@@ -384,12 +384,12 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
 
       {/* Related */}
       {related?.length > 0 && (
-        <section style={{ padding: '120px 0', background: P.stone }}>
-          <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px' }}>
+        <section className="artifact-related-section" style={{ padding: '120px 0', background: P.stone }}>
+          <div className="artifact-related-outer" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px' }}>
             <div style={{ fontSize: 9, letterSpacing: '0.28em', color: P.muted, textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 56 }}>Also in Carnelian</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 3 }}>
+            <div className="artifact-related-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 3 }}>
               {related.map(r => (
-                <Link key={r.slug} href={`/artifact/${r.slug}`}
+                <Link key={r.slug} href={`/artifact/${r.slug}`} className="artifact-related-card"
                   style={{ display: 'block', padding: '44px 48px', background: P.bone, textDecoration: 'none', transition: 'background 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.background = '#EDEAE4'}
                   onMouseLeave={e => e.currentTarget.style.background = P.bone}>
