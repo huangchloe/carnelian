@@ -169,19 +169,35 @@ export default function GraphView({ artifact, onClose }) {
     }
   }, [artifact, expandData]);
 
-  const handleDragStart = useCallback((e, nodeId) => {
-    e.preventDefault();
+  // Unified mouse + touch + pen via pointer events.
+  // stopPropagation prevents d3.zoom (attached to the SVG) from also panning during node drag.
+  const handlePointerDown = useCallback((e, nodeId) => {
     const node = nodesRef.current.find(n => n.id === nodeId);
     if (!node || node.type === 'artifact') return;
+    e.preventDefault();
+    e.stopPropagation();
+
     simRef.current?.alphaTarget(0.2).restart();
     const startX = e.clientX, startY = e.clientY;
     const origX = node.x, origY = node.y;
     const g = svgRef.current?.querySelector('g.zoom-layer');
     const scale = g ? (new DOMMatrix(window.getComputedStyle(g).transform).a || 1) : 1;
-    const onMove = me => { node.fx = origX + (me.clientX - startX) / scale; node.fy = origY + (me.clientY - startY) / scale; simRef.current?.alpha(0.1).restart(); };
-    const onUp = () => { node.fx = null; node.fy = null; simRef.current?.alphaTarget(0); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+
+    const onMove = me => {
+      node.fx = origX + (me.clientX - startX) / scale;
+      node.fy = origY + (me.clientY - startY) / scale;
+      simRef.current?.alpha(0.1).restart();
+    };
+    const onUp = () => {
+      node.fx = null; node.fy = null;
+      simRef.current?.alphaTarget(0);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   }, []);
 
   const getPos = id => positionsRef.current[id] || positions[id] || { x: 0, y: 0 };
@@ -210,11 +226,11 @@ export default function GraphView({ artifact, onClose }) {
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(247,245,241,0.97)', backdropFilter: 'blur(6px)', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 36px', borderBottom: '1px solid #e8e4de', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="graph-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 36px', borderBottom: '1px solid #e8e4de', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', minWidth: 0 }}>
           <a href="/" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)', textDecoration: 'none', cursor: 'pointer' }}>Carnelian</a>
           <span style={{ color: '#e0dcd8' }}>·</span>
-          <span style={{ fontSize: 14, color: P.ink, fontFamily: 'var(--font-display)' }}>{artifact.title}</span>
+          <span style={{ fontSize: 14, color: P.ink, fontFamily: 'var(--font-display)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60vw' }}>{artifact.title}</span>
           {expandCount > 0 && (
             <span style={{ fontSize: 9, color: P.brand, background: '#f5ece8', padding: '2px 10px', borderRadius: 2, marginLeft: 4, fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {expandCount} expansion{expandCount > 1 ? 's' : ''}
@@ -228,7 +244,7 @@ export default function GraphView({ artifact, onClose }) {
               Expanding...
             </span>
           )}
-          <span style={{ fontSize: 10, color: '#c0bdb8', fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>Click to expand · Drag · Scroll to zoom · Esc</span>
+          <span className="graph-hints-desktop" style={{ fontSize: 10, color: '#c0bdb8', fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>Click to expand · Drag · Scroll to zoom · Esc</span>
           <button onClick={onClose}
             style={{ border: '1px solid #d8d4ce', borderRadius: 2, background: 'transparent', padding: '8px 20px', fontSize: 11, cursor: 'pointer', color: P.muted, fontFamily: 'var(--font-body)', letterSpacing: '0.08em', textTransform: 'uppercase', transition: 'all 0.15s' }}
             onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
@@ -239,11 +255,11 @@ export default function GraphView({ artifact, onClose }) {
       </div>
 
       {/* Body */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div className="graph-body" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
         {/* Graph canvas */}
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          <svg ref={svgRef} width="100%" height="100%" style={{ cursor: 'grab', display: 'block' }}>
+        <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+          <svg ref={svgRef} width="100%" height="100%" style={{ cursor: 'grab', display: 'block', touchAction: 'none' }}>
             <defs>
               {nodes.map(n => (
                 <clipPath key={`clip-${n.id}`} id={`clip-${n.id.replace(/[^a-zA-Z0-9-_]/g, '-')}`}>
@@ -278,7 +294,7 @@ export default function GraphView({ artifact, onClose }) {
                     transform={`translate(${pos.x},${pos.y})`}
                     style={{ cursor: 'pointer' }}
                     onClick={() => !expanded ? doExpand(n.id, n.fullLabel || n.label) : setSelectedNode({ ...n, ...expandData[n.id] })}
-                    onMouseDown={e => handleDragStart(e, n.id)}>
+                    onPointerDown={e => handlePointerDown(e, n.id)}>
 
                     {isSelected && <circle r={nr + 7} fill="none" stroke={P.brand} strokeWidth={1.5} opacity={0.5} />}
                     {!expanded && <circle r={nr + 11} fill="none" stroke={n.color} strokeWidth={0.7} strokeDasharray="4,4" opacity={0.25} />}
@@ -343,7 +359,7 @@ export default function GraphView({ artifact, onClose }) {
             </g>
           </svg>
 
-          <div style={{ position: 'absolute', bottom: 24, left: 28, display: 'flex', gap: 20, fontFamily: 'var(--font-body)', alignItems: 'center' }}>
+          <div className="graph-legend" style={{ position: 'absolute', bottom: 24, left: 28, display: 'flex', gap: 20, fontFamily: 'var(--font-body)', alignItems: 'center' }}>
             {Object.entries(TYPE_COLORS).map(([color, { label }]) => (
               <span key={color} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9, color: '#b0ada8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, display: 'inline-block' }} />{label}
@@ -352,7 +368,7 @@ export default function GraphView({ artifact, onClose }) {
           </div>
 
           {expandCount > 0 && (
-            <div style={{ position: 'absolute', bottom: 24, right: selectedNode ? 396 : 28, fontSize: 9, color: '#c0bdb8', fontFamily: 'var(--font-body)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <div className="graph-node-count" style={{ position: 'absolute', bottom: 24, right: selectedNode ? 396 : 28, fontSize: 9, color: '#c0bdb8', fontFamily: 'var(--font-body)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               {nodes.length} nodes · {links.length} connections
             </div>
           )}
@@ -360,9 +376,9 @@ export default function GraphView({ artifact, onClose }) {
 
         {/* Info panel */}
         {selectedNode && selectedNode.type !== 'artifact' && (
-          <div style={{ width: 380, borderLeft: '1px solid #e8e4de', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
+          <div className="graph-info-panel" style={{ width: 380, borderLeft: '1px solid #e8e4de', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
-            <div style={{ height: 140, background: '#f0ece6', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+            <div className="graph-info-panel-image" style={{ height: 140, background: '#f0ece6', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
               {nodeImages[selectedNode.id] ? (
                 <img src={nodeImages[selectedNode.id]} alt=""
                   style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.75 }}
@@ -373,7 +389,7 @@ export default function GraphView({ artifact, onClose }) {
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, white 0%, transparent 55%)' }} />
 
               <button onClick={() => setSelectedNode(null)}
-                style={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.85)', border: 'none', cursor: 'pointer', fontSize: 15, color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ position: 'absolute', top: 12, right: 12, width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', fontSize: 17, color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 ×
               </button>
 
@@ -387,7 +403,7 @@ export default function GraphView({ artifact, onClose }) {
               })()}
             </div>
 
-            <div style={{ flex: 1, overflow: 'auto', padding: '24px 28px 40px' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: '24px 28px 40px', WebkitOverflowScrolling: 'touch' }}>
               <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 400, color: P.ink, lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 6 }}>
                 {selectedNode.fullLabel || selectedNode.label}
               </h3>
