@@ -205,3 +205,79 @@ body {
   .home-footer { display: none; }
   .home-main { padding-bottom: 24px; }
 }
+
+/* ============================================
+   Mobile (≤640px)
+   ============================================ */
+@media (max-width: 640px) {
+  .home-nav {
+    padding: 0 18px;
+  }
+  .home-main {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  /* Result card: stack hero + constellation */
+  .result-card-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .result-card-main {
+    border-right: none !important;
+    border-bottom: 1px solid #ebe7e0;
+    padding: 22px 22px !important;
+  }
+  .result-card-main-title {
+    font-size: 24px !important;
+  }
+  .result-card-side {
+    padding: 16px 20px 20px !important;
+  }
+
+  /* GraphView mobile */
+  .graph-header {
+    padding: 12px 16px !important;
+    flex-wrap: wrap;
+    gap: 10px !important;
+  }
+  .graph-hints-desktop {
+    display: none !important;
+  }
+  .graph-body {
+    flex-direction: column !important;
+  }
+  .graph-info-panel {
+    width: 100% !important;
+    max-height: 55vh;
+    border-left: none !important;
+    border-top: 1px solid #e8e4de;
+    animation: slideUp 0.22s ease-out;
+  }
+  .graph-info-panel-image {
+    height: 100px !important;
+  }
+  .graph-legend {
+    flex-wrap: wrap !important;
+    gap: 6px 14px !important;
+    bottom: 12px !important;
+    left: 16px !important;
+  }
+  .graph-node-count {
+    display: none !important;
+  }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12%); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .home-nav {
+    padding: 0 14px;
+  }
+  .result-card-main-title {
+    font-size: 22px !important;
+  }
+}
