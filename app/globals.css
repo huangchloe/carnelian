@@ -210,6 +210,8 @@ body {
    Mobile (≤640px)
    ============================================ */
 @media (max-width: 640px) {
+
+  /* --- Homepage --- */
   .home-nav {
     padding: 0 18px;
   }
@@ -234,7 +236,7 @@ body {
     padding: 16px 20px 20px !important;
   }
 
-  /* GraphView mobile */
+  /* --- GraphView --- */
   .graph-header {
     padding: 12px 16px !important;
     flex-wrap: wrap;
@@ -265,6 +267,109 @@ body {
   .graph-node-count {
     display: none !important;
   }
+
+  /* --- Artifact page: Nav --- */
+  .artifact-nav {
+    padding: 14px 18px !important;
+  }
+  .artifact-nav-meta-item {
+    display: none !important;
+  }
+
+  /* --- Artifact page: Hero (stacks vertically) --- */
+  .artifact-hero {
+    height: auto !important;
+    grid-template-columns: 1fr !important;
+  }
+  .artifact-hero-image {
+    height: 55vh;
+    min-height: 320px;
+  }
+  .artifact-hero-text {
+    padding: 44px 22px 56px !important;
+    overflow-y: visible !important;
+    justify-content: flex-start !important;
+  }
+  .artifact-hero-title {
+    font-size: 2.4rem !important;
+    margin-bottom: 28px !important;
+  }
+  .artifact-hero-hook {
+    font-size: 16px !important;
+    line-height: 1.75 !important;
+    margin-bottom: 28px !important;
+  }
+  .artifact-hero-reads {
+    padding-top: 22px !important;
+    margin-bottom: 36px !important;
+  }
+  .artifact-hero-caption {
+    bottom: 22px !important;
+    left: 22px !important;
+  }
+
+  /* --- Artifact page: Sections (Know / Trace / Read / Now) --- */
+  .artifact-section {
+    padding: 72px 0 !important;
+  }
+  .artifact-section-inner {
+    padding: 0 22px !important;
+    grid-template-columns: 1fr !important;
+    gap: 24px 0 !important;
+  }
+  .artifact-section-label {
+    position: static !important;
+    top: auto !important;
+  }
+  .artifact-know-para {
+    font-size: 16px !important;
+    line-height: 1.75 !important;
+    margin-bottom: 24px !important;
+  }
+  .artifact-trace-title {
+    font-size: 22px !important;
+  }
+
+  /* --- Artifact page: See section --- */
+  .artifact-section-outer {
+    padding: 0 22px !important;
+  }
+  .artifact-see-header {
+    grid-template-columns: 1fr !important;
+    gap: 14px 0 !important;
+    margin-bottom: 40px !important;
+    align-items: start !important;
+  }
+  .artifact-see-masonry {
+    columns: 2 !important;
+    gap: 6px !important;
+  }
+  .artifact-see-loading,
+  .artifact-see-fallback {
+    padding-left: 0 !important;
+  }
+  .artifact-see-motifs {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .artifact-see-analysis {
+    grid-template-columns: 1fr !important;
+    gap: 32px 0 !important;
+  }
+
+  /* --- Artifact page: Related --- */
+  .artifact-related-section {
+    padding: 72px 0 !important;
+  }
+  .artifact-related-outer {
+    padding: 0 22px !important;
+  }
+  .artifact-related-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1px !important;
+  }
+  .artifact-related-card {
+    padding: 32px 24px !important;
+  }
 }
 
 @keyframes slideUp {
@@ -279,5 +384,8 @@ body {
   }
   .result-card-main-title {
     font-size: 22px !important;
+  }
+  .artifact-hero-title {
+    font-size: 2.1rem !important;
   }
 }
