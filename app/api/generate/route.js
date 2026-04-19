@@ -480,10 +480,12 @@ async function buildStreamingResponse({ query, image }) {
           }
 
           // NEW: extract consensus brand/product from visual match titles
-          consensusId = extractConsensusIdentification(lensResults.visualMatches);
-          const identifier = consensusId?.identification || lensResults.knowledgeGraph?.title;
+consensusId = extractConsensusIdentification(lensResults.visualMatches);
+const identifier = consensusId?.identification || lensResults.knowledgeGraph?.title;
 
-          console.log('[identify] consensus:', consensusId?.identification, '| kg:', lensResults.knowledgeGraph?.title, '| chose:', identifier);
+console.log('[lens] match titles:', JSON.stringify(lensResults.visualMatches.slice(0, 10).map(m => m.title)));
+console.log('[lens] knowledge graph:', JSON.stringify(lensResults.knowledgeGraph));
+console.log('[identify] consensus:', consensusId?.identification, '| kg:', lensResults.knowledgeGraph?.title, '| chose:', identifier);
 
           if (identifier) {
             controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
