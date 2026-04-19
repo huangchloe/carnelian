@@ -1,10 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextResponse } from 'next/server';
-import { put, del } from '@vercel/blob';
 
 const client = new Anthropic();
 
-const SYSTEM_PROMPT = `You are Carnelian — a cultural knowledge platform with a sharp editorial voice. Before writing an entry, search the web to get current, accurate information about the subject. Pull from reviews, interviews, critical writing, and cultural discourse — not just Wikipedia.
+const SYSTEM_PROMPT = `You are Carnelian — a cultural knowledge platform with a sharp editorial voice. Pull from reviews, interviews, critical writing, and cultural discourse — not just Wikipedia.
 
 Return ONLY valid JSON — no preamble, no markdown fences, no commentary — with this exact schema:
 {
@@ -22,11 +21,7 @@ Return ONLY valid JSON — no preamble, no markdown fences, no commentary — wi
     "paragraphs": ["paragraph 1 (3-4 sentences)", "paragraph 2 (3-4 sentences)"],
     "relatedNodes": ["Related concept 1", "Related concept 2", "Related concept 3", "Related concept 4"]
   },
-  "see": {
-    "type": "motifs|analysis|references",
-    "label": "Section title",
-    "items": []
-  },
+  "see": { "type": "motifs|analysis|references", "label": "Section title", "items": [] },
   "trace": {
     "type": "lineage|threads",
     "label": "Section title",
@@ -61,33 +56,39 @@ function extractJSON(text) {
   let cleaned = text.trim().replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/, '').trim();
   const start = cleaned.indexOf('{');
   const end = cleaned.lastIndexOf('}');
-  if (start !== -1 && end !== -1 && end > start) {
-    cleaned = cleaned.slice(start, end + 1);
-  }
+  if (start !== -1 && end !== -1 && end > start) cleaned = cleaned.slice(start, end + 1);
   return JSON.parse(cleaned);
 }
 
-// Upload image to Vercel Blob, reverse-search via SerpApi Google Lens, clean up.
+// Google Lens via Vercel Blob + SerpApi. Returns structured identification.
 async function reverseImageSearch(imageBase64, mimeType) {
+  const { put, del } = await import('@vercel/blob');
   const buffer = Buffer.from(imageBase64, 'base64');
   const ext = (mimeType?.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
-  let blobUrl = null;
+
+  console.log('[lens] uploading to blob...');
+  const blob = await put(`lens/${Date.now()}.${ext}`, buffer, {
+    access: 'public',
+    addRandomSuffix: true,
+    contentType: mimeType || 'image/jpeg',
+  });
 
   try {
-    const blob = await put(`lens/${Date.now()}.${ext}`, buffer, {
-      access: 'public',
-      addRandomSuffix: true,
-      contentType: mimeType || 'image/jpeg',
-    });
-    blobUrl = blob.url;
+    console.log('[lens] calling SerpApi Google Lens:', blob.url);
+    const lensUrl = `https://serpapi.com/search.json?engine=google_lens&url=${encodeURIComponent(blob.url)}&api_key=${process.env.SERPAPI_KEY}`;
 
-    const lensUrl = `https://serpapi.com/search.json?engine=google_lens&url=${encodeURIComponent(blobUrl)}&api_key=${process.env.SERPAPI_KEY}`;
-    const res = await fetch(lensUrl);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    const res = await fetch(lensUrl, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    if (!res.ok) throw new Error(`SerpApi returned ${res.status}`);
     const data = await res.json();
 
-    const visualMatches = (data.visual_matches || []).slice(0, 10).map(m => ({
+    const visualMatches = (data.visual_matches || []).slice(0, 15).map(m => ({
       title: m.title,
       source: m.source,
+      link: m.link,
     })).filter(m => m.title);
 
     const knowledgeGraph = data.knowledge_graph ? {
@@ -96,70 +97,76 @@ async function reverseImageSearch(imageBase64, mimeType) {
       description: data.knowledge_graph.description,
     } : null;
 
+    console.log('[lens] got', visualMatches.length, 'matches, kg:', !!knowledgeGraph);
     return { visualMatches, knowledgeGraph };
-  } catch (err) {
-    console.error('Lens error:', err.message);
-    return null;
   } finally {
-    if (blobUrl) { try { await del(blobUrl); } catch {} }
+    try { await del(blob.url); } catch {}
   }
 }
 
-function buildUserMessage({ query, image, lensResults }) {
-  const content = [];
+async function generateArtifact({ query, image }) {
+  const isImageSearch = !!image?.data;
+  let lensResults = null;
 
+  // For image searches: Lens is required — it's literally Google Images.
+  // If it fails, we throw so the user gets a real error instead of a hallucination.
+  if (isImageSearch) {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) throw new Error('Image search not configured: BLOB_READ_WRITE_TOKEN missing');
+    if (!process.env.SERPAPI_KEY) throw new Error('Image search not configured: SERPAPI_KEY missing');
+
+    lensResults = await reverseImageSearch(image.data, image.type);
+
+    const hasMatches = lensResults?.visualMatches?.length > 0 || lensResults?.knowledgeGraph;
+    if (!hasMatches) {
+      throw new Error("Couldn't identify this image. Try a clearer photo or add text context.");
+    }
+  }
+
+  // Build user message
+  const userContent = [];
   if (image?.data && image?.type) {
-    content.push({
+    userContent.push({
       type: 'image',
       source: { type: 'base64', media_type: image.type, data: image.data },
     });
   }
 
-  let text;
-  if (image) {
+  let userText;
+  if (isImageSearch) {
     let grounding = '';
-
-    if (lensResults?.knowledgeGraph?.title) {
-      grounding += `\n\nGoogle Lens identifies this as: ${lensResults.knowledgeGraph.title}`;
-      if (lensResults.knowledgeGraph.type) grounding += ` (${lensResults.knowledgeGraph.type})`;
-      if (lensResults.knowledgeGraph.description) grounding += `. ${lensResults.knowledgeGraph.description}`;
+    if (lensResults.knowledgeGraph?.title) {
+      grounding += `\n\nGoogle identifies this as: ${lensResults.knowledgeGraph.title}`;
+      if (lensResults.knowledgeGraph.type) grounding += ` — ${lensResults.knowledgeGraph.type}`;
+      if (lensResults.knowledgeGraph.description) grounding += `\n${lensResults.knowledgeGraph.description}`;
     }
-
-    if (lensResults?.visualMatches?.length) {
-      grounding += `\n\nGoogle Image visual matches (ranked by visual similarity):\n` +
+    if (lensResults.visualMatches?.length) {
+      grounding += `\n\nGoogle Images visual matches (ranked by similarity):\n` +
         lensResults.visualMatches.map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n');
     }
 
-    if (!grounding) {
-      grounding = '\n\n(Google Lens returned no matches. Identify from the image alone.)';
-    }
-
     const userNote = query ? ` The user added context: "${query}".` : '';
-    text = `The user uploaded this image.${userNote}${grounding}
+    userText = `The user uploaded this image.${userNote}${grounding}
 
-Use the Google Lens results as your PRIMARY identification source — they tell you what this object actually is (including specific brand, product, artist, or title). Look for consensus across the visual matches. If a specific product or work is named repeatedly, that is what you are writing about, even if it is not the most famous or obvious interpretation.
+The Google Images matches above ARE the ground truth for identification. Find the consensus identification across the matches — if a specific product, brand, artist, work, or title appears repeatedly, that is what you are writing about. Do not substitute your own guess.
 
-Then search the web for editorial and critical context about the identified subject, and generate the Carnelian entry.`;
+Write the full Carnelian entry for the identified subject using your knowledge of it. Be specific about the brand/maker/title the matches indicate.`;
   } else {
-    text = `Search for current information about "${query}", then generate a Carnelian entry for it.`;
+    userText = `Search for current information about "${query}", then generate a Carnelian entry for it.`;
   }
+  userContent.push({ type: 'text', text: userText });
 
-  content.push({ type: 'text', text });
-  return content;
-}
+  // Key optimization: only include web_search for text queries.
+  // Image queries are already grounded by Lens — web search is redundant and slow.
+  const tools = isImageSearch ? [] : [{ type: 'web_search_20250305', name: 'web_search' }];
 
-async function generateArtifact({ query, image }) {
-  let lensResults = null;
-  if (image?.data && process.env.SERPAPI_KEY) {
-    lensResults = await reverseImageSearch(image.data, image.type);
-  }
+  console.log('[generate] calling Claude, image:', isImageSearch, 'tools:', tools.length);
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 4000,
-    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+    tools,
     system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: buildUserMessage({ query, image, lensResults }) }],
+    messages: [{ role: 'user', content: userContent }],
   });
 
   const textBlock = message.content.filter(b => b.type === 'text').pop();
@@ -176,7 +183,7 @@ export async function GET(request) {
     const artifact = await generateArtifact({ query: q });
     return NextResponse.json({ artifact, generated: true });
   } catch (err) {
-    console.error('Generate error:', err.message);
+    console.error('[generate] GET error:', err.message);
     return NextResponse.json({ error: 'Generation failed', detail: err.message }, { status: 500 });
   }
 }
@@ -190,7 +197,7 @@ export async function POST(request) {
     const artifact = await generateArtifact({ query, image });
     return NextResponse.json({ artifact, generated: true });
   } catch (err) {
-    console.error('Generate error:', err.message);
+    console.error('[generate] POST error:', err.message);
     return NextResponse.json({ error: 'Generation failed', detail: err.message }, { status: 500 });
   }
 }
