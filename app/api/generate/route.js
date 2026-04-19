@@ -3,32 +3,7 @@ import { NextResponse } from 'next/server';
 
 const client = new Anthropic();
 
-function extractJSON(text) {
-  let cleaned = text.trim().replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/, '').trim();
-  const start = cleaned.indexOf('{');
-  const end = cleaned.lastIndexOf('}');
-  if (start !== -1 && end !== -1 && end > start) {
-    cleaned = cleaned.slice(start, end + 1);
-  }
-  return JSON.parse(cleaned);
-}
-
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const q = searchParams.get('q') || '';
-  if (!q) return NextResponse.json({ error: 'No query' }, { status: 400 });
-
-  try {
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4000,
-      tools: [
-        {
-          type: 'web_search_20250305',
-          name: 'web_search',
-        }
-      ],
-      system: `You are Carnelian — a cultural knowledge platform with a sharp editorial voice. Before writing an entry, search the web to get current, accurate information about the subject. Pull from reviews, interviews, critical writing, and cultural discourse — not just Wikipedia.
+const SYSTEM_PROMPT = `You are Carnelian — a cultural knowledge platform with a sharp editorial voice. Before writing an entry, search the web to get current, accurate information about the subject. Pull from reviews, interviews, critical writing, and cultural discourse — not just Wikipedia.
 
 Return ONLY valid JSON — no preamble, no markdown fences, no commentary — with this exact schema:
 {
@@ -79,17 +54,85 @@ For "see" type "references": items = [{"category": "Fashion|Music|Place|Historic
 For each source in "read.sources", include an "image" field with a direct URL to the article's hero image (the one you'd see on Google News next to that headline). Look for og:image, twitter:image, or the article's featured image. The URL must end in .jpg, .jpeg, .png, or .webp and load publicly without auth. If you cannot find a reliable hero image for a source, omit the "image" field entirely rather than guessing — a missing field is better than a broken link.
 
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
-carnelianReads must be genuinely interpretive — what does this artifact reveal about culture that isn't obvious?`,
-      messages: [{ role: 'user', content: `Search for current information about "${q}", then generate a Carnelian entry for it.` }],
+carnelianReads must be genuinely interpretive — what does this artifact reveal about culture that isn't obvious?`;
+
+function extractJSON(text) {
+  let cleaned = text.trim().replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/, '').trim();
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    cleaned = cleaned.slice(start, end + 1);
+  }
+  return JSON.parse(cleaned);
+}
+
+function buildUserMessage({ query, image }) {
+  const content = [];
+
+  if (image?.data && image?.type) {
+    content.push({
+      type: 'image',
+      source: { type: 'base64', media_type: image.type, data: image.data },
     });
+  }
 
-    const textBlock = message.content.filter(b => b.type === 'text').pop();
-    if (!textBlock) throw new Error('No text in response');
+  let text;
+  if (image && query) {
+    text = `The user uploaded this image and added context: "${query}". Identify what is shown, search the web for current information about it, then generate a Carnelian entry.`;
+  } else if (image) {
+    text = `The user uploaded this image. Identify the cultural subject shown — it could be a painting, garment, film still, album cover, object, building, person, or anything culturally significant. Search the web for current information about it, then generate a Carnelian entry.`;
+  } else {
+    text = `Search for current information about "${query}", then generate a Carnelian entry for it.`;
+  }
 
-    const artifact = extractJSON(textBlock.text);
+  content.push({ type: 'text', text });
+  return content;
+}
+
+async function generateArtifact({ query, image }) {
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 4000,
+    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+    system: SYSTEM_PROMPT,
+    messages: [{ role: 'user', content: buildUserMessage({ query, image }) }],
+  });
+
+  const textBlock = message.content.filter(b => b.type === 'text').pop();
+  if (!textBlock) throw new Error('No text in response');
+  return extractJSON(textBlock.text);
+}
+
+// Text-only search (used by homepage text flow and the ArtifactPageClient slug fallback)
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const q = searchParams.get('q') || '';
+  if (!q) return NextResponse.json({ error: 'No query' }, { status: 400 });
+
+  try {
+    const artifact = await generateArtifact({ query: q });
     return NextResponse.json({ artifact, generated: true });
   } catch (err) {
     console.error('Generate error:', err.message);
     return NextResponse.json({ error: 'Generation failed', detail: err.message }, { status: 500 });
   }
 }
+
+// Image search (or image + text). Body: { query?: string, image?: { data: base64, type: mime } }
+export async function POST(request) {
+  try {
+    const { query, image } = await request.json();
+    if (!query && !image) {
+      return NextResponse.json({ error: 'Provide a query, an image, or both' }, { status: 400 });
+    }
+    const artifact = await generateArtifact({ query, image });
+    return NextResponse.json({ artifact, generated: true });
+  } catch (err) {
+    console.error('Generate error:', err.message);
+    return NextResponse.json({ error: 'Generation failed', detail: err.message }, { status: 500 });
+  }
+}
+
+// Increase body size for base64 images (up to ~5MB after compression headroom)
+export const runtime = 'nodejs';
+export const maxDuration = 60;
