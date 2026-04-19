@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextResponse } from 'next/server';
+import { put, del } from '@vercel/blob';
 
 const client = new Anthropic();
 
@@ -51,7 +52,7 @@ For "see" type "motifs": items = [{"name": "Motif name", "color": "#hex", "textC
 For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences of analysis"}] (3 items)
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
 
-For each source in "read.sources", include an "image" field with a direct URL to the article's hero image (the one you'd see on Google News next to that headline). Look for og:image, twitter:image, or the article's featured image. The URL must end in .jpg, .jpeg, .png, or .webp and load publicly without auth. If you cannot find a reliable hero image for a source, omit the "image" field entirely rather than guessing — a missing field is better than a broken link.
+For each source in "read.sources", include an "image" field with a direct URL to the article's hero image. The URL must end in .jpg, .jpeg, .png, or .webp and load publicly without auth. If you cannot find a reliable hero image for a source, omit the "image" field entirely.
 
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 carnelianReads must be genuinely interpretive — what does this artifact reveal about culture that isn't obvious?`;
@@ -66,7 +67,45 @@ function extractJSON(text) {
   return JSON.parse(cleaned);
 }
 
-function buildUserMessage({ query, image }) {
+// Upload image to Vercel Blob, reverse-search via SerpApi Google Lens, clean up.
+async function reverseImageSearch(imageBase64, mimeType) {
+  const buffer = Buffer.from(imageBase64, 'base64');
+  const ext = (mimeType?.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+  let blobUrl = null;
+
+  try {
+    const blob = await put(`lens/${Date.now()}.${ext}`, buffer, {
+      access: 'public',
+      addRandomSuffix: true,
+      contentType: mimeType || 'image/jpeg',
+    });
+    blobUrl = blob.url;
+
+    const lensUrl = `https://serpapi.com/search.json?engine=google_lens&url=${encodeURIComponent(blobUrl)}&api_key=${process.env.SERPAPI_KEY}`;
+    const res = await fetch(lensUrl);
+    const data = await res.json();
+
+    const visualMatches = (data.visual_matches || []).slice(0, 10).map(m => ({
+      title: m.title,
+      source: m.source,
+    })).filter(m => m.title);
+
+    const knowledgeGraph = data.knowledge_graph ? {
+      title: data.knowledge_graph.title,
+      type: data.knowledge_graph.type,
+      description: data.knowledge_graph.description,
+    } : null;
+
+    return { visualMatches, knowledgeGraph };
+  } catch (err) {
+    console.error('Lens error:', err.message);
+    return null;
+  } finally {
+    if (blobUrl) { try { await del(blobUrl); } catch {} }
+  }
+}
+
+function buildUserMessage({ query, image, lensResults }) {
   const content = [];
 
   if (image?.data && image?.type) {
@@ -77,10 +116,30 @@ function buildUserMessage({ query, image }) {
   }
 
   let text;
-  if (image && query) {
-    text = `The user uploaded this image and added context: "${query}". Identify what is shown, search the web for current information about it, then generate a Carnelian entry.`;
-  } else if (image) {
-    text = `The user uploaded this image. Identify the cultural subject shown — it could be a painting, garment, film still, album cover, object, building, person, or anything culturally significant. Search the web for current information about it, then generate a Carnelian entry.`;
+  if (image) {
+    let grounding = '';
+
+    if (lensResults?.knowledgeGraph?.title) {
+      grounding += `\n\nGoogle Lens identifies this as: ${lensResults.knowledgeGraph.title}`;
+      if (lensResults.knowledgeGraph.type) grounding += ` (${lensResults.knowledgeGraph.type})`;
+      if (lensResults.knowledgeGraph.description) grounding += `. ${lensResults.knowledgeGraph.description}`;
+    }
+
+    if (lensResults?.visualMatches?.length) {
+      grounding += `\n\nGoogle Image visual matches (ranked by visual similarity):\n` +
+        lensResults.visualMatches.map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n');
+    }
+
+    if (!grounding) {
+      grounding = '\n\n(Google Lens returned no matches. Identify from the image alone.)';
+    }
+
+    const userNote = query ? ` The user added context: "${query}".` : '';
+    text = `The user uploaded this image.${userNote}${grounding}
+
+Use the Google Lens results as your PRIMARY identification source — they tell you what this object actually is (including specific brand, product, artist, or title). Look for consensus across the visual matches. If a specific product or work is named repeatedly, that is what you are writing about, even if it is not the most famous or obvious interpretation.
+
+Then search the web for editorial and critical context about the identified subject, and generate the Carnelian entry.`;
   } else {
     text = `Search for current information about "${query}", then generate a Carnelian entry for it.`;
   }
@@ -90,12 +149,17 @@ function buildUserMessage({ query, image }) {
 }
 
 async function generateArtifact({ query, image }) {
+  let lensResults = null;
+  if (image?.data && process.env.SERPAPI_KEY) {
+    lensResults = await reverseImageSearch(image.data, image.type);
+  }
+
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 4000,
     tools: [{ type: 'web_search_20250305', name: 'web_search' }],
     system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: buildUserMessage({ query, image }) }],
+    messages: [{ role: 'user', content: buildUserMessage({ query, image, lensResults }) }],
   });
 
   const textBlock = message.content.filter(b => b.type === 'text').pop();
@@ -103,7 +167,6 @@ async function generateArtifact({ query, image }) {
   return extractJSON(textBlock.text);
 }
 
-// Text-only search (used by homepage text flow and the ArtifactPageClient slug fallback)
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || '';
@@ -118,7 +181,6 @@ export async function GET(request) {
   }
 }
 
-// Image search (or image + text). Body: { query?: string, image?: { data: base64, type: mime } }
 export async function POST(request) {
   try {
     const { query, image } = await request.json();
@@ -133,6 +195,5 @@ export async function POST(request) {
   }
 }
 
-// Increase body size for base64 images (up to ~5MB after compression headroom)
 export const runtime = 'nodejs';
 export const maxDuration = 60;
