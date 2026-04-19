@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { parse as parsePartialJSON } from 'partial-json';
 import DepthTabs from '@/components/DepthTabs';
 import Constellation from '@/components/Constellation';
 import imageCompression from 'browser-image-compression';
@@ -23,6 +24,21 @@ function fileToBase64(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+// Extract the first top-level JSON object from accumulating stream text.
+// Strips any code fences Claude might emit.
+function tryParsePartial(text) {
+  if (!text || text.length < 10) return null;
+  let cleaned = text.trim().replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/, '').trim();
+  const start = cleaned.indexOf('{');
+  if (start === -1) return null;
+  cleaned = cleaned.slice(start);
+  try {
+    return parsePartialJSON(cleaned);
+  } catch {
+    return null;
+  }
 }
 
 function ResultCard({ artifact, generated, uploadedPreview }) {
@@ -79,23 +95,81 @@ function ResultCard({ artifact, generated, uploadedPreview }) {
   );
 }
 
+// Progressive preview shown during streaming — hook and carnelianReads appear as they arrive
+function StreamingPreview({ query, partialArtifact, stage, uploadedPreview }) {
+  const stageText = {
+    identifying: 'Identifying image',
+    researching: 'Pulling cultural context',
+    generating: 'Writing interpretation',
+    retrying: 'Refining',
+  }[stage] || 'Building entry';
+
+  return (
+    <div style={{ textAlign: 'center', padding: '48px 0' }}>
+      {uploadedPreview && (
+        <img src={uploadedPreview} alt="" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, marginBottom: 20, border: '1px solid #e0dcd6', opacity: 0.85 }} />
+      )}
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#B94932', marginBottom: 8 }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B94932', display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite' }} />
+        <span style={{ fontSize: 15 }}>{stageText}{query ? ` for "${query}"` : ''}</span>
+      </div>
+
+      {/* Title appears as soon as streamed */}
+      {partialArtifact?.title && (
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 400, color: '#1a1816', marginTop: 28, marginBottom: 8, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+          {partialArtifact.title}
+        </h2>
+      )}
+
+      {/* Hook streams in */}
+      {partialArtifact?.hook && (
+        <p style={{ fontSize: 15, color: '#6b6860', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 16px' }}>
+          {partialArtifact.hook}
+        </p>
+      )}
+
+      {/* carnelianReads — the interpretive sentence */}
+      {partialArtifact?.carnelianReads && (
+        <p style={{
+          fontSize: 14,
+          color: '#B94932',
+          fontFamily: 'var(--font-display)',
+          fontStyle: 'italic',
+          lineHeight: 1.65,
+          maxWidth: 520,
+          margin: '0 auto',
+          paddingTop: 16,
+          borderTop: '1px solid rgba(185,73,50,0.2)',
+        }}>
+          {partialArtifact.carnelianReads}
+        </p>
+      )}
+
+      {!partialArtifact?.title && (
+        <p style={{ fontSize: 13, color: '#b0ada8', marginTop: 4 }}>
+          {stage === 'researching' ? 'Searching Google News · SerpApi' : stage === 'identifying' ? 'Google Lens · reverse image search' : 'Streaming'}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [query, setQuery] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | searching | generating | done | error
+  const [status, setStatus] = useState('idle'); // idle | searching | streaming | done | error
   const [results, setResults] = useState(null);
+  const [partialArtifact, setPartialArtifact] = useState(null);
+  const [stage, setStage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const debounceRef = useRef(null);
   const inputRef = useRef(null);
   const fileRef = useRef(null);
+  const abortRef = useRef(null);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
-
-  // Clean up object URLs
-  useEffect(() => {
-    return () => { if (imagePreview) URL.revokeObjectURL(imagePreview); };
-  }, [imagePreview]);
+  useEffect(() => () => { if (imagePreview) URL.revokeObjectURL(imagePreview); }, [imagePreview]);
 
   const handleImagePick = (e) => {
     const file = e.target.files?.[0];
@@ -114,50 +188,101 @@ export default function Home() {
     if (fileRef.current) fileRef.current.value = '';
   };
 
-  const generateWithImage = async (file, q) => {
-    setStatus('generating');
+  // ─── Streaming search (POST) ──────────────────────────────────────────────
+  const streamGenerate = async ({ query: q, image }) => {
+    setStatus('streaming');
+    setPartialArtifact(null);
+    setStage(null);
+
+    // Abort any prior request
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 1.5,
-        maxWidthOrHeight: 1600,
-        useWebWorker: true,
-      });
-      const base64 = await fileToBase64(compressed);
+      let imagePayload = null;
+      if (image) {
+        const compressed = await imageCompression(image, {
+          maxSizeMB: 1.5,
+          maxWidthOrHeight: 1600,
+          useWebWorker: true,
+        });
+        imagePayload = {
+          data: await fileToBase64(compressed),
+          type: compressed.type,
+        };
+      }
+
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: q || undefined,
-          image: { data: base64, type: compressed.type },
+          image: imagePayload,
         }),
+        signal: controller.signal,
       });
-      const gen = await res.json();
-      if (gen.artifact) {
-        setResults({ type: 'generated', artifact: gen.artifact, uploadedPreview: imagePreview });
-        setStatus('done');
-      } else {
-        setStatus('error');
+
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+      // Cache hit — server returned plain JSON, not a stream
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.artifact) {
+          setResults({ type: 'generated', artifact: data.artifact, uploadedPreview: imagePreview, cached: data.cached });
+          setStatus('done');
+        } else {
+          setStatus('error');
+        }
+        return;
       }
-    } catch {
+
+      // Otherwise: SSE stream
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        // Split on the SSE delimiter "\n\n"
+        const chunks = buffer.split('\n\n');
+        buffer = chunks.pop() || ''; // last chunk may be incomplete
+
+        for (const chunk of chunks) {
+          if (!chunk.trim()) continue;
+          const line = chunk.replace(/^data:\s*/, '');
+          let event;
+          try { event = JSON.parse(line); } catch { continue; }
+
+          if (event.type === 'status') {
+            setStage(event.stage);
+          } else if (event.type === 'delta') {
+            fullText += event.text;
+            const partial = tryParsePartial(fullText);
+            if (partial) setPartialArtifact(partial);
+          } else if (event.type === 'complete') {
+            setResults({ type: 'generated', artifact: event.artifact, uploadedPreview: imagePreview });
+            setStatus('done');
+            setPartialArtifact(null);
+          } else if (event.type === 'error') {
+            throw new Error(event.message);
+          }
+        }
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+      console.error('[stream] failed:', err.message);
       setStatus('error');
+      setPartialArtifact(null);
     }
   };
 
-  const generate = async (q) => {
-    setStatus('generating');
-    try {
-      const gen = await fetch(`/api/generate?q=${encodeURIComponent(q)}`).then(r => r.json());
-      if (gen.artifact) {
-        setResults({ type: 'generated', artifact: gen.artifact });
-        setStatus('done');
-      } else {
-        setStatus('error');
-      }
-    } catch {
-      setStatus('error');
-    }
-  };
-
+  // ─── Catalog search (GET /api/search) — unchanged ─────────────────────────
   const search = async (q) => {
     if (!q.trim() || q.trim().length < 2) { setStatus('idle'); setResults(null); return; }
     setStatus('searching');
@@ -174,12 +299,13 @@ export default function Home() {
       setStatus('done');
       return;
     }
-    await generate(q);
+    // No catalog match — stream generate
+    await streamGenerate({ query: q });
   };
 
   const handleSubmit = () => {
     if (imageFile) {
-      generateWithImage(imageFile, query.trim());
+      streamGenerate({ query: query.trim(), image: imageFile });
     } else if (query.trim()) {
       clearTimeout(debounceRef.current);
       search(query.trim());
@@ -308,21 +434,13 @@ export default function Home() {
               <div style={{ textAlign: 'center', padding: '40px 0', color: '#a0a8a0', fontSize: 14 }}>Searching...</div>
             )}
 
-            {status === 'generating' && (
-              <div style={{ textAlign: 'center', padding: '48px 0' }}>
-                {imagePreview && (
-                  <img src={imagePreview} alt="" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, marginBottom: 20, border: '1px solid #e0dcd6', opacity: 0.85 }} />
-                )}
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#B94932', marginBottom: 8 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B94932', display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite' }} />
-                  <span style={{ fontSize: 15 }}>
-                    {imageFile ? 'Reading this image' : `Building entry for "${query}"`}
-                  </span>
-                </div>
-                <p style={{ fontSize: 13, color: '#b0ada8' }}>
-                  {imageFile ? 'Identifying · Pulling context · Writing interpretation' : 'Pulling cultural context · Writing interpretation · Building graph'}
-                </p>
-              </div>
+            {status === 'streaming' && (
+              <StreamingPreview
+                query={query}
+                partialArtifact={partialArtifact}
+                stage={stage}
+                uploadedPreview={imagePreview}
+              />
             )}
 
             {status === 'error' && (
@@ -342,7 +460,7 @@ export default function Home() {
                     style={{ padding: '9px 18px', background: '#1a1816', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
                     Show &ldquo;{results.artifact.title}&rdquo; instead
                   </button>
-                  <button onClick={() => generate(query)}
+                  <button onClick={() => streamGenerate({ query })}
                     style={{ padding: '9px 18px', background: 'none', color: '#B94932', border: '1px solid #e0dcd6', borderRadius: 8, fontSize: 13, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
                     Generate new entry for &ldquo;{query}&rdquo; →
                   </button>
