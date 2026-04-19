@@ -1,7 +1,146 @@
-/* ─── Mobile ─────────────────────────────────────────────────────────── */
-@media (max-width: 767px) {
+@import "tailwindcss";
 
-  /* ARTIFACT — Nav */
+/* ─── Tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --brand: #B94932;
+  --brand-deep: #9E1A1A;
+  --bone: #F5F3EF;
+  --stone: #E7E3DC;
+  --ink: #1a1816;
+  --muted: #6F6A63;
+  --ash: #888480;
+  --espresso: #2A1E1A;
+
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-body: var(--font-dm-sans), "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.15); }
+}
+
+/* ─── HOME PAGE ──────────────────────────────────────────────────────── */
+.home-main {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bone);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.home-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 52px;
+  width: 100%;
+}
+
+.home-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 80px;
+  max-width: 100%;
+}
+
+.home-footer {
+  text-align: center;
+  padding: 24px 0 32px;
+  font-size: 11px;
+  color: #b0ada8;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-family: var(--font-body);
+}
+
+/* ─── SEARCH INPUT ───────────────────────────────────────────────────── */
+.search-input {
+  width: 100%;
+  padding: 18px 44px 18px 22px;
+  font-size: 16px; /* iOS anti-zoom */
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: white;
+  border: 1px solid #e0dcd6;
+  border-radius: 999px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.search-input::placeholder {
+  color: #b0ada8;
+}
+
+.search-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(185, 73, 50, 0.08);
+}
+
+@media (min-width: 768px) {
+  .search-input {
+    font-size: 1.15rem;
+    padding: 20px 48px 20px 26px;
+  }
+}
+
+/* ─── QUICK PILLS ────────────────────────────────────────────────────── */
+.k-pill {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  color: var(--muted);
+  background: white;
+  border: 1px solid #e0dcd6;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.k-pill:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: #fdfaf8;
+}
+
+/* ─── MOBILE — HOME ──────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .home-nav {
+    padding: 18px 20px;
+  }
+  .home-content {
+    padding: 24px 20px 60px;
+  }
+}
+
+/* ─── ARTIFACT PAGE (mobile adjustments only — desktop uses inline styles) */
+@media (max-width: 767px) {
   .artifact-nav {
     padding: 14px 20px !important;
   }
@@ -9,7 +148,6 @@
     display: none !important;
   }
 
-  /* ARTIFACT — Hero (stacked) */
   .artifact-hero {
     grid-template-columns: 1fr !important;
     height: auto !important;
@@ -44,7 +182,6 @@
     max-width: 100% !important;
   }
 
-  /* ARTIFACT — Sections */
   .artifact-section {
     padding: 72px 0 !important;
   }
@@ -65,7 +202,6 @@
     margin-bottom: 24px !important;
   }
 
-  /* ARTIFACT — See */
   .artifact-see-header {
     grid-template-columns: 1fr !important;
     gap: 10px !important;
@@ -87,12 +223,10 @@
     gap: 32px !important;
   }
 
-  /* ARTIFACT — Trace titles */
   .artifact-trace-title {
     font-size: 22px !important;
   }
 
-  /* ARTIFACT — Related */
   .artifact-related-section {
     padding: 72px 0 !important;
   }
@@ -106,7 +240,6 @@
     padding: 28px 24px !important;
   }
 
-  /* GRAPH — Header */
   .graph-header {
     padding: 12px 16px !important;
     flex-wrap: wrap !important;
@@ -115,8 +248,6 @@
   .graph-hints-desktop {
     display: none !important;
   }
-
-  /* GRAPH — Info panel as full-screen overlay */
   .graph-info-panel {
     position: fixed !important;
     inset: 0 !important;
@@ -127,8 +258,6 @@
   .graph-info-panel-image {
     height: 200px !important;
   }
-
-  /* GRAPH — Legend */
   .graph-legend {
     flex-wrap: wrap !important;
     gap: 10px !important;
@@ -140,7 +269,6 @@
     display: none !important;
   }
 
-  /* HOME — Result card stacks */
   .result-card-grid {
     grid-template-columns: 1fr !important;
   }
@@ -154,18 +282,5 @@
   }
   .result-card-side {
     padding: 16px 20px !important;
-  }
-}
-
-/* iOS safe-area + input zoom prevention */
-html {
-  -webkit-text-size-adjust: 100%;
-}
-.search-input {
-  font-size: 16px !important; /* prevents iOS zoom-on-focus */
-}
-@media (min-width: 768px) {
-  .search-input {
-    font-size: 1.15rem !important; /* restore desktop sizing */
   }
 }
