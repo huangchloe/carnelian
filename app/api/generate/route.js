@@ -57,6 +57,8 @@ Notice: real mechanism named, accurate time range (not invented date), real pred
 
 ## Return format — ONLY valid JSON, no preamble, no markdown fences
 
+Begin your response with the opening { and end with the closing }. Do not include any text before or after the JSON object.
+
 {
   "slug": "url-slug-no-spaces",
   "title": "Exact title",
@@ -99,7 +101,7 @@ For "see" type "motifs": items = [{"name": "Motif name", "color": "#hex", "textC
 For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences"}] (3 items)
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
 
-For read.sources: USE THE REAL ARTICLE URLS FROM THE RESEARCH CONTEXT PROVIDED. Do not invent article titles or URLs. If the context has fewer than 3 good sources, include fewer — don't pad with fabrications.
+For read.sources: USE THE REAL ARTICLE URLS FROM THE RESEARCH CONTEXT PROVIDED. Do not invent article titles or URLs. If the context has fewer than 3 good sources, include fewer.
 
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 
@@ -128,7 +130,7 @@ function normalizeSlug(query) {
   return query.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80);
 }
 
-// ─── CACHE (Vercel Blob) ────────────────────────────────────────────────────
+// ─── CACHE ──────────────────────────────────────────────────────────────────
 
 async function getCached(slug) {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
@@ -163,13 +165,10 @@ async function setCached(slug, artifact) {
   }
 }
 
-// ─── RESEARCH — parallel SerpApi calls, ~2 seconds ──────────────────────────
+// ─── RESEARCH ───────────────────────────────────────────────────────────────
 
 async function parallelResearch(query) {
-  if (!process.env.SERPAPI_KEY) {
-    console.log('[research] SERPAPI_KEY missing, skipping');
-    return null;
-  }
+  if (!process.env.SERPAPI_KEY) return null;
 
   const key = process.env.SERPAPI_KEY;
   const controller = new AbortController();
@@ -179,7 +178,6 @@ async function parallelResearch(query) {
   const searchUrl = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(query)}&num=10&api_key=${key}`;
 
   try {
-    console.log('[research] firing parallel SerpApi calls for:', query);
     const [newsRes, searchRes] = await Promise.allSettled([
       fetch(newsUrl, { signal: controller.signal }).then(r => r.json()),
       fetch(searchUrl, { signal: controller.signal }).then(r => r.json()),
@@ -234,29 +232,25 @@ function formatResearch(research) {
   if (research.knowledgeGraph) {
     parts.push(`KNOWLEDGE PANEL:\n${research.knowledgeGraph.title}${research.knowledgeGraph.type ? ` (${research.knowledgeGraph.type})` : ''}\n${research.knowledgeGraph.description || ''}`);
   }
-
   if (research.newsResults?.length) {
     parts.push(`RECENT NEWS (ordered by recency):\n` + research.newsResults.map((n, i) =>
       `${i + 1}. "${n.title}" — ${n.source}${n.date ? ` (${n.date})` : ''}\n   ${n.snippet || ''}\n   URL: ${n.link}`
     ).join('\n\n'));
   }
-
   if (research.organicResults?.length) {
     parts.push(`TOP SEARCH RESULTS:\n` + research.organicResults.map((r, i) =>
       `${i + 1}. "${r.title}" — ${r.source}\n   ${r.snippet || ''}\n   URL: ${r.link}`
     ).join('\n\n'));
   }
-
   if (research.relatedQuestions?.length) {
-    parts.push(`RELATED QUESTIONS PEOPLE ASK:\n` + research.relatedQuestions.map(q =>
+    parts.push(`RELATED QUESTIONS:\n` + research.relatedQuestions.map(q =>
       `Q: ${q.question}\nA: ${q.snippet || ''}`
     ).join('\n\n'));
   }
-
   return parts.join('\n\n---\n\n');
 }
 
-// ─── LENS for image search ──────────────────────────────────────────────────
+// ─── LENS ───────────────────────────────────────────────────────────────────
 
 async function reverseImageSearch(imageBase64, mimeType) {
   const { put, del } = await import('@vercel/blob');
@@ -294,9 +288,9 @@ async function reverseImageSearch(imageBase64, mimeType) {
   }
 }
 
-// ─── CLAUDE CALL — no tool use, all grounding pre-fetched ───────────────────
+// ─── USER CONTENT BUILDER ───────────────────────────────────────────────────
 
-async function callClaude({ query, image, lensResults, research, isRetry }) {
+function buildUserContent({ query, image, lensResults, research, isRetry }) {
   const isImageSearch = !!image?.data;
 
   const userContent = [];
@@ -334,100 +328,166 @@ The Google Images matches are ground truth for identification. Find consensus ac
   }
 
   userContent.push({ type: 'text', text: userText });
+  return userContent;
+}
 
-  console.log('[generate] calling Claude, image:', isImageSearch, 'retry:', !!isRetry, 'research:', !!research);
+// ─── NON-STREAMING CLAUDE CALL (for retry fallback) ─────────────────────────
 
+async function callClaudeNonStreaming(params) {
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 4000,
     system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: userContent }],
-    // No tools. Everything Claude needs is in the context.
+    messages: [{ role: 'user', content: buildUserContent(params) }],
   });
-
   const textBlock = message.content.filter(b => b.type === 'text').pop();
   if (!textBlock) throw new Error('No text in Claude response');
-
-  const parsed = extractJSON(textBlock.text);
-  return validateArtifact(parsed);
+  return validateArtifact(extractJSON(textBlock.text));
 }
 
-// ─── ORCHESTRATION ──────────────────────────────────────────────────────────
+// ─── STREAMING HANDLER (POST only) ──────────────────────────────────────────
 
-async function generateArtifact({ query, image }) {
+function sseEncode(data) {
+  return new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`);
+}
+
+async function buildStreamingResponse({ query, image }) {
   const isImageSearch = !!image?.data;
+
+  // Pre-flight: research + lens (can't stream these, they're API calls)
+  let lensResults = null;
+  let research = null;
 
   if (isImageSearch) {
     if (!process.env.BLOB_READ_WRITE_TOKEN) throw new Error('BLOB_READ_WRITE_TOKEN missing');
     if (!process.env.SERPAPI_KEY) throw new Error('SERPAPI_KEY missing');
-
-    const lensResults = await reverseImageSearch(image.data, image.type);
-    const hasMatches = lensResults?.visualMatches?.length > 0 || lensResults?.knowledgeGraph;
-    if (!hasMatches) throw new Error("Couldn't identify this image. Try a clearer photo or add text context.");
-
-    // Also do parallel research on the identified subject for richer sources
-    const identifier = lensResults.knowledgeGraph?.title || lensResults.visualMatches[0]?.title;
-    const research = identifier ? await parallelResearch(identifier) : null;
-
-    try {
-      return await callClaude({ query, image, lensResults, research, isRetry: false });
-    } catch (err) {
-      console.warn('[generate] first attempt failed:', err.message);
-      return await callClaude({ query, image, lensResults, research, isRetry: true });
-    }
   }
 
-  // Text search: parallel research first, then Claude.
-  const research = await parallelResearch(query);
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        // Stage 1: Identify (image) or research (text)
+        if (isImageSearch) {
+          controller.enqueue(sseEncode({ type: 'status', stage: 'identifying' }));
+          lensResults = await reverseImageSearch(image.data, image.type);
+          const hasMatches = lensResults?.visualMatches?.length > 0 || lensResults?.knowledgeGraph;
+          if (!hasMatches) {
+            controller.enqueue(sseEncode({ type: 'error', message: "Couldn't identify this image. Try a clearer photo or add text context." }));
+            controller.close();
+            return;
+          }
+          const identifier = lensResults.knowledgeGraph?.title || lensResults.visualMatches[0]?.title;
+          if (identifier) {
+            controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
+            research = await parallelResearch(identifier);
+          }
+        } else {
+          controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
+          research = await parallelResearch(query);
+        }
 
-  try {
-    return await callClaude({ query, research, isRetry: false });
-  } catch (err) {
-    console.warn('[generate] first attempt failed:', err.message);
-    return await callClaude({ query, research, isRetry: true });
-  }
+        // Stage 2: Stream Claude
+        controller.enqueue(sseEncode({ type: 'status', stage: 'generating' }));
+
+        let fullText = '';
+        const claudeStream = client.messages.stream({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 4000,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: buildUserContent({ query, image, lensResults, research, isRetry: false }) }],
+        });
+
+        for await (const event of claudeStream) {
+          if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+            fullText += event.delta.text;
+            controller.enqueue(sseEncode({ type: 'delta', text: event.delta.text }));
+          }
+        }
+
+        // Stage 3: Validate, retry if needed
+        let artifact;
+        try {
+          artifact = validateArtifact(extractJSON(fullText));
+        } catch (parseErr) {
+          console.warn('[stream] first attempt failed validation:', parseErr.message, '— retrying non-streamed');
+          controller.enqueue(sseEncode({ type: 'status', stage: 'retrying' }));
+          artifact = await callClaudeNonStreaming({ query, image, lensResults, research, isRetry: true });
+        }
+
+        // Cache (text-only)
+        if (query && !image) {
+          setCached(normalizeSlug(query), artifact);
+        }
+
+        controller.enqueue(sseEncode({ type: 'complete', artifact }));
+        controller.close();
+      } catch (err) {
+        console.error('[stream] error:', err.message);
+        controller.enqueue(sseEncode({ type: 'error', message: err.message }));
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no', // defeat proxies that buffer SSE
+    },
+  });
 }
 
 // ─── HANDLERS ───────────────────────────────────────────────────────────────
 
+// GET remains non-streaming (used by ArtifactPageClient fallback for direct slug loads)
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || '';
   if (!q) return NextResponse.json({ error: 'No query' }, { status: 400 });
 
   const slug = normalizeSlug(q);
-
-  // Cache check
   const cached = await getCached(slug);
   if (cached) return NextResponse.json({ artifact: cached, generated: true, cached: true });
 
   try {
-    const artifact = await generateArtifact({ query: q });
-    setCached(slug, artifact); // fire-and-forget, don't wait
+    const research = await parallelResearch(q);
+    let artifact;
+    try {
+      artifact = await callClaudeNonStreaming({ query: q, research, isRetry: false });
+    } catch (err) {
+      console.warn('[generate GET] first attempt failed:', err.message);
+      artifact = await callClaudeNonStreaming({ query: q, research, isRetry: true });
+    }
+    setCached(slug, artifact);
     return NextResponse.json({ artifact, generated: true });
   } catch (err) {
-    console.error('[generate] GET error:', err.message);
+    console.error('[generate GET] error:', err.message);
     return NextResponse.json({ error: 'Generation failed', detail: err.message }, { status: 500 });
   }
 }
 
+// POST streams (for homepage search). Cache hits return JSON instantly (no stream).
 export async function POST(request) {
   try {
     const { query, image } = await request.json();
-    if (!query && !image) return NextResponse.json({ error: 'Provide a query, an image, or both' }, { status: 400 });
-
-    // Text-only cache check (images always regenerate — too variable)
-    if (query && !image) {
-      const slug = normalizeSlug(query);
-      const cached = await getCached(slug);
-      if (cached) return NextResponse.json({ artifact: cached, generated: true, cached: true });
+    if (!query && !image) {
+      return NextResponse.json({ error: 'Provide a query, an image, or both' }, { status: 400 });
     }
 
-    const artifact = await generateArtifact({ query, image });
-    if (query && !image) setCached(normalizeSlug(query), artifact); // cache text-only
-    return NextResponse.json({ artifact, generated: true });
+    // Cache check (text-only) — return instant JSON, NOT a stream
+    if (query && !image) {
+      const cached = await getCached(normalizeSlug(query));
+      if (cached) {
+        return NextResponse.json({ artifact: cached, generated: true, cached: true });
+      }
+    }
+
+    // Otherwise, stream the response
+    return await buildStreamingResponse({ query, image });
   } catch (err) {
-    console.error('[generate] POST error:', err.message);
+    console.error('[generate POST] error:', err.message);
     return NextResponse.json({ error: 'Generation failed', detail: err.message }, { status: 500 });
   }
 }
