@@ -101,8 +101,7 @@ Notice: physical (red paint, Italian calfskin, cropped pants), specific scenes (
     {"label": "Short", "x": 14, "y": 96, "color": "#7F77DD", "fullLabel": "Full name"},
     {"label": "Short", "x": 10, "y": 48, "color": "#993C1D", "fullLabel": "Full name"}
   ],
-  "heroImageQuery": "A SEPARATE google image search query to find the ideal hero image. Think like an editor sourcing a photograph for a feature: this should return the EDITORIAL ESTABLISHING SHOT for this entry. For a specific well-known product, a campaign or press image of that product. For a category-level entry (e.g. 'Tod's mid-2000s mini hobo'), something that anchors the house and era: a designer portrait, an archive campaign, a workshop interior, a period editorial spread. NOT a product listing shot. Examples: 'Diego Della Valle portrait Marche workshop' · 'Margiela 1988 runway Paris' · 'Courrèges 1970s archive campaign'.",
-  "tags": ["tag1", "tag2"],
+"heroImageQuery": "A SEPARATE google image search query to find the ideal hero image — the editorial establishing shot for this entry. Think like a magazine photo editor, not a shopping search. STRONGLY PREFER queries about PEOPLE, PLACES, and ATMOSPHERE over queries about the product itself, because product-focused queries return product photography (white backgrounds, e-commerce), while person/place/atmosphere queries return editorial photography (portraits, interiors, runway, campaigns). Good queries: 'Diego Della Valle portrait Vogue' · 'Tod's Le Marche workshop interior' · 'Martin Margiela 1988 Paris runway' · 'Courrèges 1968 Space Age editorial' · 'Phoebe Philo Celine studio Paris' · 'Rosalía El Mal Querer cover shoot'. Bad queries (don't do these): 'Tod's yellow handbag', 'Alo Yoga tote campaign', 'Courrèges vintage watch'. For specific well-known works (a specific painting, a specific film still, a specific album cover), the work itself IS the right query.",  "tags": ["tag1", "tag2"],
   "searchTerms": ["term1", "term2"],
   "redditQueries": ["query"],
   "redditRequiredTerms": ["required"],
@@ -460,16 +459,19 @@ ${candidatesBlock}
 
 Pick the BEST hero image by these criteria, in order:
 
-1. EDITORIAL QUALITY. Campaign images, editorial shoots, press photos, museum photography, archive images — yes. E-commerce product shots on white backgrounds, user-generated marketplace photos (eBay, Poshmark, Etsy listings), amateur shots — no.
+1. EDITORIAL QUALITY. Campaign images, editorial shoots, press photos, portraits of the designer/artist, museum photography, archive images, runway shots, workshop/studio interiors — yes. E-commerce product shots on white backgrounds, user-generated marketplace photos (eBay, Poshmark, Etsy listings), amateur shots — no. A portrait of the designer is almost always better than a product shot, because it anchors the WORLD of the object rather than showing the object itself on a backdrop.
 
-2. ERA-APPROPRIATE. If the entry is about a 2005 object, a 2024 product shot is wrong. Look for images from or about the correct period.
+2. COLOR AND MATERIAL FIDELITY. If the entry's description commits to a specific color or material (e.g. "mustard-yellow pebbled calfskin," "burgundy leather," "matte black wool"), the chosen image must read in the same color family and material register. A creamy pale-yellow bag on a page titled around "mustard" creates a jarring mismatch. Err toward candidates that visually match the description.
 
-3. CONTEXT-ANCHORING. For category-level entries, a designer portrait, an archive campaign, or a workshop interior is BETTER than a current-season product shot. For specific-product entries, an editorial image of that specific product is best.
+3. ERA-APPROPRIATE. If the entry is about a 2005 object, a 2024 product shot is wrong. Look for images from or about the correct period — vintage editorial spreads beat current-season campaigns for historical entries.
 
-4. ASPECT. Landscape or square preferred over portrait for hero use. Minimum 800px on the longest side.
+4. CONTEXT-ANCHORING. For category-level entries, a designer portrait, an archive campaign, or a workshop interior is BETTER than a current-season product shot. For specific-product entries, an editorial image of that specific product is best.
 
-5. TITLE CUES. The candidate title tells you a lot — "Pinterest" "eBay" "Poshmark" "buy now" are usually bad. "Vogue" "The New York Times" "Business of Fashion" "archive" "campaign" "editorial" are usually good.
+5. ASPECT. Landscape or square preferred over portrait for hero use. Minimum 800px on the longest side.
 
+6. TITLE CUES. The candidate title tells you a lot — "Pinterest" "eBay" "Poshmark" "buy now" "for sale" are usually bad. "Vogue" "The New York Times" "Business of Fashion" "archive" "campaign" "editorial" "portrait" "interview" "studio" "workshop" are usually good.
+
+If NONE of the candidates meet criteria 1 (all are e-commerce product shots), return null rather than picking the least-bad product shot. No hero is better than a wrong hero.
 Return ONLY JSON, no fences:
 {
   "choice": <integer, 1-indexed, position of the chosen candidate, or null if NONE are acceptable>,
