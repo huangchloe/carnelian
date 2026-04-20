@@ -235,13 +235,17 @@ function MiniConstellation({ nodes }) {
 
 // ─── NOW / Live context ───────────────────────────────────────────────────────
 function NowSection({ slug, artifact }) {
+  const [isEmpty, setIsEmpty] = useState(false);
+  // If LiveContext reports no content, don't render the section at all —
+  // an empty labeled block reads as broken; omitting it reads as intentional.
+  if (isEmpty) return null;
   return (
     <section className="artifact-section" style={{ padding: '140px 0', background: P.bone, borderTop: `1px solid ${P.stone}` }}>
       <div className="artifact-section-inner" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 100px', display: 'grid', gridTemplateColumns: '200px 1fr', gap: '0 140px', alignItems: 'start' }}>
         <div className="artifact-section-label" style={{ position: 'sticky', top: 120 }}>
           <span style={{ fontSize: 9, letterSpacing: '0.28em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Now</span>
         </div>
-        <LiveContext slug={slug} artifact={artifact} />
+        <LiveContext slug={slug} artifact={artifact} onEmpty={() => setIsEmpty(true)} />
       </div>
     </section>
   );
