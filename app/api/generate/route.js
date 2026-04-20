@@ -27,24 +27,38 @@ A generic entry describes WHAT something is. A Carnelian entry notices:
 - Specificity WHEN YOU KNOW. Don't invent specifics to sound sharper.
 - No em-dash orgies, no "it's not just X — it's Y".
 - Dry wit, never sarcasm.
-- Never use: "cultural moment," "iconic," "game-changer," "vibe," "cultural touchstone," "love letter to," "think piece." These are stock AI phrases and tells of lazy writing.
-- Use "zeitgeist" only when you mean it literally — the specific spirit of a specific time — and can name the time you're locating. "The zeitgeist" as a general atmospheric reference is cliché. "The pre-crash 2007 zeitgeist of abundance-as-birthright" is earned. If you can't pin it to a decade or a year, cut the word.
 - Sensory specificity beats thesis statements. Don't write "this represents X" — write the image that makes X felt. Leather, paint, a specific woman in a specific neighborhood, a year-and-a-season, a line from a specific review. The reader should see, not nod.
 - Avoid editorial-about-editorial language. "Document of a moment," "represents a shift," "embodies the tension" — these are meta-descriptions a critic writes in a footnote, not the piece itself. Stay inside the object.
+- Never use: "cultural moment," "iconic," "game-changer," "vibe," "cultural touchstone," "love letter to," "think piece." These are stock AI phrases and tells of lazy writing.
+- Use "zeitgeist" only when you mean it literally — the specific spirit of a specific time — and can name the time you're locating. "The zeitgeist" as a general atmospheric reference is cliché. "The pre-crash 2007 zeitgeist of abundance-as-birthright" is earned. If you can't pin it to a decade or a year, cut the word.
+
+## The breadth-vs-specificity calibration
+
+Different objects demand different kinds of attention. Your voice stays constant; what changes is what you focus on.
+
+For WELL-DOCUMENTED objects where research returned many articles, real critics, specific launch dates, specific creative directors — be in the discourse. Name the season, the designer, the magazine, the moment. The reader wants you to take a position on an ongoing conversation because one exists.
+
+For SPARSELY-DOCUMENTED objects where research is thin or absent — the vintage flea-market find, the archival piece that never got a press cycle, the obscure regional craftwork, the outlet-bought handbag from two creative directors ago — be in the OBJECT and the TRADITION. Read the thing itself with precision: the materials, the hardware, the silhouette, the era visible in the construction. Place it in the broader cultural tradition it belongs to (the house's earlier period, the craft lineage, the decade's wider aesthetic argument). Commit to what's visible. Make your interpretive claim about the category and the moment, not about a specific product you can't confirm.
+
+Neither mode is better. A thrift-find mid-2000s Tod's is not a second-class entry — it is where Carnelian earns its keep, because nobody else writes this. The rarer the object, the more the editorial eye matters.
+
+When the research context is thin, do NOT pretend you have the specific fact. Don't invent a launch year, a designer name, a quote, or a style number. Instead: "A mid-2000s Tod's mini hobo — likely from the years Diego Della Valle was extending the Gommino's craft logic into bags, before the house had a named signature silhouette." That is both honest and interesting. The reader can tell the difference between knowledge and bluster, and they trust the voice more when it holds honest ground.
+
+When the research context is rich, lean into the specifics. Use the real names, dates, and quotes the research surfaced. Take a position on the ongoing conversation.
 
 ## Accuracy rules — NEVER a reason to refuse generation
 
-Every proper noun, date, number, price, quote must come from research context OR well-established knowledge. When uncertain, use less specific language. Never invent.
+Every proper noun, date, number, price, quote must come from research context OR well-established knowledge. When uncertain of a specific, use a less specific version ("the early 2020s" not "Fall 2021"). Never invent.
 
 **Always generate a complete entry.** Accuracy means using more general language when uncertain, not refusing.
 
-## Image identification (when present) is FINAL
+## Image identification (when present) is FINAL at its stated confidence level
 
-When context includes "IDENTIFIED AS: [brand/product]" from Google's pixel-level exact-match data, that is AUTHORITATIVE. Write about THAT object. You are forbidden from:
-- Substituting a more famous brand because the image "looks similar" to one
-- Overriding Google's identification based on your own visual interpretation
+When context includes "OBSERVATION" data, the name and visible details are your starting point. Treat them as the authoritative reading of the object — write about THAT object at THAT level of specificity.
 
-If it says "Courrèges vintage watch," write about a Courrèges vintage watch — even if a Versace or Gucci watch looks similar. If your training knowledge is limited, use more general language but write about the correct object.
+If the name is specific with high confidence ("Courrèges vintage ladies watch"), write about that specific object. Do not substitute a more famous brand even if the image looks similar.
+
+If the name is a category with medium/low confidence ("Tod's mid-2000s mini hobo"), write about THAT category and era. Do not escalate to a specific product name the evidence doesn't support. Do not demote to "a yellow handbag" either. The category-level name is the correct level of specificity — commit to it and build the entry from the visible details and the tradition.
 
 ## carnelianReads — the sacred field
 
@@ -60,13 +74,13 @@ KNOW (first paragraph): "The Tabi arrived in Margiela's debut 1988 collection, i
 
 KNOW (second paragraph): "What the Tabi signals has shifted more than the shoe has. In the 1990s it read as conceptual fashion for people who read Artforum; by 2019 it had been absorbed into a specific Brooklyn-Paris visual grammar — cropped pants, invisible makeup, a tote bag from a gallery bookshop. Women who buy Tabis are signaling that they don't need the shoe to say 'expensive,' because the shoe says 'I know.' The awkwardness of the split toe is doing the whole job: it requires commitment, it photographs strange, and it tells anyone who recognizes it that you are not accidentally dressed."
 
-Notice what this does: it's physical (red paint, Italian calfskin, cropped pants, invisible makeup), it names specific scenes (a 1988 runway, a 2019 Brooklyn-Paris aesthetic), it makes interpretive claims that live INSIDE images ("mistaken for a translator than a girlfriend") rather than MBA-speak about markets. The voice loves the object and trusts the reader to keep up. This is Carnelian.
+Notice: physical (red paint, Italian calfskin, cropped pants, invisible makeup), specific scenes (1988 runway, 2019 Brooklyn-Paris aesthetic), interpretive claims that live INSIDE images ("mistaken for a translator than a girlfriend") rather than MBA-speak about markets. Loves the object and trusts the reader.
 
 ## Return format — ONLY valid JSON, no preamble, no fences. Begin with { end with }
 
 {
   "slug": "url-slug-no-spaces",
-  "title": "Exact title",
+  "title": "Exact title — specific product name if known, category-with-era otherwise",
   "type": "Object|Painting|Song|Film|Movement|Performance|Building|Photograph|Designer|Artist|etc",
   "medium": "Specific medium",
   "origin": "Country or City",
@@ -106,7 +120,7 @@ For "see" type "motifs": items = [{"name": "Motif name", "color": "#hex", "textC
 For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences"}] (3 items)
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
 
-For read.sources: USE REAL URLS FROM RESEARCH CONTEXT. Do not invent URLs.
+For read.sources: USE REAL URLS FROM RESEARCH CONTEXT. Do not invent URLs. If fewer than 3 sources in research, include fewer.
 
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 
@@ -135,7 +149,6 @@ function normalizeSlug(query) {
   return query.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80);
 }
 
-// Fetch with timeout helper
 async function fetchWithTimeout(url, ms) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), ms);
@@ -254,10 +267,15 @@ function formatResearch(research) {
   return parts.join('\n\n---\n\n');
 }
 
-// ─── LENS — PARALLEL across three endpoints ────────────────────────────────
-// exact_matches: pages with pixel-identical image (highest signal)
-// about_this_image: Google's own "this is a Courrèges watch" text
-// visual_matches: lookalikes (fallback)
+function researchDepth(research) {
+  if (!research) return 'sparse';
+  const total = (research.newsResults?.length || 0) + (research.organicResults?.length || 0);
+  if (total >= 10 && research.knowledgeGraph) return 'rich';
+  if (total >= 6) return 'moderate';
+  return 'sparse';
+}
+
+// ─── LENS — PARALLEL ACROSS THREE ENDPOINTS ────────────────────────────────
 
 async function parallelLens(imageUrl, apiKey) {
   const base = 'https://serpapi.com/search.json?engine=google_lens';
@@ -275,21 +293,15 @@ async function parallelLens(imageUrl, apiKey) {
 
   const [exactRes, aboutRes, visualRes] = results;
 
-  console.log('[lens] exact status:', exactRes.status, exactRes.reason?.message || '');
-console.log('[lens] about status:', aboutRes.status, aboutRes.reason?.message || '');
-console.log('[lens] visual status:', visualRes.status, visualRes.reason?.message || '');
-
   const exactMatches = exactRes.status === 'fulfilled'
     ? (exactRes.value?.exact_matches || []).slice(0, 10).map(m => ({
         title: m.title, source: m.source, link: m.link, thumbnail: m.thumbnail,
       })).filter(m => m.title)
     : [];
 
-  // about_this_image returns structured text blocks describing the object
   const aboutData = aboutRes.status === 'fulfilled' ? aboutRes.value : null;
   let aboutText = '';
   if (aboutData) {
-    // Different shapes possible; gather any snippets we can find
     const blocks = aboutData.about_this_image?.text_blocks
                 || aboutData.text_blocks
                 || aboutData.ai_overview?.text_blocks
@@ -299,7 +311,6 @@ console.log('[lens] visual status:', visualRes.status, visualRes.reason?.message
       if (b?.snippet) aboutText += b.snippet + '\n';
       if (b?.text) aboutText += b.text + '\n';
     }
-    // Also check for a knowledge_graph-like field
     if (aboutData.about_this_image?.title) {
       aboutText = `${aboutData.about_this_image.title}\n` + aboutText;
     }
@@ -322,8 +333,6 @@ console.log('[lens] visual status:', visualRes.status, visualRes.reason?.message
   return { exactMatches, aboutText, visualMatches, visualKG };
 }
 
-// ─── UPLOAD + LENS ──────────────────────────────────────────────────────────
-
 async function reverseImageSearch(imageBase64, mimeType) {
   const { put, del } = await import('@vercel/blob');
   const buffer = Buffer.from(imageBase64, 'base64');
@@ -340,13 +349,15 @@ async function reverseImageSearch(imageBase64, mimeType) {
   }
 }
 
-// ─── IDENTIFICATION ─────────────────────────────────────────────────────────
-// Priority: exact_matches > about_this_image text > visual_matches
+// ─── NEW: RICH OBSERVATION (replaces old identifyImage) ─────────────────────
+// Instead of "name the specific product or give up," this produces a full
+// observation block — best-name, visible details, era guess, house context,
+// and a culturally-useful search query. Used for all images regardless of
+// how much signal Lens returned.
 
-async function identifyImage({ imageBase64, mimeType, lens }) {
+async function observeImage({ imageBase64, mimeType, lens }) {
   const { exactMatches, aboutText, visualMatches, visualKG } = lens;
 
-  // Build a prompt that gives Claude the best evidence available, weighted by source quality.
   const parts = [];
 
   if (exactMatches.length) {
@@ -364,37 +375,40 @@ async function identifyImage({ imageBase64, mimeType, lens }) {
 
   if (visualMatches.length) {
     parts.push(`VISUAL MATCHES (similar-looking, lower signal):\n` +
-      visualMatches.slice(0, 8).map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n'));
+      visualMatches.slice(0, 10).map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n'));
   }
 
-  if (!parts.length) {
-    console.warn('[identify] no signals available');
-    return { identification: null, confidence: 'none', reasoning: 'no lens data', search_query: null };
-  }
+  const evidenceBlock = parts.length
+    ? parts.join('\n\n')
+    : 'No Google Lens data returned. Rely on the image alone and your visual knowledge.';
 
-  const prompt = `Identify the specific object in this image.
+  const prompt = `You are the identification layer of Carnelian, a cultural intelligence platform. Your job is to produce a rich OBSERVATION of the object in this image — not just "name it or give up."
 
-${parts.join('\n\n')}
+${evidenceBlock}
 
-CRITICAL PRIORITY ORDER:
-1. If EXACT IMAGE MATCHES exist, those are pages hosting the SAME image — the object IS whatever they describe. Trust them first and above all else.
+PRIORITY for naming:
+1. If EXACT IMAGE MATCHES clearly name a specific product, use that name exactly. Highest confidence.
 2. If ABOUT THIS IMAGE text names a specific brand/product, use that.
-3. Only use VISUAL MATCHES as a tiebreaker or last resort — visual matches are just lookalikes and are often dominated by commercial-spam brands (Versace, Rolex, Gucci, etc.) that don't reflect the actual object.
+3. Only use VISUAL MATCHES as tiebreaker — visual matches are often flooded with commercial-spam brands (Versace, Rolex, Gucci, Coach) that don't reflect the actual object. A less-famous brand that appears in fewer but clearer matches is almost always correct over a famous brand that appears more often.
+4. If no signal converges on a specific product, look at the image yourself and produce a CATEGORY-LEVEL name with era: "Tod's mid-2000s mini hobo," "1970s Courrèges ladies watch," "a late-1990s Margiela artisanal piece." Commit to what you can see in the construction, hardware, silhouette, and any visible insignia.
 
-Ignore brands that only appear in visual matches if exact matches name a different, less-famous brand. The less-famous brand is almost always correct because commercial spam floods generic visual matches.
+NEVER return null for best_name. Always name at the level the evidence supports. A category-with-era name is AS GOOD an answer as a specific product name for this pipeline — Carnelian is designed to write compelling entries at either level of specificity.
 
 Return ONLY JSON, no fences:
+
 {
-  "identification": "Specific brand + product (e.g. 'Courrèges vintage ladies watch', 'Alo Yoga tie-dye tote'), or null if truly unidentifiable",
-  "confidence": "high | medium | low",
-  "reasoning": "Which source you used (exact/about/visual) and why",
-  "search_query": "Best query to find more info"
+  "best_name": "Most specific honest name. Specific product if evidence supports it, otherwise category-with-era (e.g. 'Tod's mid-2000s mini hobo').",
+  "confidence_name": "high | medium | low",
+  "visible_details": "Rich sensory description of what the EYE sees. Materials, colors, silhouette, hardware, stitching, proportions, any visible insignia, condition cues. 2-4 sentences. This is what the writing stage draws on when research is thin, so be specific and sensory.",
+  "likely_era": "Best era guess based on construction cues (e.g. 'mid-2000s', 'late 1960s to early 1970s', '2020s').",
+  "likely_house_context": "If a brand is identifiable, what period of the house this likely comes from (e.g. 'Tod's under Della Valle, post-Gommino, pre-named-signature-bag era' or 'Courrèges post-André era, early-Coqueline-Courrèges period'). If no brand, leave empty string.",
+  "search_query": "The query most likely to return useful CULTURAL CONTEXT — not product listings. For a Tod's bag, prefer 'Tod's Diego Della Valle handbag history' over 'Tod's yellow leather satchel'. For a specific well-known product, use the product name. Goal: find editorial/critical writing, not e-commerce."
 }`;
 
   try {
     const msg = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 400,
+      max_tokens: 600,
       messages: [{
         role: 'user',
         content: [
@@ -405,18 +419,26 @@ Return ONLY JSON, no fences:
     });
     const text = msg.content.filter(b => b.type === 'text').pop()?.text || '';
     const result = extractJSON(text);
-    console.log('[identify]', result.identification, '| confidence:', result.confidence, '| via:', result.reasoning);
-    return { ...result, aboutText };
+    console.log('[observe] name:', result.best_name, '| conf:', result.confidence_name, '| era:', result.likely_era);
+    return result;
   } catch (err) {
-    console.error('[identify] failed:', err.message);
-    return { identification: null, confidence: 'none', reasoning: 'identify call failed', search_query: null, aboutText };
+    console.error('[observe] failed:', err.message);
+    return {
+      best_name: null,
+      confidence_name: 'none',
+      visible_details: '',
+      likely_era: '',
+      likely_house_context: '',
+      search_query: null,
+    };
   }
 }
 
 // ─── WRITING STAGE ──────────────────────────────────────────────────────────
 
-function buildUserContent({ query, image, lens, identification, research, isRetry }) {
+function buildUserContent({ query, image, lens, observation, research, isRetry }) {
   const isImageSearch = !!image?.data;
+  const depth = researchDepth(research);
 
   const userContent = [];
   if (image?.data && image?.type) {
@@ -427,37 +449,44 @@ function buildUserContent({ query, image, lens, identification, research, isRetr
   if (isImageSearch) {
     let grounding = '';
 
-    if (identification?.identification) {
-      grounding += `\n\n===== IDENTIFIED AS: ${identification.identification} =====\n`;
-      grounding += `Source: ${identification.reasoning}\n`;
-      if (identification.aboutText) {
-        grounding += `\nGoogle's own description of this image:\n"""\n${identification.aboutText}\n"""\n`;
-      }
-      if (lens?.exactMatches?.length) {
-        grounding += `\nExact-match pages (image appears on these sites):\n` +
-          lens.exactMatches.slice(0, 5).map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n') + '\n';
-      }
-      grounding += `\nThis identification is FINAL. Write about this specific object.\n`;
+    if (observation?.best_name) {
+      grounding += `\n\n===== OBSERVATION =====\n`;
+      grounding += `NAME: ${observation.best_name}\n`;
+      grounding += `CONFIDENCE: ${observation.confidence_name}\n`;
+      if (observation.likely_era) grounding += `LIKELY ERA: ${observation.likely_era}\n`;
+      if (observation.likely_house_context) grounding += `HOUSE CONTEXT: ${observation.likely_house_context}\n`;
+      if (observation.visible_details) grounding += `VISIBLE DETAILS: ${observation.visible_details}\n`;
+    }
+
+    if (lens?.exactMatches?.length) {
+      grounding += `\nExact-match pages (image appears on these sites):\n` +
+        lens.exactMatches.slice(0, 5).map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n') + '\n';
+    }
+
+    if (lens?.aboutText) {
+      grounding += `\nGoogle's "about this image" text:\n"""\n${lens.aboutText}\n"""\n`;
     }
 
     if (research) {
-      grounding += `\n\n===== RESEARCH ON "${identification?.identification || 'the subject'}" =====\n\n${formatResearch(research)}`;
+      grounding += `\n\n===== RESEARCH (depth: ${depth}) =====\n\n${formatResearch(research)}`;
+    } else {
+      grounding += `\n\n===== RESEARCH: SPARSE =====\nNo substantial research results for this object. Rely on the observation above, your knowledge of the tradition/house, and what is VISIBLE in the image. Write about the OBJECT AND TRADITION, not a specific product you can't confirm.`;
     }
 
     const userNote = query ? ` The user added context: "${query}".` : '';
 
-    if (identification?.identification) {
-      userText = `The user uploaded an image.${userNote}${grounding}
+    userText = `The user uploaded an image.${userNote}${grounding}
 
-Write the Carnelian entry about the IDENTIFIED object above. Do not substitute a different brand even if the image visually resembles one. The identification came from Google's own pixel-level data.`;
-    } else {
-      userText = `The user uploaded an image.${userNote}
+Write the Carnelian entry using the observation and research above.
 
-Identification failed. Describe what the image shows generally without guessing at a specific brand.`;
-    }
+CALIBRATION:
+- Research depth is "${depth}". ${depth === 'rich' ? 'You have substantial material — name specific critics, moments, launches, dates from the research. Be in the discourse.' : depth === 'moderate' ? 'You have some material — use what the research gave you, supplement with the tradition the object belongs to.' : 'Research is thin. Write about the OBJECT AND TRADITION. Commit to visible details. Place the object in its house/era/craft lineage. Do NOT invent specifics to compensate.'}
+- Name confidence is "${observation?.confidence_name || 'unknown'}". ${observation?.confidence_name === 'high' ? 'Write about the specific product named.' : 'Write about the object at the category/era level given. Do not escalate to a specific product name.'}
+
+The title should match the observation's name (specific product or category-with-era). Do not substitute a different named product. Do not demote to "a yellow bag."`;
   } else {
-    const researchBlock = research ? `\n\n=== RESEARCH CONTEXT ===\n\n${formatResearch(research)}\n\n=== END ===\n\n` : '';
-    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context.`;
+    const researchBlock = research ? `\n\n=== RESEARCH CONTEXT (depth: ${depth}) ===\n\n${formatResearch(research)}\n\n=== END ===\n\n` : '';
+    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context. Research depth is "${depth}" — ${depth === 'rich' ? 'be in the discourse, name specific critics and moments.' : depth === 'moderate' ? 'use what research gave you, supplement with the tradition.' : 'research is thin — write about the object/concept and its tradition, commit to what you know, do not invent specifics.'}`;
   }
 
   if (isRetry) {
@@ -496,27 +525,25 @@ async function buildStreamingResponse({ query, image }) {
     async start(controller) {
       try {
         let lens = null;
-        let identification = null;
+        let observation = null;
         let research = null;
 
         if (isImageSearch) {
           controller.enqueue(sseEncode({ type: 'status', stage: 'identifying' }));
           lens = await reverseImageSearch(image.data, image.type);
 
-          const hasAnySignal = lens.exactMatches.length > 0 || lens.aboutText.length > 0 || lens.visualMatches.length > 0;
-          if (!hasAnySignal) {
-            controller.enqueue(sseEncode({ type: 'error', message: "Couldn't identify this image. Try a clearer photo or add text context." }));
+          // Always run observation — even if Lens returned nothing, Claude can read the image
+          observation = await observeImage({ imageBase64: image.data, mimeType: image.type, lens });
+
+          if (!observation?.best_name) {
+            controller.enqueue(sseEncode({ type: 'error', message: "Couldn't read this image. Try a clearer photo or add text context." }));
             controller.close();
             return;
           }
 
-          identification = await identifyImage({ imageBase64: image.data, mimeType: image.type, lens });
-
-          const searchQuery = identification?.search_query || identification?.identification || lens.visualKG?.title;
-          if (searchQuery) {
-            controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
-            research = await parallelResearch(searchQuery);
-          }
+          const searchQuery = observation.search_query || observation.best_name;
+          controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
+          research = await parallelResearch(searchQuery);
         } else {
           controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
           research = await parallelResearch(query);
@@ -529,7 +556,7 @@ async function buildStreamingResponse({ query, image }) {
           model: 'claude-sonnet-4-6',
           max_tokens: 4000,
           system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: buildUserContent({ query, image, lens, identification, research, isRetry: false }) }],
+          messages: [{ role: 'user', content: buildUserContent({ query, image, lens, observation, research, isRetry: false }) }],
         });
 
         for await (const event of claudeStream) {
@@ -545,7 +572,7 @@ async function buildStreamingResponse({ query, image }) {
         } catch (parseErr) {
           console.warn('[stream] first attempt failed validation:', parseErr.message, '— retrying');
           controller.enqueue(sseEncode({ type: 'status', stage: 'retrying' }));
-          artifact = await callClaudeNonStreaming({ query, image, lens, identification, research, isRetry: true });
+          artifact = await callClaudeNonStreaming({ query, image, lens, observation, research, isRetry: true });
         }
 
         if (query && !image) setCached(normalizeSlug(query), artifact);
