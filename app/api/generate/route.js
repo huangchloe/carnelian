@@ -15,48 +15,43 @@ You are emphatically not: a recapper, a listicle, a TikTok hot take, a Wikipedia
 
 A generic entry describes WHAT something is. A Carnelian entry notices:
 
-**The contradiction.** Every culturally alive object holds a tension. Find it and name it.
+**The contradiction.** Every culturally alive object holds a tension. Find it.
 
-**The mechanism.** How did this move through culture? Who adopted it, who saw them? What platform, friend group, magazine, party? Culture doesn't spread by osmosis.
+**The mechanism.** How did this move through culture? Who adopted it, who saw them?
 
-**The tipping moment.** The specific year, season, launch, or event — when you actually know it.
+**The tipping moment.** The specific year, season, launch — when you actually know it.
 
 **The class or generational tell.** What adopting this signals. Precision, never contempt.
 
-**The lineage that isn't obvious.** Not "influenced by Bauhaus" — the specific unexpected thread.
+**The lineage that isn't obvious.** The specific unexpected thread, not "influenced by Bauhaus."
 
 ## Voice rules
 
 - Present tense for living culture. Past only for things actually finished.
 - One clear claim per sentence. No hedging chains.
 - Specificity WHEN YOU KNOW. Don't invent specifics to sound sharper.
-- No em-dash orgies, no "it's not just X — it's Y" (LLM tells).
+- No em-dash orgies, no "it's not just X — it's Y".
 - Dry wit, never sarcasm.
 - Never use: "cultural moment," "zeitgeist," "iconic," "game-changer," "vibe," "cultural touchstone," "love letter to," "think piece."
 
 ## Accuracy rules — NEVER a reason to refuse generation
 
-Every proper noun, date, number, price, quote, attribution must come from the research context OR well-established knowledge. When uncertain, use less specific language ("the early 2020s" not "Fall 2021"). Never invent.
+Every proper noun, date, number, price, quote must come from the research context OR well-established knowledge. When uncertain, use less specific language. Never invent.
 
-**Always generate a complete entry.** Accuracy means using more general language when uncertain, not refusing. For recent events, lean on the research context provided — that is your source of truth.
+**Always generate a complete entry.** Accuracy means using more general language when uncertain, not refusing.
 
-## IDENTIFICATION RULES FOR IMAGE SEARCHES — READ CAREFULLY
+## Image identification (when present) is FINAL
 
-When the user uploads an image and research context includes "IDENTIFIED AS: [brand/product]", that identification is FINAL and AUTHORITATIVE. Write about THAT object.
-
-You are explicitly forbidden from:
-- Substituting a more famous brand or model because it "looks similar"
+When the user context includes "IDENTIFIED AS: [brand/product]", that identification is AUTHORITATIVE. Write about THAT object. You are forbidden from:
+- Substituting a more famous brand because it "looks similar"
 - Overriding the identification based on your own visual interpretation
 - Correcting the identification to something you think is more likely
-- Suggesting the identification might be wrong
 
-If the identification says "Courrèges vintage watch," write about a Courrèges vintage watch — even if a Versace Vanity watch looks similar. If the identification says "Alo Yoga tote," write about an Alo Yoga tote — even if a Lululemon bag has similar aesthetics. If you have limited training knowledge about the specific identified item, write from the research context and use more general language — but write about the correct object.
-
-When there is no explicit identification (only raw visual matches), look for any brand or product name mentioned in the matches and treat the most frequent one as correct. Only fall back to your own visual identification when NO brand or product appears in any match title.
+If the identification says "Courrèges vintage watch," write about a Courrèges vintage watch — even if a Versace watch looks similar. Use the research context for facts; if your training knowledge of the identified item is limited, use more general language, but write about the correct object.
 
 ## carnelianReads — the sacred field
 
-One interpretive claim. Not a summary. Not a description. A claim the reader couldn't have produced themselves.
+One interpretive claim. Not a summary. Not a description. A claim.
 
 ## Worked example — Alo tie-dye tote
 
@@ -64,9 +59,7 @@ HOOK: "A canvas tote bag, frequently given away free with a qualifying Alo Yoga 
 
 CARNELIAN READS: "The Alo tote is the first It bag of the loyalty-program era — status accrued not by waitlist or price but by the sheer saturation of seeing it on every third woman in SoHo, Venice, and the UES."
 
-## Return format — ONLY valid JSON, no preamble, no markdown fences
-
-Begin with { and end with }. No prose before or after.
+## Return format — ONLY valid JSON, no preamble, no fences. Begin with { end with }
 
 {
   "slug": "url-slug-no-spaces",
@@ -110,7 +103,7 @@ For "see" type "motifs": items = [{"name": "Motif name", "color": "#hex", "textC
 For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences"}] (3 items)
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
 
-For read.sources: USE THE REAL ARTICLE URLS FROM THE RESEARCH CONTEXT. Do not invent URLs.
+For read.sources: USE REAL URLS FROM THE RESEARCH CONTEXT. Do not invent URLs.
 
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 
@@ -137,100 +130,6 @@ function validateArtifact(a) {
 
 function normalizeSlug(query) {
   return query.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80);
-}
-
-// ─── CONSENSUS IDENTIFICATION from Lens matches ────────────────────────────
-// Goal: from 10-15 match titles, extract the brand+product everyone agrees on.
-// A match title typically looks like:
-//   "Vintage Courreges Gold Plated Watch with Red Dial"
-//   "Courrèges Paris 1970s ladies watch, red face, 17 jewels"
-//   "Ladies vintage gold watch burgundy"  <- generic, no signal
-// If 3+ titles share a capitalized proper noun (Courreges, Courrèges), that's the brand.
-
-const GENERIC_WATCH_WORDS = new Set([
-  'watch', 'watches', 'vintage', 'antique', 'used', 'classic', 'rare', 'authentic',
-  'ladies', 'women', "women's", 'womens', 'men', "men's", 'mens', 'unisex',
-  'gold', 'silver', 'rose', 'black', 'white', 'red', 'blue', 'green', 'burgundy',
-  'brown', 'yellow', 'pink', 'purple', 'navy', 'cream', 'beige', 'tan',
-  'plated', 'tone', 'toned', 'colored', 'color', 'color',
-  'dial', 'face', 'case', 'strap', 'band', 'bracelet', 'hands', 'movement',
-  'leather', 'steel', 'stainless', 'metal', 'mesh', 'lizard', 'croc',
-  'round', 'square', 'rectangular', 'oval', 'slim',
-  'quartz', 'automatic', 'mechanical', 'manual',
-  'new', 'excellent', 'condition', 'pre-owned', 'preowned',
-  'sale', 'sold', 'buy', 'shop', 'wts', 'fs',
-  'with', 'and', 'for', 'the', 'from', 'in', 'on', 'of', 'by', 'as',
-  'jewelry', 'jewellery', 'accessory', 'accessories',
-  'dress', 'fashion', 'style', 'designer', 'luxury',
-  'like', 'similar', 'style',
-  'collection', 'edition', 'limited', 'vintage',
-  'reddit', 'etsy', 'ebay', 'pinterest', 'facebook', 'instagram', 'tiktok',
-]);
-
-const GENERIC_TERMS_REGEX = /\b(19|20)\d{2}s?\b|\b\d+mm\b|\b\d+\s*(jewel|jewels)\b/gi;
-
-function extractConsensusIdentification(visualMatches) {
-  if (!visualMatches?.length) return null;
-
-  const normalize = (s) => s.toLowerCase().replace(/[àáâãä]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i').replace(/[òóôõö]/g, 'o').replace(/[ùúûü]/g, 'u');
-
-  // Collect capitalized words (likely proper nouns / brands) from all titles.
-  const tokenCount = {};  // normalized token -> { count, originalForms: Set }
-  const bigramCount = {}; // "token1 token2" -> count (for "Alo Yoga", "Rick Owens")
-
-  for (const match of visualMatches) {
-    const title = match.title || '';
-    const cleaned = title.replace(GENERIC_TERMS_REGEX, '').replace(/[^\w\sÀ-ÿ-]/g, ' ');
-    const words = cleaned.split(/\s+/).filter(Boolean);
-
-    const caps = []; // capitalized words, kept in order
-    for (const word of words) {
-      // Is it capitalized or all-caps, length > 2, and not a generic term?
-      const isCap = /^[A-ZÀ-Ý]/.test(word);
-      const normalized = normalize(word);
-      if (!isCap) continue;
-      if (normalized.length < 3) continue;
-      if (GENERIC_WATCH_WORDS.has(normalized)) continue;
-
-      if (!tokenCount[normalized]) tokenCount[normalized] = { count: 0, originalForms: new Set() };
-      tokenCount[normalized].count += 1;
-      tokenCount[normalized].originalForms.add(word);
-      caps.push({ word, normalized });
-    }
-
-    // Count adjacent capitalized pairs (common brand patterns).
-    for (let i = 0; i < caps.length - 1; i++) {
-      const bigram = `${caps[i].normalized} ${caps[i + 1].normalized}`;
-      const bigramOriginal = `${caps[i].word} ${caps[i + 1].word}`;
-      if (!bigramCount[bigram]) bigramCount[bigram] = { count: 0, originalForms: new Set() };
-      bigramCount[bigram].count += 1;
-      bigramCount[bigram].originalForms.add(bigramOriginal);
-    }
-  }
-
-  // Find the best signal: a bigram or unigram with count ≥ 2 (or ≥ 20% of matches).
-  const threshold = Math.max(2, Math.ceil(visualMatches.length * 0.2));
-
-  const bigrams = Object.entries(bigramCount)
-    .filter(([, v]) => v.count >= threshold)
-    .sort(([, a], [, b]) => b.count - a.count);
-
-  const unigrams = Object.entries(tokenCount)
-    .filter(([, v]) => v.count >= threshold)
-    .sort(([, a], [, b]) => b.count - a.count);
-
-  // Prefer bigrams (brand + model) over unigrams (just brand).
-  if (bigrams.length > 0) {
-    const [, data] = bigrams[0];
-    const original = [...data.originalForms][0]; // best guess of original casing
-    return { identification: original, confidence: data.count, source: 'visual_match_consensus' };
-  }
-  if (unigrams.length > 0) {
-    const [, data] = unigrams[0];
-    const original = [...data.originalForms][0];
-    return { identification: original, confidence: data.count, source: 'visual_match_consensus' };
-  }
-  return null;
 }
 
 // ─── CACHE ──────────────────────────────────────────────────────────────────
@@ -268,7 +167,7 @@ async function setCached(slug, artifact) {
   }
 }
 
-// ─── RESEARCH (Google News + Google Search) ─────────────────────────────────
+// ─── RESEARCH ───────────────────────────────────────────────────────────────
 
 async function parallelResearch(query) {
   if (!process.env.SERPAPI_KEY) return null;
@@ -364,23 +263,102 @@ async function reverseImageSearch(imageBase64, mimeType) {
     if (!res.ok) throw new Error(`SerpApi returned ${res.status}`);
     const data = await res.json();
 
-    const visualMatches = (data.visual_matches || []).slice(0, 20).map(m => ({
-      title: m.title, source: m.source, link: m.link,
+    const visualMatches = (data.visual_matches || []).slice(0, 30).map((m, i) => ({
+      position: m.position ?? i + 1,
+      title: m.title,
+      source: m.source,
+      link: m.link,
     })).filter(m => m.title);
 
     const knowledgeGraph = data.knowledge_graph ? {
       title: data.knowledge_graph.title, type: data.knowledge_graph.type, description: data.knowledge_graph.description,
     } : null;
 
+    console.log('[lens] returned', visualMatches.length, 'matches');
     return { visualMatches, knowledgeGraph };
   } finally {
     try { await del(blob.url); } catch {}
   }
 }
 
-// ─── USER CONTENT BUILDER ───────────────────────────────────────────────────
+// ─── NEW: CLAUDE-AS-IDENTIFIER (Stage 1 of image search) ────────────────────
+// Purpose: given the user's image + top Lens matches, return the correct brand/product.
+// This fixes the frequency-bias problem where Versace floods visual matches.
 
-function buildUserContent({ query, image, lensResults, consensusId, research, isRetry }) {
+async function identifyImage({ imageBase64, mimeType, visualMatches, lensKG }) {
+  // Top 10 matches — those are Google's highest-confidence results. Beyond that
+  // is noise that dilutes with commercial saturation (Versace, etc).
+  const topMatches = visualMatches.slice(0, 10);
+
+  const matchesBlock = topMatches.map((m, i) =>
+    `${i + 1}. "${m.title}" — ${m.source || 'unknown'}`
+  ).join('\n');
+
+  const kgBlock = lensKG?.title
+    ? `\n\nGoogle Knowledge Graph says: ${lensKG.title}${lensKG.type ? ` (${lensKG.type})` : ''}`
+    : '';
+
+  const identificationPrompt = `You are identifying a specific object from an image. Below are the TOP 10 Google Images visual matches, ordered by Google's visual-similarity ranking. Position 1 is Google's most confident match.
+
+TOP VISUAL MATCHES:
+${matchesBlock}${kgBlock}
+
+Look at the user's image and the match list. Identify the specific object.
+
+CRITICAL RULES:
+1. Google's position ranking matters more than how often a brand appears. Position 1-3 matches are Google's highest-confidence guesses. A brand appearing in 5 low-position matches is often commercial saturation (e-commerce sites flooding the index), NOT a correct identification.
+
+2. For consumer products (watches, bags, clothing), look at the TOP match especially. If match #1 or #4 names a specific brand that visually matches the image, that is very likely the answer — even if 15 later matches name a different, more famous brand.
+
+3. Look at the image yourself to cross-check. Does the object in the image actually look like the top match, or like the flood of later matches? Trust what you see.
+
+4. If top matches disagree wildly (e.g. Rolex vs Courrèges vs Versace all in top 5), say confidence is low and give your best single guess based on the image.
+
+5. Generic descriptions ("red dial watch," "burgundy leather strap") mean nothing — ignore them. Only specific brand/product names count.
+
+Return ONLY a JSON object, no preamble, no fences:
+
+{
+  "identification": "Specific brand and product (e.g. 'Courrèges vintage ladies watch', 'Alo Yoga tie-dye tote', 'Margiela Tabi boot')",
+  "confidence": "high | medium | low",
+  "reasoning": "One sentence explaining the choice",
+  "search_query": "Best query to search for more info (e.g. 'Courrèges vintage watch red dial')"
+}
+
+If the top matches are too contradictory and the image is too generic to identify with any confidence, return:
+{
+  "identification": null,
+  "confidence": "none",
+  "reasoning": "Why identification failed",
+  "search_query": "Generic description query"
+}`;
+
+  try {
+    const msg = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 500,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
+          { type: 'text', text: identificationPrompt },
+        ],
+      }],
+    });
+
+    const text = msg.content.filter(b => b.type === 'text').pop()?.text || '';
+    const result = extractJSON(text);
+    console.log('[identify] Claude ID:', result.identification, '| confidence:', result.confidence);
+    return result;
+  } catch (err) {
+    console.error('[identify] failed:', err.message);
+    return { identification: null, confidence: 'none', reasoning: 'identification call failed', search_query: null };
+  }
+}
+
+// ─── USER CONTENT BUILDER (Stage 2 — writing) ──────────────────────────────
+
+function buildUserContent({ query, image, lensResults, identification, research, isRetry }) {
   const isImageSearch = !!image?.data;
 
   const userContent = [];
@@ -392,50 +370,47 @@ function buildUserContent({ query, image, lensResults, consensusId, research, is
   if (isImageSearch) {
     let grounding = '';
 
-    // Explicit identification block — this is what Claude MUST write about.
-    if (consensusId) {
-      grounding += `\n\n===== IDENTIFIED AS: ${consensusId.identification} =====\n`;
-      grounding += `This identification comes from consensus across ${consensusId.confidence} Google Images visual matches. This IS the object. Write about it.\n`;
-    } else if (lensResults?.knowledgeGraph?.title) {
-      grounding += `\n\n===== IDENTIFIED AS: ${lensResults.knowledgeGraph.title} =====\n`;
-      if (lensResults.knowledgeGraph.type) grounding += `Type: ${lensResults.knowledgeGraph.type}\n`;
-      if (lensResults.knowledgeGraph.description) grounding += `${lensResults.knowledgeGraph.description}\n`;
-    }
-
-    if (lensResults?.visualMatches?.length) {
-      grounding += `\n\nGoogle Images visual matches (supporting evidence):\n` +
-        lensResults.visualMatches.map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n');
+    // The committed identification from Stage 1
+    if (identification?.identification) {
+      grounding += `\n\n===== IDENTIFIED AS: ${identification.identification} =====\n`;
+      grounding += `(Confidence: ${identification.confidence}. ${identification.reasoning})\n`;
+      grounding += `This identification is FINAL. Write about this specific object.\n`;
     }
 
     if (research) {
-      grounding += `\n\n====\nRESEARCH ON THE IDENTIFIED SUBJECT:\n\n${formatResearch(research)}`;
+      grounding += `\n\n===== RESEARCH ON "${identification?.identification || 'the subject'}" =====\n\n${formatResearch(research)}`;
+    }
+
+    // Include raw matches as supporting evidence only — NOT as primary ID source.
+    if (lensResults?.visualMatches?.length && identification?.identification) {
+      const topMatches = lensResults.visualMatches.slice(0, 5);
+      grounding += `\n\nSupporting visual matches (reference only):\n` +
+        topMatches.map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n');
     }
 
     const userNote = query ? ` The user added context: "${query}".` : '';
 
-    if (consensusId || lensResults?.knowledgeGraph) {
+    if (identification?.identification) {
       userText = `The user uploaded an image.${userNote}${grounding}
 
-Write the Carnelian entry about the IDENTIFIED object above. Do not substitute a different, more famous brand even if the image visually resembles one. The identification is final.`;
+Write the Carnelian entry about the IDENTIFIED object above. Do not substitute a different brand even if the image resembles one. The identification is final.`;
     } else {
-      userText = `The user uploaded an image.${userNote}${grounding}
+      userText = `The user uploaded an image.${userNote}
 
-Google Lens returned visual matches but no clear consensus on identification. Find any brand or product name that appears in the match titles and use it. If no brand appears anywhere in the matches, describe what the image shows generally — do not guess at a famous brand.`;
+Identification failed — no reliable match. Describe what the image shows generally without guessing at a specific brand. It is better to say "a vintage ladies' watch with red dial" than to confidently misidentify.`;
     }
   } else {
-    const researchBlock = research ? `\n\n=== RESEARCH CONTEXT (your ground truth) ===\n\n${formatResearch(research)}\n\n=== END ===\n\n` : '';
-    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context. For recent events, trust the news results.`;
+    const researchBlock = research ? `\n\n=== RESEARCH CONTEXT ===\n\n${formatResearch(research)}\n\n=== END ===\n\n` : '';
+    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context.`;
   }
 
   if (isRetry) {
-    userText += `\n\nThis is a retry. Previous attempt returned invalid or incomplete JSON. Return valid JSON with ALL required fields populated.`;
+    userText += `\n\nThis is a retry. Previous attempt returned invalid JSON. Return valid JSON with ALL required fields.`;
   }
 
   userContent.push({ type: 'text', text: userText });
   return userContent;
 }
-
-// ─── CLAUDE CALLS ───────────────────────────────────────────────────────────
 
 async function callClaudeNonStreaming(params) {
   const message = await client.messages.create({
@@ -465,37 +440,44 @@ async function buildStreamingResponse({ query, image }) {
     async start(controller) {
       try {
         let lensResults = null;
-        let consensusId = null;
+        let identification = null;
         let research = null;
 
         if (isImageSearch) {
+          // Stage 1a: Google Lens for raw visual matches
           controller.enqueue(sseEncode({ type: 'status', stage: 'identifying' }));
           lensResults = await reverseImageSearch(image.data, image.type);
 
-          const hasMatches = lensResults?.visualMatches?.length > 0 || lensResults?.knowledgeGraph;
+          const hasMatches = lensResults?.visualMatches?.length > 0;
           if (!hasMatches) {
             controller.enqueue(sseEncode({ type: 'error', message: "Couldn't identify this image. Try a clearer photo or add text context." }));
             controller.close();
             return;
           }
 
-          // NEW: extract consensus brand/product from visual match titles
-consensusId = extractConsensusIdentification(lensResults.visualMatches);
-const identifier = consensusId?.identification || lensResults.knowledgeGraph?.title;
+          // Stage 1b: Claude identifies the specific object from matches + image
+          identification = await identifyImage({
+            imageBase64: image.data,
+            mimeType: image.type,
+            visualMatches: lensResults.visualMatches,
+            lensKG: lensResults.knowledgeGraph,
+          });
 
-console.log('[lens] match titles:', JSON.stringify(lensResults.visualMatches.slice(0, 10).map(m => m.title)));
-console.log('[lens] knowledge graph:', JSON.stringify(lensResults.knowledgeGraph));
-console.log('[identify] consensus:', consensusId?.identification, '| kg:', lensResults.knowledgeGraph?.title, '| chose:', identifier);
+          // Stage 1c: Research the identified object (or fallback to Lens KG if ID failed)
+          const searchQuery = identification?.search_query
+            || identification?.identification
+            || lensResults.knowledgeGraph?.title;
 
-          if (identifier) {
+          if (searchQuery) {
             controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
-            research = await parallelResearch(identifier);
+            research = await parallelResearch(searchQuery);
           }
         } else {
           controller.enqueue(sseEncode({ type: 'status', stage: 'researching' }));
           research = await parallelResearch(query);
         }
 
+        // Stage 2: Writing
         controller.enqueue(sseEncode({ type: 'status', stage: 'generating' }));
 
         let fullText = '';
@@ -503,7 +485,7 @@ console.log('[identify] consensus:', consensusId?.identification, '| kg:', lensR
           model: 'claude-sonnet-4-6',
           max_tokens: 4000,
           system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: buildUserContent({ query, image, lensResults, consensusId, research, isRetry: false }) }],
+          messages: [{ role: 'user', content: buildUserContent({ query, image, lensResults, identification, research, isRetry: false }) }],
         });
 
         for await (const event of claudeStream) {
@@ -517,9 +499,9 @@ console.log('[identify] consensus:', consensusId?.identification, '| kg:', lensR
         try {
           artifact = validateArtifact(extractJSON(fullText));
         } catch (parseErr) {
-          console.warn('[stream] first attempt failed validation:', parseErr.message, '— retrying non-streamed');
+          console.warn('[stream] first attempt failed validation:', parseErr.message, '— retrying');
           controller.enqueue(sseEncode({ type: 'status', stage: 'retrying' }));
-          artifact = await callClaudeNonStreaming({ query, image, lensResults, consensusId, research, isRetry: true });
+          artifact = await callClaudeNonStreaming({ query, image, lensResults, identification, research, isRetry: true });
         }
 
         if (query && !image) setCached(normalizeSlug(query), artifact);
@@ -543,8 +525,6 @@ console.log('[identify] consensus:', consensusId?.identification, '| kg:', lensR
     },
   });
 }
-
-// ─── HANDLERS ───────────────────────────────────────────────────────────────
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
