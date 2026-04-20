@@ -54,8 +54,8 @@ function NewsItem({ item }) {
       )}
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        {item.source && (
-          <div style={{ fontSize: 9, color: '#B31B1B', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 8, fontWeight: 500 }}>{item.source}</div>
+        {(item.publisher || item.source) && (
+          <div style={{ fontSize: 9, color: '#B31B1B', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 8, fontWeight: 500 }}>{item.publisher || item.source}</div>
         )}
         <div style={{ fontSize: 16, color: '#111111', lineHeight: 1.55, fontFamily: 'var(--font-body)', fontWeight: 400, marginBottom: 8 }}>{item.title}</div>
         {date && <div style={{ fontSize: 11, color: '#C0BDB8', fontFamily: 'var(--font-body)', letterSpacing: '0.04em' }}>{date}</div>}
@@ -65,7 +65,7 @@ function NewsItem({ item }) {
   );
 }
 
-export default function LiveContext({ slug, artifact, onEmpty }) {
+export default function LiveContext({ slug, artifact }) {
   const [context, setContext] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -82,12 +82,6 @@ export default function LiveContext({ slug, artifact, onEmpty }) {
 
   const hasReddit = context?.reddit?.length > 0;
   const hasNews = context?.news?.length > 0;
-
-  // Notify parent when fetch completes with no content, so the Now
-  // section can hide itself rather than render a stranded label.
-  useEffect(() => {
-    if (!loading && !hasReddit && !hasNews && onEmpty) onEmpty();
-  }, [loading, hasReddit, hasNews, onEmpty]);
 
   if (loading) {
     return (
