@@ -255,15 +255,17 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
   const [heroLoaded, setHeroLoaded] = useState(false);
   const router = useRouter();
 
-  // Hero image: specific editorial query
-  const heroQuery = artifact
-    ? `${artifact.title} ${artifact.type !== 'Object' ? artifact.type : ''} editorial`.trim()
-    : '';
-  const { images: heroImages } = useImages(heroQuery, 3, !!artifact);
+// Hero image: prefer the curated one from the artifact; fall back to CSE for catalog entries without one
+const hasCuratedHero = !!artifact?.heroImage?.url;
+const fallbackQuery = !hasCuratedHero && artifact
+  ? `${artifact.title} ${artifact.type !== 'Object' ? artifact.type : ''} editorial`.trim()
+  : '';
+const { images: fallbackImages } = useImages(fallbackQuery, 3, !!fallbackQuery);
 
-  // Try images until one loads
-  const [heroIndex, setHeroIndex] = useState(0);
-  const heroImage = heroImages[heroIndex];
+const [heroIndex, setHeroIndex] = useState(0);
+const heroImage = hasCuratedHero
+  ? { url: artifact.heroImage.url, title: artifact.heroImage.title }
+  : fallbackImages[heroIndex];
 
   useEffect(() => {
     if (catalogArtifact) return;
