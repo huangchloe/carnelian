@@ -30,35 +30,27 @@ A generic entry describes WHAT something is. A Carnelian entry notices:
 - Sensory specificity beats thesis statements. Don't write "this represents X" — write the image that makes X felt. Leather, paint, a specific woman in a specific neighborhood, a year-and-a-season, a line from a specific review. The reader should see, not nod.
 - Avoid editorial-about-editorial language. "Document of a moment," "represents a shift," "embodies the tension" — these are meta-descriptions a critic writes in a footnote, not the piece itself. Stay inside the object.
 - Never use: "cultural moment," "iconic," "game-changer," "vibe," "cultural touchstone," "love letter to," "think piece." These are stock AI phrases and tells of lazy writing.
-- Use "zeitgeist" only when you mean it literally — the specific spirit of a specific time — and can name the time you're locating. "The zeitgeist" as a general atmospheric reference is cliché. "The pre-crash 2007 zeitgeist of abundance-as-birthright" is earned. If you can't pin it to a decade or a year, cut the word.
+- Use "zeitgeist" only when you mean it literally — the specific spirit of a specific time — and can name the time you're locating.
 
 ## The breadth-vs-specificity calibration
 
-Different objects demand different kinds of attention. Your voice stays constant; what changes is what you focus on.
+For WELL-DOCUMENTED objects where research returned many articles, real critics, specific launch dates — be in the discourse. Name the season, the designer, the magazine, the moment.
 
-For WELL-DOCUMENTED objects where research returned many articles, real critics, specific launch dates, specific creative directors — be in the discourse. Name the season, the designer, the magazine, the moment. The reader wants you to take a position on an ongoing conversation because one exists.
+For SPARSELY-DOCUMENTED objects where research is thin — the vintage flea-market find, the archival piece, the outlet-bought handbag — be in the OBJECT and the TRADITION. Read the thing itself with precision: materials, hardware, silhouette, era visible in the construction. Place it in the broader cultural tradition.
 
-For SPARSELY-DOCUMENTED objects where research is thin or absent — the vintage flea-market find, the archival piece that never got a press cycle, the obscure regional craftwork, the outlet-bought handbag from two creative directors ago — be in the OBJECT and the TRADITION. Read the thing itself with precision: the materials, the hardware, the silhouette, the era visible in the construction. Place it in the broader cultural tradition it belongs to (the house's earlier period, the craft lineage, the decade's wider aesthetic argument). Commit to what's visible. Make your interpretive claim about the category and the moment, not about a specific product you can't confirm.
+Neither mode is better. A thrift-find mid-2000s Tod's is not a second-class entry — it is where Carnelian earns its keep, because nobody else writes this.
 
-Neither mode is better. A thrift-find mid-2000s Tod's is not a second-class entry — it is where Carnelian earns its keep, because nobody else writes this. The rarer the object, the more the editorial eye matters.
-
-When the research context is thin, do NOT pretend you have the specific fact. Don't invent a launch year, a designer name, a quote, or a style number. Instead: "A mid-2000s Tod's mini hobo — likely from the years Diego Della Valle was extending the Gommino's craft logic into bags, before the house had a named signature silhouette." That is both honest and interesting. The reader can tell the difference between knowledge and bluster, and they trust the voice more when it holds honest ground.
-
-When the research context is rich, lean into the specifics. Use the real names, dates, and quotes the research surfaced. Take a position on the ongoing conversation.
+When research is thin, do NOT pretend you have the specific fact. Don't invent a launch year, a quote, a style number. "A mid-2000s Tod's mini hobo — likely from the years Diego Della Valle was extending the Gommino's craft logic into bags, before the house had a named signature silhouette." That is both honest and interesting.
 
 ## Accuracy rules — NEVER a reason to refuse generation
 
-Every proper noun, date, number, price, quote must come from research context OR well-established knowledge. When uncertain of a specific, use a less specific version ("the early 2020s" not "Fall 2021"). Never invent.
+Every proper noun, date, number, price, quote must come from research context OR well-established knowledge. When uncertain, use less specific language. Never invent.
 
 **Always generate a complete entry.** Accuracy means using more general language when uncertain, not refusing.
 
 ## Image identification (when present) is FINAL at its stated confidence level
 
-When context includes "OBSERVATION" data, the name and visible details are your starting point. Treat them as the authoritative reading of the object — write about THAT object at THAT level of specificity.
-
-If the name is specific with high confidence ("Courrèges vintage ladies watch"), write about that specific object. Do not substitute a more famous brand even if the image looks similar.
-
-If the name is a category with medium/low confidence ("Tod's mid-2000s mini hobo"), write about THAT category and era. Do not escalate to a specific product name the evidence doesn't support. Do not demote to "a yellow handbag" either. The category-level name is the correct level of specificity — commit to it and build the entry from the visible details and the tradition.
+When context includes "OBSERVATION" data, the name and visible details are your starting point. Write about THAT object at THAT level of specificity. Do not substitute a more famous brand. Do not escalate to a specific product the evidence doesn't support. Do not demote to "a yellow bag."
 
 ## carnelianReads — the sacred field
 
@@ -70,17 +62,17 @@ HOOK: "A split-toe leather boot, shaped like a hoof and borrowed from 15th-centu
 
 CARNELIAN READS: "The Tabi is an outfit's whole argument — the shoe that makes a black turtleneck and straight-leg jean read as a worldview instead of a weekday, purchased by women who would rather be mistaken for a translator than a girlfriend."
 
-KNOW (first paragraph): "The Tabi arrived in Margiela's debut 1988 collection, introduced on models walking through a pool of red paint that printed cloven footsteps onto the white canvas runway — an image that has run on loop in fashion-school lectures ever since. The design lifts from the jikatabi, the split-toe worker's boot Japanese laborers have worn since the 16th century, and translates it into Italian calfskin with a 4cm wooden heel. Every Margiela collection since has included it, in roughly the same silhouette, because Margiela's entire conceptual move was to make the catalogue itself the avant-garde gesture — the Tabi doesn't evolve, it accumulates meaning."
+KNOW (first paragraph): "The Tabi arrived in Margiela's debut 1988 collection, introduced on models walking through a pool of red paint that printed cloven footsteps onto the white canvas runway — an image that has run on loop in fashion-school lectures ever since. The design lifts from the jikatabi, the split-toe worker's boot Japanese laborers have worn since the 16th century, and translates it into Italian calfskin with a 4cm wooden heel."
 
-KNOW (second paragraph): "What the Tabi signals has shifted more than the shoe has. In the 1990s it read as conceptual fashion for people who read Artforum; by 2019 it had been absorbed into a specific Brooklyn-Paris visual grammar — cropped pants, invisible makeup, a tote bag from a gallery bookshop. Women who buy Tabis are signaling that they don't need the shoe to say 'expensive,' because the shoe says 'I know.' The awkwardness of the split toe is doing the whole job: it requires commitment, it photographs strange, and it tells anyone who recognizes it that you are not accidentally dressed."
+KNOW (second paragraph): "What the Tabi signals has shifted more than the shoe has. In the 1990s it read as conceptual fashion for people who read Artforum; by 2019 it had been absorbed into a specific Brooklyn-Paris visual grammar — cropped pants, invisible makeup, a tote bag from a gallery bookshop. Women who buy Tabis are signaling that they don't need the shoe to say 'expensive,' because the shoe says 'I know.'"
 
-Notice: physical (red paint, Italian calfskin, cropped pants, invisible makeup), specific scenes (1988 runway, 2019 Brooklyn-Paris aesthetic), interpretive claims that live INSIDE images ("mistaken for a translator than a girlfriend") rather than MBA-speak about markets. Loves the object and trusts the reader.
+Notice: physical (red paint, Italian calfskin, cropped pants), specific scenes (1988 runway, 2019 Brooklyn-Paris aesthetic), interpretive claims that live INSIDE images ("mistaken for a translator than a girlfriend") rather than MBA-speak.
 
-## Return format — ONLY valid JSON, no preamble, no fences. Begin with { end with }
+## Return format — ONLY valid JSON, no preamble, no fences
 
 {
   "slug": "url-slug-no-spaces",
-  "title": "Exact title — specific product name if known, category-with-era otherwise",
+  "title": "Specific product name if known, category-with-era otherwise",
   "type": "Object|Painting|Song|Film|Movement|Performance|Building|Photograph|Designer|Artist|etc",
   "medium": "Specific medium",
   "origin": "Country or City",
@@ -100,7 +92,7 @@ Notice: physical (red paint, Italian calfskin, cropped pants, invisible makeup),
     "items": [{"year": "Year or season", "title": "Event", "description": "1-2 sentences"}]
   },
   "read": {
-    "sources": [{"outlet": "Publication", "year": "2024", "title": "Article title", "url": "https://real-url.com", "abbr": "4chr", "image": "https://real-hero-image.jpg"}]
+    "sources": [{"outlet": "Publication", "year": "2024", "title": "Article title", "url": "https://real-url.com", "abbr": "4chr"}]
   },
   "constellation": [
     {"label": "Short", "x": 80, "y": 12, "color": "#378ADD", "fullLabel": "Full name"},
@@ -109,6 +101,7 @@ Notice: physical (red paint, Italian calfskin, cropped pants, invisible makeup),
     {"label": "Short", "x": 14, "y": 96, "color": "#7F77DD", "fullLabel": "Full name"},
     {"label": "Short", "x": 10, "y": 48, "color": "#993C1D", "fullLabel": "Full name"}
   ],
+  "heroImageQuery": "A SEPARATE google image search query to find the ideal hero image. Think like an editor sourcing a photograph for a feature: this should return the EDITORIAL ESTABLISHING SHOT for this entry. For a specific well-known product, a campaign or press image of that product. For a category-level entry (e.g. 'Tod's mid-2000s mini hobo'), something that anchors the house and era: a designer portrait, an archive campaign, a workshop interior, a period editorial spread. NOT a product listing shot. Examples: 'Diego Della Valle portrait Marche workshop' · 'Margiela 1988 runway Paris' · 'Courrèges 1970s archive campaign'.",
   "tags": ["tag1", "tag2"],
   "searchTerms": ["term1", "term2"],
   "redditQueries": ["query"],
@@ -120,7 +113,7 @@ For "see" type "motifs": items = [{"name": "Motif name", "color": "#hex", "textC
 For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences"}] (3 items)
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
 
-For read.sources: USE REAL URLS FROM RESEARCH CONTEXT. Do not invent URLs. If fewer than 3 sources in research, include fewer.
+For read.sources: USE REAL URLS FROM RESEARCH CONTEXT. Do not invent URLs.
 
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 
@@ -275,7 +268,7 @@ function researchDepth(research) {
   return 'sparse';
 }
 
-// ─── LENS — PARALLEL ACROSS THREE ENDPOINTS ────────────────────────────────
+// ─── LENS ───────────────────────────────────────────────────────────────────
 
 async function parallelLens(imageUrl, apiKey) {
   const base = 'https://serpapi.com/search.json?engine=google_lens';
@@ -328,7 +321,7 @@ async function parallelLens(imageUrl, apiKey) {
     ? { title: visualRes.value.knowledge_graph.title, description: visualRes.value.knowledge_graph.description }
     : null;
 
-  console.log('[lens] exact:', exactMatches.length, '| about:', aboutText.length, 'chars | visual:', visualMatches.length, '| kg:', !!visualKG);
+  console.log('[lens] exact:', exactMatches.length, '| about:', aboutText.length, 'chars | visual:', visualMatches.length);
 
   return { exactMatches, aboutText, visualMatches, visualKG };
 }
@@ -349,30 +342,22 @@ async function reverseImageSearch(imageBase64, mimeType) {
   }
 }
 
-// ─── NEW: RICH OBSERVATION (replaces old identifyImage) ─────────────────────
-// Instead of "name the specific product or give up," this produces a full
-// observation block — best-name, visible details, era guess, house context,
-// and a culturally-useful search query. Used for all images regardless of
-// how much signal Lens returned.
+// ─── OBSERVATION ────────────────────────────────────────────────────────────
 
 async function observeImage({ imageBase64, mimeType, lens }) {
   const { exactMatches, aboutText, visualMatches, visualKG } = lens;
 
   const parts = [];
-
   if (exactMatches.length) {
     parts.push(`EXACT IMAGE MATCHES (pages hosting the identical image — strongest signal):\n` +
       exactMatches.map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n'));
   }
-
   if (aboutText) {
     parts.push(`GOOGLE'S "ABOUT THIS IMAGE" TEXT:\n"""\n${aboutText}\n"""`);
   }
-
   if (visualKG?.title) {
     parts.push(`LENS KNOWLEDGE GRAPH: ${visualKG.title}${visualKG.description ? `\n${visualKG.description}` : ''}`);
   }
-
   if (visualMatches.length) {
     parts.push(`VISUAL MATCHES (similar-looking, lower signal):\n` +
       visualMatches.slice(0, 10).map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n'));
@@ -387,22 +372,22 @@ async function observeImage({ imageBase64, mimeType, lens }) {
 ${evidenceBlock}
 
 PRIORITY for naming:
-1. If EXACT IMAGE MATCHES clearly name a specific product, use that name exactly. Highest confidence.
+1. If EXACT IMAGE MATCHES clearly name a specific product, use that name exactly.
 2. If ABOUT THIS IMAGE text names a specific brand/product, use that.
-3. Only use VISUAL MATCHES as tiebreaker — visual matches are often flooded with commercial-spam brands (Versace, Rolex, Gucci, Coach) that don't reflect the actual object. A less-famous brand that appears in fewer but clearer matches is almost always correct over a famous brand that appears more often.
-4. If no signal converges on a specific product, look at the image yourself and produce a CATEGORY-LEVEL name with era: "Tod's mid-2000s mini hobo," "1970s Courrèges ladies watch," "a late-1990s Margiela artisanal piece." Commit to what you can see in the construction, hardware, silhouette, and any visible insignia.
+3. Only use VISUAL MATCHES as tiebreaker — visual matches are often flooded with commercial-spam brands.
+4. If no signal converges on a specific product, produce a CATEGORY-LEVEL name with era: "Tod's mid-2000s mini hobo," "1970s Courrèges ladies watch."
 
-NEVER return null for best_name. Always name at the level the evidence supports. A category-with-era name is AS GOOD an answer as a specific product name for this pipeline — Carnelian is designed to write compelling entries at either level of specificity.
+NEVER return null for best_name. Always name at the level the evidence supports.
 
 Return ONLY JSON, no fences:
 
 {
-  "best_name": "Most specific honest name. Specific product if evidence supports it, otherwise category-with-era (e.g. 'Tod's mid-2000s mini hobo').",
+  "best_name": "Most specific honest name.",
   "confidence_name": "high | medium | low",
-  "visible_details": "Rich sensory description of what the EYE sees. Materials, colors, silhouette, hardware, stitching, proportions, any visible insignia, condition cues. 2-4 sentences. This is what the writing stage draws on when research is thin, so be specific and sensory.",
-  "likely_era": "Best era guess based on construction cues (e.g. 'mid-2000s', 'late 1960s to early 1970s', '2020s').",
-  "likely_house_context": "If a brand is identifiable, what period of the house this likely comes from (e.g. 'Tod's under Della Valle, post-Gommino, pre-named-signature-bag era' or 'Courrèges post-André era, early-Coqueline-Courrèges period'). If no brand, leave empty string.",
-  "search_query": "The query most likely to return useful CULTURAL CONTEXT — not product listings. For a Tod's bag, prefer 'Tod's Diego Della Valle handbag history' over 'Tod's yellow leather satchel'. For a specific well-known product, use the product name. Goal: find editorial/critical writing, not e-commerce."
+  "visible_details": "Rich sensory description. Materials, colors, silhouette, hardware, stitching, insignia, condition. 2-4 sentences.",
+  "likely_era": "Best era guess.",
+  "likely_house_context": "If brand identifiable, what period of the house. Empty string otherwise.",
+  "search_query": "Query most likely to return CULTURAL CONTEXT — not product listings. For a Tod's bag, prefer 'Tod's Diego Della Valle handbag history' over 'Tod's yellow leather satchel'."
 }`;
 
   try {
@@ -424,14 +409,111 @@ Return ONLY JSON, no fences:
   } catch (err) {
     console.error('[observe] failed:', err.message);
     return {
-      best_name: null,
-      confidence_name: 'none',
-      visible_details: '',
-      likely_era: '',
-      likely_house_context: '',
-      search_query: null,
+      best_name: null, confidence_name: 'none', visible_details: '',
+      likely_era: '', likely_house_context: '', search_query: null,
     };
   }
+}
+
+// ─── HERO IMAGE CURATION (Google CSE + Claude pick-the-best) ────────────────
+
+async function searchImages(query, num = 10) {
+  const key = process.env.GOOGLE_API_KEY;
+  const cx = process.env.GOOGLE_CSE_ID;
+  if (!key || !cx || !query) return [];
+
+  try {
+    const url = `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${encodeURIComponent(query)}&searchType=image&num=${num}&safe=active&imgSize=large`;
+    const res = await fetchWithTimeout(url, 12000);
+    return (res.items || []).map(item => ({
+      url: item.link,
+      title: item.title,
+      contextLink: item.image?.contextLink,
+      thumbnail: item.image?.thumbnailLink,
+      width: item.image?.width,
+      height: item.image?.height,
+    }));
+  } catch (err) {
+    console.warn('[hero] CSE search failed:', err.message);
+    return [];
+  }
+}
+
+async function curateHeroImage({ artifact, candidates }) {
+  if (!candidates?.length) return null;
+  if (candidates.length === 1) return candidates[0];
+
+  const candidatesBlock = candidates.map((c, i) =>
+    `${i + 1}. Title: "${c.title}"\n   From: ${c.contextLink || 'unknown'}\n   Dimensions: ${c.width || '?'}x${c.height || '?'}`
+  ).join('\n\n');
+
+  const prompt = `You are curating the HERO image for a Carnelian entry. This image will be the large editorial anchor at the top of the page — the first thing a reader sees.
+
+ENTRY:
+Title: ${artifact.title}
+Era: ${artifact.era || 'unknown'}
+Hook: ${artifact.hook}
+Carnelian reads: ${artifact.carnelianReads}
+
+CANDIDATES (from Google Images):
+${candidatesBlock}
+
+Pick the BEST hero image by these criteria, in order:
+
+1. EDITORIAL QUALITY. Campaign images, editorial shoots, press photos, museum photography, archive images — yes. E-commerce product shots on white backgrounds, user-generated marketplace photos (eBay, Poshmark, Etsy listings), amateur shots — no.
+
+2. ERA-APPROPRIATE. If the entry is about a 2005 object, a 2024 product shot is wrong. Look for images from or about the correct period.
+
+3. CONTEXT-ANCHORING. For category-level entries, a designer portrait, an archive campaign, or a workshop interior is BETTER than a current-season product shot. For specific-product entries, an editorial image of that specific product is best.
+
+4. ASPECT. Landscape or square preferred over portrait for hero use. Minimum 800px on the longest side.
+
+5. TITLE CUES. The candidate title tells you a lot — "Pinterest" "eBay" "Poshmark" "buy now" are usually bad. "Vogue" "The New York Times" "Business of Fashion" "archive" "campaign" "editorial" are usually good.
+
+Return ONLY JSON, no fences:
+{
+  "choice": <integer, 1-indexed, position of the chosen candidate, or null if NONE are acceptable>,
+  "reason": "One sentence why"
+}`;
+
+  try {
+    const msg = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 200,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = msg.content.filter(b => b.type === 'text').pop()?.text || '';
+    const result = extractJSON(text);
+    if (!result.choice || result.choice < 1 || result.choice > candidates.length) {
+      console.log('[hero] curator rejected all candidates:', result.reason);
+      return null;
+    }
+    const chosen = candidates[result.choice - 1];
+    console.log('[hero] picked #' + result.choice + ':', chosen.title?.slice(0, 60), '—', result.reason);
+    return chosen;
+  } catch (err) {
+    console.warn('[hero] curation failed:', err.message, '— defaulting to first candidate');
+    return candidates[0];
+  }
+}
+
+async function findHeroImage(artifact) {
+  const query = artifact.heroImageQuery || artifact.title;
+  if (!query) return null;
+
+  console.log('[hero] query:', query);
+  const candidates = await searchImages(query, 10);
+
+  if (!candidates.length) {
+    if (query !== artifact.title) {
+      console.log('[hero] fallback to title:', artifact.title);
+      const fallback = await searchImages(artifact.title, 6);
+      if (fallback.length) return await curateHeroImage({ artifact, candidates: fallback });
+    }
+    return null;
+  }
+
+  return await curateHeroImage({ artifact, candidates });
 }
 
 // ─── WRITING STAGE ──────────────────────────────────────────────────────────
@@ -459,7 +541,7 @@ function buildUserContent({ query, image, lens, observation, research, isRetry }
     }
 
     if (lens?.exactMatches?.length) {
-      grounding += `\nExact-match pages (image appears on these sites):\n` +
+      grounding += `\nExact-match pages:\n` +
         lens.exactMatches.slice(0, 5).map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n') + '\n';
     }
 
@@ -470,7 +552,7 @@ function buildUserContent({ query, image, lens, observation, research, isRetry }
     if (research) {
       grounding += `\n\n===== RESEARCH (depth: ${depth}) =====\n\n${formatResearch(research)}`;
     } else {
-      grounding += `\n\n===== RESEARCH: SPARSE =====\nNo substantial research results for this object. Rely on the observation above, your knowledge of the tradition/house, and what is VISIBLE in the image. Write about the OBJECT AND TRADITION, not a specific product you can't confirm.`;
+      grounding += `\n\n===== RESEARCH: SPARSE =====\nNo substantial research results. Rely on observation, knowledge of the tradition/house, and what is VISIBLE. Write about the OBJECT AND TRADITION, not a specific product you can't confirm.`;
     }
 
     const userNote = query ? ` The user added context: "${query}".` : '';
@@ -480,13 +562,13 @@ function buildUserContent({ query, image, lens, observation, research, isRetry }
 Write the Carnelian entry using the observation and research above.
 
 CALIBRATION:
-- Research depth is "${depth}". ${depth === 'rich' ? 'You have substantial material — name specific critics, moments, launches, dates from the research. Be in the discourse.' : depth === 'moderate' ? 'You have some material — use what the research gave you, supplement with the tradition the object belongs to.' : 'Research is thin. Write about the OBJECT AND TRADITION. Commit to visible details. Place the object in its house/era/craft lineage. Do NOT invent specifics to compensate.'}
-- Name confidence is "${observation?.confidence_name || 'unknown'}". ${observation?.confidence_name === 'high' ? 'Write about the specific product named.' : 'Write about the object at the category/era level given. Do not escalate to a specific product name.'}
+- Research depth is "${depth}". ${depth === 'rich' ? 'Be in the discourse — name specific critics, moments, launches.' : depth === 'moderate' ? 'Use what research gave you, supplement with the tradition.' : 'Research is thin. Write about the OBJECT AND TRADITION. Commit to visible details. Do NOT invent specifics.'}
+- Name confidence is "${observation?.confidence_name || 'unknown'}". ${observation?.confidence_name === 'high' ? 'Write about the specific product named.' : 'Write about the object at the category/era level given.'}
 
-The title should match the observation's name (specific product or category-with-era). Do not substitute a different named product. Do not demote to "a yellow bag."`;
+Title matches the observation's name. Do not substitute a different named product. Do not demote to "a yellow bag."`;
   } else {
     const researchBlock = research ? `\n\n=== RESEARCH CONTEXT (depth: ${depth}) ===\n\n${formatResearch(research)}\n\n=== END ===\n\n` : '';
-    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context. Research depth is "${depth}" — ${depth === 'rich' ? 'be in the discourse, name specific critics and moments.' : depth === 'moderate' ? 'use what research gave you, supplement with the tradition.' : 'research is thin — write about the object/concept and its tradition, commit to what you know, do not invent specifics.'}`;
+    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context. Research depth is "${depth}".`;
   }
 
   if (isRetry) {
@@ -532,7 +614,6 @@ async function buildStreamingResponse({ query, image }) {
           controller.enqueue(sseEncode({ type: 'status', stage: 'identifying' }));
           lens = await reverseImageSearch(image.data, image.type);
 
-          // Always run observation — even if Lens returned nothing, Claude can read the image
           observation = await observeImage({ imageBase64: image.data, mimeType: image.type, lens });
 
           if (!observation?.best_name) {
@@ -575,6 +656,20 @@ async function buildStreamingResponse({ query, image }) {
           artifact = await callClaudeNonStreaming({ query, image, lens, observation, research, isRetry: true });
         }
 
+        // Curate hero image AFTER text generation
+        controller.enqueue(sseEncode({ type: 'status', stage: 'curating_hero' }));
+        const hero = await findHeroImage(artifact);
+        if (hero) {
+          artifact.heroImage = {
+            url: hero.url,
+            title: hero.title,
+            contextLink: hero.contextLink,
+          };
+          console.log('[hero] saved to artifact');
+        } else {
+          console.log('[hero] no suitable hero found');
+        }
+
         if (query && !image) setCached(normalizeSlug(query), artifact);
 
         controller.enqueue(sseEncode({ type: 'complete', artifact }));
@@ -615,6 +710,10 @@ export async function GET(request) {
       console.warn('[generate GET] first attempt failed:', err.message);
       artifact = await callClaudeNonStreaming({ query: q, research, isRetry: true });
     }
+
+    const hero = await findHeroImage(artifact);
+    if (hero) artifact.heroImage = { url: hero.url, title: hero.title, contextLink: hero.contextLink };
+
     setCached(slug, artifact);
     return NextResponse.json({ artifact, generated: true });
   } catch (err) {
