@@ -275,6 +275,10 @@ async function parallelLens(imageUrl, apiKey) {
 
   const [exactRes, aboutRes, visualRes] = results;
 
+  console.log('[lens] exact status:', exactRes.status, exactRes.reason?.message || '');
+console.log('[lens] about status:', aboutRes.status, aboutRes.reason?.message || '');
+console.log('[lens] visual status:', visualRes.status, visualRes.reason?.message || '');
+
   const exactMatches = exactRes.status === 'fulfilled'
     ? (exactRes.value?.exact_matches || []).slice(0, 10).map(m => ({
         title: m.title, source: m.source, link: m.link, thumbnail: m.thumbnail,
