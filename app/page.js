@@ -334,9 +334,6 @@ export default function Home() {
     <main className="home-main">
       <nav className="home-nav">
         <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: '#B94932', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
-        <div style={{ display: 'flex', gap: 24 }}>
-          <Link href="/search" style={{ fontSize: 13, color: '#888480', textDecoration: 'none' }}>Browse all</Link>
-        </div>
       </nav>
 
       <div className="home-content">
@@ -471,11 +468,6 @@ export default function Home() {
           </div>
         )}
 
-        {!showResults && !imagePreview && (
-          <p style={{ marginTop: 28, fontSize: 13, color: '#b0ada8' }}>
-            Press Enter to search · <Link href="/search" style={{ color: '#a0a8a0', textDecoration: 'underline', textUnderlineOffset: 3 }}>Browse all entries →</Link>
-          </p>
-        )}
       </div>
 
       <p className="home-footer">Carnelian · To know is to love</p>
