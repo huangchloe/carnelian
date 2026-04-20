@@ -65,7 +65,7 @@ function NewsItem({ item }) {
   );
 }
 
-export default function LiveContext({ slug, artifact }) {
+export default function LiveContext({ slug, artifact, onEmpty }) {
   const [context, setContext] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -82,6 +82,12 @@ export default function LiveContext({ slug, artifact }) {
 
   const hasReddit = context?.reddit?.length > 0;
   const hasNews = context?.news?.length > 0;
+
+  // Notify parent when fetch completes with no content, so the Now
+  // section can hide itself rather than render a stranded label.
+  useEffect(() => {
+    if (!loading && !hasReddit && !hasNews && onEmpty) onEmpty();
+  }, [loading, hasReddit, hasNews, onEmpty]);
 
   if (loading) {
     return (
