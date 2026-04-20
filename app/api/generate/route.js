@@ -36,18 +36,18 @@ A generic entry describes WHAT something is. A Carnelian entry notices:
 
 ## Accuracy rules — NEVER a reason to refuse generation
 
-Every proper noun, date, number, price, quote must come from the research context OR well-established knowledge. When uncertain, use less specific language. Never invent.
+Every proper noun, date, number, price, quote must come from research context OR well-established knowledge. When uncertain, use less specific language. Never invent.
 
 **Always generate a complete entry.** Accuracy means using more general language when uncertain, not refusing.
 
 ## Image identification (when present) is FINAL
 
-When the user context includes "IDENTIFIED AS: [brand/product]", that identification is AUTHORITATIVE. Write about THAT object. You are forbidden from:
-- Substituting a more famous brand because it "looks similar"
-- Overriding the identification based on your own visual interpretation
+When the user context includes "IDENTIFIED AS: [brand/product]" sourced from Google's own AI Overview, that identification is AUTHORITATIVE. Write about THAT object. You are forbidden from:
+- Substituting a more famous brand because the image "looks similar" to one
+- Overriding Google's identification based on your own visual interpretation
 - Correcting the identification to something you think is more likely
 
-If the identification says "Courrèges vintage watch," write about a Courrèges vintage watch — even if a Versace watch looks similar. Use the research context for facts; if your training knowledge of the identified item is limited, use more general language, but write about the correct object.
+If the identification says "Courrèges vintage watch," write about a Courrèges vintage watch — even if a Versace watch looks visually similar. If your training knowledge of the exact item is limited, use more general language but write about the correct object.
 
 ## carnelianReads — the sacred field
 
@@ -103,7 +103,7 @@ For "see" type "motifs": items = [{"name": "Motif name", "color": "#hex", "textC
 For "see" type "analysis": items = [{"title": "Title", "body": "2-3 sentences"}] (3 items)
 For "see" type "references": items = [{"category": "Fashion|Music|Place|Historical|Linguistic|Visual art", "variant": "info|warning|danger|neutral", "body": "2-3 sentences"}]
 
-For read.sources: USE REAL URLS FROM THE RESEARCH CONTEXT. Do not invent URLs.
+For read.sources: USE REAL URLS FROM RESEARCH CONTEXT. Do not invent URLs.
 
 Constellation label max 10 chars. Colors: #378ADD=person, #BA7517=movement/era, #1D9E75=place, #7F77DD=concept, #993C1D=object/work
 
@@ -274,89 +274,162 @@ async function reverseImageSearch(imageBase64, mimeType) {
       title: data.knowledge_graph.title, type: data.knowledge_graph.type, description: data.knowledge_graph.description,
     } : null;
 
-    console.log('[lens] returned', visualMatches.length, 'matches');
-    return { visualMatches, knowledgeGraph };
+    // NEW: AI Overview page token — this is what we'll exchange for Google's actual identification
+    const aiOverviewPageToken = data.ai_overview?.page_token || null;
+
+    console.log('[lens] returned', visualMatches.length, 'matches | AI overview available:', !!aiOverviewPageToken);
+    return { visualMatches, knowledgeGraph, aiOverviewPageToken };
   } finally {
     try { await del(blob.url); } catch {}
   }
 }
 
-// ─── NEW: CLAUDE-AS-IDENTIFIER (Stage 1 of image search) ────────────────────
-// Purpose: given the user's image + top Lens matches, return the correct brand/product.
-// This fixes the frequency-bias problem where Versace floods visual matches.
+// ─── NEW: FETCH GOOGLE'S AI OVERVIEW (the text behind "This item is a vintage Courrèges watch...") ──
 
-async function identifyImage({ imageBase64, mimeType, visualMatches, lensKG }) {
-  // Top 10 matches — those are Google's highest-confidence results. Beyond that
-  // is noise that dilutes with commercial saturation (Versace, etc).
+async function fetchAIOverview(pageToken) {
+  if (!pageToken || !process.env.SERPAPI_KEY) return null;
+
+  try {
+    const url = `https://serpapi.com/search.json?engine=google_ai_overview&page_token=${encodeURIComponent(pageToken)}&api_key=${process.env.SERPAPI_KEY}`;
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 15000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(t);
+
+    if (!res.ok) {
+      console.warn('[ai_overview] HTTP', res.status);
+      return null;
+    }
+    const data = await res.json();
+
+    // SerpApi returns AI Overview as a list of text blocks. Stitch them together.
+    const blocks = data.ai_overview?.text_blocks || [];
+    let fullText = '';
+    for (const block of blocks) {
+      if (block.snippet) fullText += block.snippet + '\n';
+      if (block.list) {
+        for (const item of block.list) {
+          if (item.snippet) fullText += `- ${item.snippet}\n`;
+          if (item.title) fullText += `- ${item.title}: ${item.snippet || ''}\n`;
+        }
+      }
+    }
+    fullText = fullText.trim();
+
+    if (!fullText) {
+      console.warn('[ai_overview] empty response');
+      return null;
+    }
+
+    console.log('[ai_overview] got', fullText.length, 'chars. Preview:', fullText.slice(0, 120));
+    return fullText;
+  } catch (err) {
+    console.warn('[ai_overview] failed:', err.message);
+    return null;
+  }
+}
+
+// ─── IDENTIFICATION ORCHESTRATION ───────────────────────────────────────────
+// Uses Google's own AI Overview as primary ID source. Falls back to Claude if unavailable.
+
+async function identifyImage({ imageBase64, mimeType, visualMatches, lensKG, aiOverviewPageToken }) {
+  // Primary: Google AI Overview (the same text you saw on your phone)
+  const aiOverviewText = await fetchAIOverview(aiOverviewPageToken);
+
+  if (aiOverviewText) {
+    // AI Overview text typically starts "This item is a [brand/product]..."
+    // We hand the full text to a tiny Claude call to extract the identification cleanly.
+    const extractionPrompt = `Google AI Overview wrote this about an image someone uploaded:
+
+"""
+${aiOverviewText}
+"""
+
+Extract the specific brand and product name Google identified. Return ONLY JSON, no fences:
+
+{
+  "identification": "Brand + product (e.g. 'Courrèges vintage ladies watch', 'Alo Yoga tie-dye tote')",
+  "search_query": "Best query to find more info about this"
+}
+
+If Google's text is too vague or didn't identify a specific brand, return:
+{
+  "identification": null,
+  "search_query": "the most specific description possible from the text"
+}`;
+
+    try {
+      const msg = await client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: extractionPrompt }],
+      });
+      const text = msg.content.filter(b => b.type === 'text').pop()?.text || '';
+      const result = extractJSON(text);
+      console.log('[identify] from AI Overview:', result.identification);
+      return {
+        identification: result.identification,
+        confidence: result.identification ? 'high' : 'low',
+        reasoning: 'Google AI Overview',
+        search_query: result.search_query,
+        aiOverviewText,
+      };
+    } catch (err) {
+      console.warn('[identify] AI Overview parse failed:', err.message);
+      // Fall through to visual-match fallback
+    }
+  }
+
+  // Fallback: when AI Overview is unavailable, use Claude with top matches + image.
+  // Applied weighting hint: position matters more than frequency.
   const topMatches = visualMatches.slice(0, 10);
-
   const matchesBlock = topMatches.map((m, i) =>
     `${i + 1}. "${m.title}" — ${m.source || 'unknown'}`
   ).join('\n');
 
-  const kgBlock = lensKG?.title
-    ? `\n\nGoogle Knowledge Graph says: ${lensKG.title}${lensKG.type ? ` (${lensKG.type})` : ''}`
-    : '';
+  const kgBlock = lensKG?.title ? `\n\nGoogle Knowledge Graph: ${lensKG.title}${lensKG.type ? ` (${lensKG.type})` : ''}` : '';
 
-  const identificationPrompt = `You are identifying a specific object from an image. Below are the TOP 10 Google Images visual matches, ordered by Google's visual-similarity ranking. Position 1 is Google's most confident match.
+  const fallbackPrompt = `Identify the object in this image. These are Google's top 10 visual matches (ordered by Google's visual similarity):
 
-TOP VISUAL MATCHES:
 ${matchesBlock}${kgBlock}
 
-Look at the user's image and the match list. Identify the specific object.
+Position 1-3 matters more than later positions. Commercial spam brands (Versace, Rolex, Amazon listings) often flood the lower rankings without being correct. Prefer specific unusual brands (Courrèges, Alo, vintage brands) that appear in top matches over common brands that appear more often later.
 
-CRITICAL RULES:
-1. Google's position ranking matters more than how often a brand appears. Position 1-3 matches are Google's highest-confidence guesses. A brand appearing in 5 low-position matches is often commercial saturation (e-commerce sites flooding the index), NOT a correct identification.
-
-2. For consumer products (watches, bags, clothing), look at the TOP match especially. If match #1 or #4 names a specific brand that visually matches the image, that is very likely the answer — even if 15 later matches name a different, more famous brand.
-
-3. Look at the image yourself to cross-check. Does the object in the image actually look like the top match, or like the flood of later matches? Trust what you see.
-
-4. If top matches disagree wildly (e.g. Rolex vs Courrèges vs Versace all in top 5), say confidence is low and give your best single guess based on the image.
-
-5. Generic descriptions ("red dial watch," "burgundy leather strap") mean nothing — ignore them. Only specific brand/product names count.
-
-Return ONLY a JSON object, no preamble, no fences:
-
+Return ONLY JSON, no fences:
 {
-  "identification": "Specific brand and product (e.g. 'Courrèges vintage ladies watch', 'Alo Yoga tie-dye tote', 'Margiela Tabi boot')",
-  "confidence": "high | medium | low",
-  "reasoning": "One sentence explaining the choice",
-  "search_query": "Best query to search for more info (e.g. 'Courrèges vintage watch red dial')"
-}
-
-If the top matches are too contradictory and the image is too generic to identify with any confidence, return:
-{
-  "identification": null,
-  "confidence": "none",
-  "reasoning": "Why identification failed",
-  "search_query": "Generic description query"
+  "identification": "Specific brand + product, or null if truly unidentifiable",
+  "search_query": "Best query for more info"
 }`;
 
   try {
     const msg = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 500,
+      max_tokens: 300,
       messages: [{
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
-          { type: 'text', text: identificationPrompt },
+          { type: 'text', text: fallbackPrompt },
         ],
       }],
     });
-
     const text = msg.content.filter(b => b.type === 'text').pop()?.text || '';
     const result = extractJSON(text);
-    console.log('[identify] Claude ID:', result.identification, '| confidence:', result.confidence);
-    return result;
+    console.log('[identify] fallback ID:', result.identification);
+    return {
+      identification: result.identification,
+      confidence: result.identification ? 'medium' : 'low',
+      reasoning: 'Fallback: visual matches (no AI Overview available)',
+      search_query: result.search_query,
+      aiOverviewText: null,
+    };
   } catch (err) {
-    console.error('[identify] failed:', err.message);
-    return { identification: null, confidence: 'none', reasoning: 'identification call failed', search_query: null };
+    console.error('[identify] fallback failed:', err.message);
+    return { identification: null, confidence: 'none', reasoning: 'identification failed', search_query: null, aiOverviewText: null };
   }
 }
 
-// ─── USER CONTENT BUILDER (Stage 2 — writing) ──────────────────────────────
+// ─── USER CONTENT BUILDER (writing stage) ──────────────────────────────────
 
 function buildUserContent({ query, image, lensResults, identification, research, isRetry }) {
   const isImageSearch = !!image?.data;
@@ -370,22 +443,17 @@ function buildUserContent({ query, image, lensResults, identification, research,
   if (isImageSearch) {
     let grounding = '';
 
-    // The committed identification from Stage 1
     if (identification?.identification) {
       grounding += `\n\n===== IDENTIFIED AS: ${identification.identification} =====\n`;
-      grounding += `(Confidence: ${identification.confidence}. ${identification.reasoning})\n`;
-      grounding += `This identification is FINAL. Write about this specific object.\n`;
+      grounding += `Source: ${identification.reasoning}\n`;
+      if (identification.aiOverviewText) {
+        grounding += `\nGoogle's own description:\n"""\n${identification.aiOverviewText}\n"""\n`;
+      }
+      grounding += `\nThis identification is FINAL. Write about this specific object.\n`;
     }
 
     if (research) {
       grounding += `\n\n===== RESEARCH ON "${identification?.identification || 'the subject'}" =====\n\n${formatResearch(research)}`;
-    }
-
-    // Include raw matches as supporting evidence only — NOT as primary ID source.
-    if (lensResults?.visualMatches?.length && identification?.identification) {
-      const topMatches = lensResults.visualMatches.slice(0, 5);
-      grounding += `\n\nSupporting visual matches (reference only):\n` +
-        topMatches.map((m, i) => `${i + 1}. "${m.title}" — ${m.source}`).join('\n');
     }
 
     const userNote = query ? ` The user added context: "${query}".` : '';
@@ -393,11 +461,11 @@ function buildUserContent({ query, image, lensResults, identification, research,
     if (identification?.identification) {
       userText = `The user uploaded an image.${userNote}${grounding}
 
-Write the Carnelian entry about the IDENTIFIED object above. Do not substitute a different brand even if the image resembles one. The identification is final.`;
+Write the Carnelian entry about the IDENTIFIED object above. Do not substitute a different brand even if the image visually resembles one. The identification came from Google itself.`;
     } else {
       userText = `The user uploaded an image.${userNote}
 
-Identification failed — no reliable match. Describe what the image shows generally without guessing at a specific brand. It is better to say "a vintage ladies' watch with red dial" than to confidently misidentify.`;
+Identification failed — no reliable match. Describe what the image shows generally without guessing at a specific brand.`;
     }
   } else {
     const researchBlock = research ? `\n\n=== RESEARCH CONTEXT ===\n\n${formatResearch(research)}\n\n=== END ===\n\n` : '';
@@ -444,26 +512,26 @@ async function buildStreamingResponse({ query, image }) {
         let research = null;
 
         if (isImageSearch) {
-          // Stage 1a: Google Lens for raw visual matches
           controller.enqueue(sseEncode({ type: 'status', stage: 'identifying' }));
           lensResults = await reverseImageSearch(image.data, image.type);
 
           const hasMatches = lensResults?.visualMatches?.length > 0;
-          if (!hasMatches) {
+          const hasAIOverview = !!lensResults?.aiOverviewPageToken;
+          if (!hasMatches && !hasAIOverview) {
             controller.enqueue(sseEncode({ type: 'error', message: "Couldn't identify this image. Try a clearer photo or add text context." }));
             controller.close();
             return;
           }
 
-          // Stage 1b: Claude identifies the specific object from matches + image
+          // Primary: AI Overview. Fallback: Claude vision.
           identification = await identifyImage({
             imageBase64: image.data,
             mimeType: image.type,
             visualMatches: lensResults.visualMatches,
             lensKG: lensResults.knowledgeGraph,
+            aiOverviewPageToken: lensResults.aiOverviewPageToken,
           });
 
-          // Stage 1c: Research the identified object (or fallback to Lens KG if ID failed)
           const searchQuery = identification?.search_query
             || identification?.identification
             || lensResults.knowledgeGraph?.title;
@@ -477,7 +545,6 @@ async function buildStreamingResponse({ query, image }) {
           research = await parallelResearch(query);
         }
 
-        // Stage 2: Writing
         controller.enqueue(sseEncode({ type: 'status', stage: 'generating' }));
 
         let fullText = '';
