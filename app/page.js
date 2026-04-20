@@ -10,11 +10,9 @@ import imageCompression from 'browser-image-compression';
 
 const QUICK = [
   { label: 'The Ballet Flat', slug: 'ballet-flat' },
-  { label: "Christina's World", slug: 'christinas-world' },
   { label: 'Berghain — Rosalía', slug: 'rosalia-berghain' },
   { label: 'Bauhaus', slug: null },
-  { label: 'Dior New Look', slug: null },
-  { label: 'Vivienne Westwood', slug: null },
+  { label: 'Marcel Duchamp retrospective', slug: null },
 ];
 
 function fileToBase64(file) {
@@ -356,7 +354,7 @@ export default function Home() {
         </div>
 
         {/* Search */}
-        <div style={{ width: '100%', maxWidth: 640, position: 'relative' }}>
+        <div style={{ width: '100%', maxWidth: 540, position: 'relative' }}>
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             {imagePreview && (
               <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 8, zIndex: 2 }}>
@@ -379,7 +377,7 @@ export default function Home() {
               className="search-input"
               autoComplete="off"
               spellCheck={false}
-              style={{ fontSize: '1.15rem', paddingLeft: imagePreview ? 52 : undefined, paddingRight: 80 }}
+              style={{ fontSize: '1rem', paddingLeft: imagePreview ? 52 : undefined, paddingRight: 80 }}
             />
 
             <button
