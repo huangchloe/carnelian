@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import GraphView from './GraphView';
 import LiveContext from './LiveContext';
+import FindButton from './FindButton';
+
 
 const P = {
   bone:      '#F5F3EF',
@@ -370,6 +372,7 @@ const heroImage = hasCuratedHero
           </div>
 
           <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+            <FindButton artifact={artifact} />
             <button onClick={() => setShowGraph(true)}
               style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: P.ink, background: 'none', border: `1px solid #C8C3BB`, borderRadius: 2, padding: '13px 26px', cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'all 0.15s' }}
               onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
@@ -378,7 +381,6 @@ const heroImage = hasCuratedHero
             </button>
             <span style={{ fontSize: 10, color: '#C8C3BB', fontFamily: 'var(--font-body)', letterSpacing: '0.1em' }}>Scroll to explore ↓</span>
           </div>
-        </div>
       </section>
 
       {/* Content */}
