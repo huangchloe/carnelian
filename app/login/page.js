@@ -1,11 +1,37 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
-  const router = useRouter();
+  return (
+    <Suspense fallback={<LoginShell />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginShell({ children }) {
+  return (
+    <main style={styles.main}>
+      <nav style={styles.nav}>
+        <a href="/" style={styles.brand}>
+          carnelian<span style={styles.brandDot}>·</span>
+          <em style={styles.brandTag}>to know is to love</em>
+        </a>
+      </nav>
+      <div style={styles.content}>
+        <div style={styles.card}>{children}</div>
+      </div>
+      <footer style={styles.footer}>
+        Carnelian<span style={styles.footerDot}>·</span>To know is to love
+      </footer>
+    </main>
+  );
+}
+
+function LoginForm() {
   const searchParams = useSearchParams();
   const errorParam = searchParams.get('error');
 
@@ -49,71 +75,52 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={styles.main}>
-      <nav style={styles.nav}>
-        <a href="/" style={styles.brand}>
-          carnelian<span style={styles.brandDot}>·</span>
-          <em style={styles.brandTag}>to know is to love</em>
-        </a>
-      </nav>
+    <LoginShell>
+      <h1 style={styles.title}>Enter</h1>
+      <p style={styles.dek}>
+        To save what moves you, and to read what&rsquo;s been drawn across it.
+      </p>
 
-      <div style={styles.content}>
-        <div style={styles.card}>
-          <h1 style={styles.title}>Enter</h1>
-          <p style={styles.dek}>
-            To save what moves you, and to read what&rsquo;s been drawn across it.
-          </p>
+      <button
+        onClick={handleGoogle}
+        disabled={status === 'loading'}
+        style={styles.googleBtn}
+      >
+        <GoogleIcon />
+        <span>Continue with Google</span>
+      </button>
 
-          <button
-            onClick={handleGoogle}
-            disabled={status === 'loading'}
-            style={styles.googleBtn}
-          >
-            <GoogleIcon />
-            <span>Continue with Google</span>
-          </button>
-
-          <div style={styles.divider}>
-            <span style={styles.dividerText}>or</span>
-          </div>
-
-          <form onSubmit={handleEmail} style={styles.form}>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your email"
-              required
-              style={styles.input}
-              disabled={status === 'loading' || status === 'sent'}
-            />
-            <button
-              type="submit"
-              disabled={status === 'loading' || status === 'sent' || !email}
-              style={styles.emailBtn}
-            >
-              {status === 'sent' ? 'Sent' : 'Send sign-in link'}
-            </button>
-          </form>
-
-          {status === 'sent' && (
-            <p style={styles.confirm}>{message}</p>
-          )}
-          {status === 'error' && (
-            <p style={styles.errorMsg}>{message}</p>
-          )}
-          {errorParam === 'auth_failed' && status === 'idle' && (
-            <p style={styles.errorMsg}>
-              Something went wrong signing you in. Try again.
-            </p>
-          )}
-        </div>
+      <div style={styles.divider}>
+        <span style={styles.dividerText}>or</span>
       </div>
 
-      <footer style={styles.footer}>
-        Carnelian<span style={styles.footerDot}>·</span>To know is to love
-      </footer>
-    </main>
+      <form onSubmit={handleEmail} style={styles.form}>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your email"
+          required
+          style={styles.input}
+          disabled={status === 'loading' || status === 'sent'}
+        />
+        <button
+          type="submit"
+          disabled={status === 'loading' || status === 'sent' || !email}
+          style={styles.emailBtn}
+        >
+          {status === 'sent' ? 'Sent' : 'Send sign-in link'}
+        </button>
+      </form>
+
+      {status === 'sent' && <p style={styles.confirm}>{message}</p>}
+      {status === 'error' && <p style={styles.errorMsg}>{message}</p>}
+      {errorParam === 'auth_failed' && status === 'idle' && (
+        <p style={styles.errorMsg}>
+          Something went wrong signing you in. Try again.
+        </p>
+      )}
+    </LoginShell>
   );
 }
 
@@ -137,9 +144,7 @@ const styles = {
     fontFamily: 'var(--font-body)',
     color: '#1a1816',
   },
-  nav: {
-    padding: '28px 52px',
-  },
+  nav: { padding: '28px 52px' },
   brand: {
     fontFamily: 'var(--font-display)',
     fontStyle: 'italic',
@@ -156,10 +161,7 @@ const styles = {
     justifyContent: 'center',
     padding: '40px 24px',
   },
-  card: {
-    width: '100%',
-    maxWidth: 400,
-  },
+  card: { width: '100%', maxWidth: 400 },
   title: {
     fontFamily: 'var(--font-display)',
     fontStyle: 'italic',
@@ -193,13 +195,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    transition: 'border-color 0.15s, box-shadow 0.15s',
   },
-  divider: {
-    position: 'relative',
-    textAlign: 'center',
-    margin: '24px 0',
-  },
+  divider: { position: 'relative', textAlign: 'center', margin: '24px 0' },
   dividerText: {
     background: '#F5F3EF',
     padding: '0 14px',
@@ -207,8 +204,6 @@ const styles = {
     letterSpacing: '0.2em',
     textTransform: 'uppercase',
     color: '#888480',
-    position: 'relative',
-    zIndex: 1,
   },
   form: { display: 'flex', flexDirection: 'column', gap: 10 },
   input: {
