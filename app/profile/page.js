@@ -63,6 +63,9 @@ export default function ProfilePage() {
           <div style={s.sectionHead}>
             <h2 style={s.sectionTitle}>Studies</h2>
             <span style={s.sectionCount}>{studies.length}</span>
+            {finds.length >= 2 && (
+              <Link href="/studies/new" style={{ marginLeft: 'auto', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#B94932', textDecoration: 'none' }}>+ Make a study</Link>
+            )}
           </div>
           {studies.length === 0 ? (
             <div style={s.empty}>
