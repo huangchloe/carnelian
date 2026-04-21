@@ -380,7 +380,8 @@ const heroImage = hasCuratedHero
               Expand graph →
             </button>
             <span style={{ fontSize: 10, color: '#C8C3BB', fontFamily: 'var(--font-body)', letterSpacing: '0.1em' }}>Scroll to explore ↓</span>
-          </div>
+         </div>
+        </div>
       </section>
 
       {/* Content */}
