@@ -7,6 +7,7 @@ import { parse as parsePartialJSON } from 'partial-json';
 import DepthTabs from '@/components/DepthTabs';
 import Constellation from '@/components/Constellation';
 import imageCompression from 'browser-image-compression';
+import UserMenu from '@/components/UserMenu';
 
 const QUICK = [
   { label: 'The Ballet Flat', slug: 'ballet-flat' },
@@ -332,9 +333,10 @@ export default function Home() {
 
   return (
     <main className="home-main">
-      <nav className="home-nav">
-        <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: '#B94932', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
-      </nav>
+<nav className="home-nav">
+  <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: '#B94932', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
+  <UserMenu />
+</nav>
 
       <div className="home-content">
         <div style={{ width: '100%', maxWidth: 640, textAlign: 'center', marginBottom: showResults ? 32 : 52, transition: 'margin 0.3s ease' }}>
