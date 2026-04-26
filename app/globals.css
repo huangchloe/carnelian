@@ -282,3 +282,66 @@ body {
     padding: 16px 20px !important;
   }
 }
+
+/* ─── Disable hover effects on touch ────────────────────────────────── */
+@media (hover: none) {
+  .k-pill:hover {
+    background: white;
+    border-color: #e0dcd6;
+    color: var(--muted);
+  }
+}
+
+/* ─── Hide graph legend on phone — info panel covers it ─────────────── */
+@media (max-width: 767px) {
+  .graph-legend {
+    display: none !important;
+  }
+}
+
+/* ─── TABLET (768–1023px) ───────────────────────────────────────────── */
+/* Desktop layout assumes a ~1300px content frame. On iPad portrait the
+   200/140 label-and-gap pattern eats so much width that prose collapses
+   to ~228px. Compress the editorial chrome but keep the two-column feel. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .artifact-nav {
+    padding: 18px 32px !important;
+  }
+  .artifact-hero {
+    grid-template-columns: 50% 50% !important;
+  }
+  .artifact-hero-text {
+    padding: 80px 44px 60px 44px !important;
+  }
+  .artifact-section {
+    padding: 100px 0 !important;
+  }
+  .artifact-section-inner {
+    padding: 0 44px !important;
+    grid-template-columns: 120px 1fr !important;
+    gap: 0 56px !important;
+  }
+  .artifact-section-outer {
+    padding: 0 44px !important;
+  }
+  .artifact-see-header {
+    grid-template-columns: 120px 1fr !important;
+    gap: 0 56px !important;
+  }
+  .artifact-see-masonry {
+    columns: 2 !important;
+  }
+  .artifact-see-fallback,
+  .artifact-see-loading {
+    padding-left: 176px !important;
+  }
+  .artifact-see-motifs {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .artifact-related-outer {
+    padding: 0 44px !important;
+  }
+  .artifact-related-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
