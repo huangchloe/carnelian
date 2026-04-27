@@ -20,11 +20,25 @@ const TYPE_COLORS = {
   '#993C1D': { label: 'Work',     bg: '#fee2e2', text: '#991b1b' },
 };
 
+const RELATIONSHIP_STYLES = {
+  lineage:       { stroke: '#8B7355', dash: null,    width: 1.6, opacity: 0.7,  label: 'Lineage'       },
+  citation:      { stroke: '#5B4636', dash: '5,3',   width: 1.2, opacity: 0.65, label: 'Citation'      },
+  collaborator:  { stroke: '#2A1E1A', dash: null,    width: 1.4, opacity: 0.75, label: 'Collaborator'  },
+  juxtaposition: { stroke: '#B31B1B', dash: '7,4',   width: 1.2, opacity: 0.6,  label: 'Juxtaposition' },
+  echo:          { stroke: '#7F77DD', dash: '2,4',   width: 1.0, opacity: 0.55, label: 'Echo'          },
+  displacement:  { stroke: '#1D9E75', dash: '9,4',   width: 1.2, opacity: 0.6,  label: 'Displacement'  },
+  peer:          { stroke: '#BA7517', dash: null,    width: 1.0, opacity: 0.6,  label: 'Peer'          },
+  related:       { stroke: '#d8d4ce', dash: null,    width: 1.0, opacity: 0.5,  label: 'Related'       },
+};
+
 function getTypeBadge(color) {
   return TYPE_COLORS[color] || { label: 'Reference', bg: '#f3f4f6', text: '#6b7280' };
 }
 function getTypeLabel(color) {
   return TYPE_COLORS[color]?.label || 'Reference';
+}
+function getRelationshipStyle(rel) {
+  return RELATIONSHIP_STYLES[rel] || RELATIONSHIP_STYLES.related;
 }
 
 export default function GraphView({ artifact, onClose }) {
@@ -75,7 +89,10 @@ export default function GraphView({ artifact, onClose }) {
       })),
     ];
     const seedLinks = (artifact.constellation || []).map(c => ({
-      source: artifact.slug, target: c.label, id: `${artifact.slug}--${c.label}`,
+      source: artifact.slug,
+      target: c.label,
+      id: `${artifact.slug}--${c.label}`,
+      relationship: c.relationship || 'related',
     }));
 
     nodesRef.current = seedNodes;
@@ -151,7 +168,12 @@ export default function GraphView({ artifact, onClose }) {
         }
         const lkId = `${nodeId}--${nodeLabel}`;
         if (!linksRef.current.find(l => l.id === lkId)) {
-          linksRef.current.push({ source: nodeId, target: nodeLabel, id: lkId });
+          linksRef.current.push({
+            source: nodeId,
+            target: nodeLabel,
+            id: lkId,
+            relationship: c.relationship || 'related',
+          });
         }
       });
 
@@ -271,12 +293,16 @@ export default function GraphView({ artifact, onClose }) {
               {links.map(lk => {
                 const { x1, y1, x2, y2 } = getLinkPos(lk);
                 const sid = typeof lk.source === 'object' ? lk.source.id : lk.source;
+                const tid = typeof lk.target === 'object' ? lk.target.id : lk.target;
                 const isPrimary = sid === artifact.slug;
+                const style = getRelationshipStyle(lk.relationship);
                 return (
-                  <line key={lk.id || `${sid}--${typeof lk.target === 'object' ? lk.target.id : lk.target}`}
+                  <line key={lk.id || `${sid}--${tid}`}
                     x1={x1} y1={y1} x2={x2} y2={y2}
-                    stroke={isPrimary ? '#d8d4ce' : '#e8e4de'}
-                    strokeWidth={isPrimary ? 1 : 0.7}
+                    stroke={isPrimary ? style.stroke : '#e8e4de'}
+                    strokeWidth={isPrimary ? style.width : 0.7}
+                    strokeDasharray={isPrimary && style.dash ? style.dash : undefined}
+                    opacity={isPrimary ? style.opacity : 0.4}
                   />
                 );
               })}
@@ -359,6 +385,44 @@ export default function GraphView({ artifact, onClose }) {
             </g>
           </svg>
 
+          {/* Relationship legend (typed edges) */}
+          <div className="graph-relationship-legend" style={{
+            position: 'absolute',
+            bottom: 56,
+            left: 28,
+            display: 'flex',
+            gap: 16,
+            flexWrap: 'wrap',
+            maxWidth: 520,
+            fontFamily: 'var(--font-body)',
+            alignItems: 'center'
+          }}>
+            {Object.entries(RELATIONSHIP_STYLES)
+              .filter(([rel]) => rel !== 'related')
+              .map(([rel, style]) => (
+                <span key={rel} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 9,
+                  color: '#b0ada8',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase'
+                }}>
+                  <svg width={20} height={4}>
+                    <line x1={0} y1={2} x2={20} y2={2}
+                      stroke={style.stroke}
+                      strokeWidth={style.width}
+                      strokeDasharray={style.dash || undefined}
+                      opacity={style.opacity}
+                    />
+                  </svg>
+                  {style.label}
+                </span>
+              ))}
+          </div>
+
+          {/* Node-type legend */}
           <div className="graph-legend" style={{ position: 'absolute', bottom: 24, left: 28, display: 'flex', gap: 20, fontFamily: 'var(--font-body)', alignItems: 'center' }}>
             {Object.entries(TYPE_COLORS).map(([color, { label }]) => (
               <span key={color} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9, color: '#b0ada8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
