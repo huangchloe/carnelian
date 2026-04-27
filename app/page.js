@@ -96,12 +96,12 @@ function ResultCard({ artifact, generated, uploadedPreview }) {
 
 // Progressive preview shown during streaming — hook and carnelianReads appear as they arrive
 function StreamingPreview({ query, partialArtifact, stage, uploadedPreview }) {
-  const stageText = {
-    identifying: 'Identifying image',
-    researching: 'Pulling cultural context',
-    generating: 'Writing interpretation',
-    retrying: 'Refining',
-  }[stage] || 'Building entry';
+const stageText = {
+  identifying: 'Carnelian is looking',
+  researching: 'Carnelian is looking',
+  generating: 'Carnelian is reading',
+  retrying: 'Carnelian is reading',
+}[stage] || 'Carnelian is reading';
 
   return (
     <div style={{ textAlign: 'center', padding: '48px 0' }}>
@@ -110,7 +110,7 @@ function StreamingPreview({ query, partialArtifact, stage, uploadedPreview }) {
       )}
       <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#B94932', marginBottom: 8 }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B94932', display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite' }} />
-        <span style={{ fontSize: 15 }}>{stageText}{query ? ` for "${query}"` : ''}</span>
+        <span style={{ fontSize: 15 }}>{stageText}</span>
       </div>
 
       {/* Title appears as soon as streamed */}
@@ -144,11 +144,6 @@ function StreamingPreview({ query, partialArtifact, stage, uploadedPreview }) {
         </p>
       )}
 
-      {!partialArtifact?.title && (
-        <p style={{ fontSize: 13, color: '#b0ada8', marginTop: 4 }}>
-          {stage === 'researching' ? 'Searching Google News · SerpApi' : stage === 'identifying' ? 'Google Lens · reverse image search' : 'Streaming'}
-        </p>
-      )}
     </div>
   );
 }
