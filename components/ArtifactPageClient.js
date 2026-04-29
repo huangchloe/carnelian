@@ -162,12 +162,15 @@ function TraceSection({ data }) {
               ))}
             </div>
           )}
-          {data.type === 'threads' && (
+{data.type === 'threads' && (
             <div>
               {data.items?.map((item, i) => (
                 <div key={i} style={{ paddingLeft: 32, borderLeft: `2px solid ${item.color || P.brand}`, marginBottom: 56 }}>
+                  {item.year && (
+                    <div style={{ fontSize: 10, color: P.brand, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 12, fontFamily: 'var(--font-body)' }}>{item.year}</div>
+                  )}
                   <div className="artifact-trace-title" style={{ fontSize: 24, fontWeight: 400, color: P.ink, marginBottom: 12, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}>{item.title}</div>
-                  <div style={{ fontSize: 16, color: P.muted, lineHeight: 1.9, fontFamily: 'var(--font-body)', fontWeight: 300 }}>{item.body}</div>
+                  <div style={{ fontSize: 16, color: P.muted, lineHeight: 1.9, fontFamily: 'var(--font-body)', fontWeight: 300 }}>{item.description}</div>
                 </div>
               ))}
             </div>
