@@ -634,7 +634,9 @@ CALIBRATION:
 Title matches the observation's name. Do not substitute a different named product. Do not demote to "a yellow bag."`;
   } else {
     const researchBlock = research ? `\n\n=== RESEARCH CONTEXT (depth: ${depth}) ===\n\n${formatResearch(research)}\n\n=== END ===\n\n` : '';
-    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context. Research depth is "${depth}".`;
+    userText = `Generate a Carnelian entry for: "${query}"${researchBlock}Use the research context as ground truth. URLs in read.sources MUST come from the context. Research depth is "${depth}".
+
+CRITICAL: No image is in context. Skip move 1 (face-value visual observation) entirely. Do NOT describe what the work physically looks like — no colors, materials, composition, brushwork, staging, or background — unless those details appear verbatim in the research context. SEE should map discourse, lineage, and references around the work, NOT invented physical observations. Set see.type to "references" and use the references item shape: [{category, variant, body}]. Each body should cite a specific critic, designer statement, or archival citation, not describe what the work looks like.`;
   }
 
   if (isRetry) {
