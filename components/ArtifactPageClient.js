@@ -162,7 +162,7 @@ function TraceSection({ data }) {
               ))}
             </div>
           )}
-{data.type === 'threads' && (
+          {data.type === 'threads' && (
             <div>
               {data.items?.map((item, i) => (
                 <div key={i} style={{ paddingLeft: 32, borderLeft: `2px solid ${item.color || P.brand}`, marginBottom: 56 }}>
@@ -264,17 +264,17 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
   const [heroLoaded, setHeroLoaded] = useState(false);
   const router = useRouter();
 
-// Hero image: prefer the curated one from the artifact; fall back to CSE for catalog entries without one
-const hasCuratedHero = !!artifact?.heroImage?.url;
-const fallbackQuery = !hasCuratedHero && artifact
-  ? `${artifact.title} ${artifact.type !== 'Object' ? artifact.type : ''} editorial`.trim()
-  : '';
-const { images: fallbackImages } = useImages(fallbackQuery, 3, !!fallbackQuery);
+  // Hero image: prefer the curated one from the artifact; fall back to CSE for catalog entries without one
+  const hasCuratedHero = !!artifact?.heroImage?.url;
+  const fallbackQuery = !hasCuratedHero && artifact
+    ? `${artifact.title} ${artifact.type !== 'Object' ? artifact.type : ''} editorial`.trim()
+    : '';
+  const { images: fallbackImages } = useImages(fallbackQuery, 3, !!fallbackQuery);
 
-const [heroIndex, setHeroIndex] = useState(0);
-const heroImage = hasCuratedHero
-  ? { url: artifact.heroImage.url, title: artifact.heroImage.title }
-  : fallbackImages[heroIndex];
+  const [heroIndex, setHeroIndex] = useState(0);
+  const heroImage = hasCuratedHero
+    ? { url: artifact.heroImage.url, title: artifact.heroImage.title }
+    : fallbackImages[heroIndex];
 
   useEffect(() => {
     if (catalogArtifact) return;
@@ -325,11 +325,21 @@ const heroImage = hasCuratedHero
         <Link href="/" style={{ fontSize: 11, color: P.muted, textDecoration: 'none', fontFamily: 'var(--font-body)', letterSpacing: '0.06em' }}>← Back</Link>
       </nav>
 
-      {/* Hero — full viewport, 54/46 split on desktop, stacked on mobile */}
-      <section className="artifact-hero" style={{ height: '100vh', display: 'grid', gridTemplateColumns: '54% 46%' }}>
+      {/* Hero — proportional, content-driven, magazine-spread feel */}
+      <section className="artifact-hero" style={{
+        minHeight: '90vh',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)',
+        paddingTop: 64,
+      }}>
 
         {/* Image side */}
-        <div className="artifact-hero-image" style={{ position: 'relative', overflow: 'hidden', background: P.espresso }}>
+        <div className="artifact-hero-image" style={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: P.espresso,
+          minHeight: '60vh',
+        }}>
           {heroImage ? (
             <img
               src={heroImage.url}
@@ -337,53 +347,128 @@ const heroImage = hasCuratedHero
               onLoad={() => setHeroLoaded(true)}
               onError={() => {
                 setHeroLoaded(false);
-                if (heroIndex < heroImages.length - 1) setHeroIndex(i => i + 1);
+                if (!hasCuratedHero && heroIndex < fallbackImages.length - 1) setHeroIndex(i => i + 1);
               }}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: heroLoaded ? 1 : 0, transition: 'opacity 1.2s ease' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                objectPosition: 'center',
+                display: 'block',
+                opacity: heroLoaded ? 1 : 0,
+                transition: 'opacity 1.2s ease',
+                padding: 'clamp(24px, 4vw, 64px)',
+                boxSizing: 'border-box',
+              }}
             />
           ) : (
             <div style={{ width: '100%', height: '100%', background: `linear-gradient(160deg, ${P.espresso} 0%, #3d2b25 50%, ${P.espresso} 100%)` }} />
           )}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 50%, rgba(245,243,239,0.04) 100%)' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '28%', background: `linear-gradient(to top, rgba(42,30,26,0.5), transparent)` }} />
-          <div className="artifact-hero-caption" style={{ position: 'absolute', bottom: 44, left: 56, fontSize: 9, color: 'rgba(245,243,239,0.38)', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
+          <div className="artifact-hero-caption" style={{
+            position: 'absolute',
+            bottom: 'clamp(20px, 3vw, 44px)',
+            left: 'clamp(20px, 3vw, 44px)',
+            fontSize: 9,
+            color: 'rgba(245,243,239,0.55)',
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            fontFamily: 'var(--font-body)',
+          }}>
             {artifact.origin} · {artifact.year}
           </div>
         </div>
 
         {/* Text side */}
-        <div className="artifact-hero-text" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '110px 80px 80px 72px', background: P.bone, overflowY: 'auto' }}>
-          <div style={{ fontSize: 9, letterSpacing: '0.24em', color: P.brand, textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 22 }}>
-            {artifact.era}
+        <div className="artifact-hero-text" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: 'clamp(48px, 6vw, 96px) clamp(32px, 5vw, 88px)',
+          background: P.bone,
+        }}>
+          <div style={{ maxWidth: 480 }}>
+            <div style={{
+              fontSize: 9,
+              letterSpacing: '0.24em',
+              color: P.brand,
+              textTransform: 'uppercase',
+              fontFamily: 'var(--font-body)',
+              marginBottom: 20,
+            }}>
+              {artifact.era}
+            </div>
+
+            <h1 className="artifact-hero-title" style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.4rem, 3.2vw, 4.2rem)',
+              fontWeight: 400,
+              lineHeight: 1.02,
+              letterSpacing: '-0.025em',
+              color: P.ink,
+              marginBottom: 28,
+            }}>
+              {artifact.title}
+            </h1>
+
+            <p className="artifact-hero-hook" style={{
+              fontSize: 'clamp(15px, 1.05vw, 17px)',
+              color: P.muted,
+              lineHeight: 1.7,
+              marginBottom: 28,
+              fontFamily: 'var(--font-body)',
+              fontWeight: 300,
+            }}>
+              {artifact.hook}
+            </p>
+
+            <div className="artifact-hero-reads" style={{
+              fontSize: 'clamp(14px, 0.95vw, 16px)',
+              fontFamily: 'var(--font-display)',
+              fontStyle: 'italic',
+              color: P.brand,
+              lineHeight: 1.65,
+              paddingTop: 24,
+              borderTop: `1px solid ${P.stone}`,
+              marginBottom: 36,
+            }}>
+              {artifact.carnelianReads}
+            </div>
+
+            <div style={{ marginBottom: 32 }}>
+              <div style={{
+                fontSize: 8,
+                letterSpacing: '0.24em',
+                color: '#B8B4AE',
+                textTransform: 'uppercase',
+                fontFamily: 'var(--font-body)',
+                marginBottom: 14,
+              }}>Connects to</div>
+              <MiniConstellation nodes={artifact.constellation} />
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+              <FindButton artifact={artifact} />
+              <button onClick={() => setShowGraph(true)}
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: P.ink,
+                  background: 'none',
+                  border: `1px solid #C8C3BB`,
+                  borderRadius: 2,
+                  padding: '12px 22px',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-body)',
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
+                onMouseLeave={e => { e.target.style.borderColor = '#C8C3BB'; e.target.style.color = P.ink; }}>
+                Expand graph →
+              </button>
+              <span style={{ fontSize: 10, color: '#C8C3BB', fontFamily: 'var(--font-body)', letterSpacing: '0.1em' }}>Scroll to explore ↓</span>
+            </div>
           </div>
-
-          <h1 className="artifact-hero-title" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(3rem, 4.2vw, 5.8rem)', fontWeight: 400, lineHeight: 0.93, letterSpacing: '-0.03em', color: P.ink, marginBottom: 40 }}>
-            {artifact.title}
-          </h1>
-
-          <p className="artifact-hero-hook" style={{ fontSize: 18, color: P.muted, lineHeight: 1.9, marginBottom: 36, fontFamily: 'var(--font-body)', fontWeight: 300, maxWidth: 420 }}>
-            {artifact.hook}
-          </p>
-
-          <div className="artifact-hero-reads" style={{ fontSize: 16, fontFamily: 'var(--font-display)', fontStyle: 'italic', color: P.brand, lineHeight: 1.75, paddingTop: 30, borderTop: `1px solid ${P.stone}`, marginBottom: 48, maxWidth: 420 }}>
-            {artifact.carnelianReads}
-          </div>
-
-          <div style={{ marginBottom: 44 }}>
-            <div style={{ fontSize: 8, letterSpacing: '0.24em', color: '#B8B4AE', textTransform: 'uppercase', fontFamily: 'var(--font-body)', marginBottom: 18 }}>Connects to</div>
-            <MiniConstellation nodes={artifact.constellation} />
-          </div>
-
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
-            <FindButton artifact={artifact} />
-            <button onClick={() => setShowGraph(true)}
-              style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: P.ink, background: 'none', border: `1px solid #C8C3BB`, borderRadius: 2, padding: '13px 26px', cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'all 0.15s' }}
-              onMouseEnter={e => { e.target.style.borderColor = P.brand; e.target.style.color = P.brand; }}
-              onMouseLeave={e => { e.target.style.borderColor = '#C8C3BB'; e.target.style.color = P.ink; }}>
-              Expand graph →
-            </button>
-            <span style={{ fontSize: 10, color: '#C8C3BB', fontFamily: 'var(--font-body)', letterSpacing: '0.1em' }}>Scroll to explore ↓</span>
-         </div>
         </div>
       </section>
 
