@@ -262,6 +262,7 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
   const [loading, setLoading] = useState(!catalogArtifact);
   const [showGraph, setShowGraph] = useState(false);
   const [heroLoaded, setHeroLoaded] = useState(false);
+  const [heroFailed, setHeroFailed] = useState(false);
   const router = useRouter();
 
   // Hero image: prefer the curated one from the artifact; fall back to CSE for catalog entries without one
@@ -275,6 +276,20 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
   const heroImage = hasCuratedHero
     ? { url: artifact.heroImage.url, title: artifact.heroImage.title }
     : fallbackImages[heroIndex];
+
+  // Reset load/fail state when the hero source changes (curated vs fallback, or advancing through fallbacks).
+  useEffect(() => {
+    setHeroLoaded(false);
+    setHeroFailed(false);
+  }, [heroImage?.url]);
+
+  // Safety: if onLoad never fires (slow CDN, CORS, blocked referer), reveal the image anyway after 2.5s
+  // so we never get stuck staring at an opacity-0 image against the dark background.
+  useEffect(() => {
+    if (!heroImage?.url) return;
+    const t = setTimeout(() => setHeroLoaded(true), 2500);
+    return () => clearTimeout(t);
+  }, [heroImage?.url]);
 
   useEffect(() => {
     if (catalogArtifact) return;
@@ -308,6 +323,8 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
     );
   }
 
+  const showHeroImage = heroImage && !heroFailed;
+
   return (
     <div style={{ minHeight: '100vh', background: P.bone }}>
 
@@ -340,14 +357,18 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
           background: P.espresso,
           minHeight: '60vh',
         }}>
-          {heroImage ? (
+          {showHeroImage ? (
             <img
               src={heroImage.url}
               alt={artifact.title}
               onLoad={() => setHeroLoaded(true)}
               onError={() => {
-                setHeroLoaded(false);
-                if (!hasCuratedHero && heroIndex < fallbackImages.length - 1) setHeroIndex(i => i + 1);
+                if (!hasCuratedHero && heroIndex < fallbackImages.length - 1) {
+                  setHeroIndex(i => i + 1);
+                } else {
+                  // Exhausted all options (or curated hero failed) — drop to gradient.
+                  setHeroFailed(true);
+                }
               }}
               style={{
                 width: '100%',
