@@ -361,6 +361,7 @@ export default function ArtifactPageClient({ slug, catalogArtifact, related }) {
             <img
               src={heroImage.url}
               alt={artifact.title}
+   referrerPolicy="no-referrer"
               onLoad={() => setHeroLoaded(true)}
               onError={() => {
                 if (!hasCuratedHero && heroIndex < fallbackImages.length - 1) {
