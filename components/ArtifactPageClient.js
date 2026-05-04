@@ -91,6 +91,7 @@ function SeeSection({ data, artifact }) {
               <div key={i} onClick={() => setLightbox(img)}
                 style={{ marginBottom: 10, breakInside: 'avoid', cursor: 'zoom-in', overflow: 'hidden', borderRadius: 2, background: '#1a1410', position: 'relative' }}>
                 <img src={img.url} alt={img.title}
+ referrerPolicy="no-referrer"
                   style={{ width: '100%', display: 'block', transition: 'transform 0.5s ease, opacity 0.25s' }}
                   onError={e => { e.target.parentElement.style.display = 'none'; }}
                   onMouseEnter={e => { e.target.style.transform = 'scale(1.04)'; e.target.style.opacity = '0.82'; }}
@@ -130,6 +131,7 @@ function SeeSection({ data, artifact }) {
         <div onClick={() => setLightbox(null)}
           style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(10,8,8,0.97)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 72 }}>
           <img src={lightbox.url} alt={lightbox.title}
+  referrerPolicy="no-referrer"
             style={{ maxWidth: '84vw', maxHeight: '80vh', objectFit: 'contain', borderRadius: 2 }} />
           {lightbox.title && (
             <p style={{ marginTop: 22, fontSize: 11, color: 'rgba(255,255,255,0.22)', fontFamily: 'var(--font-body)', letterSpacing: '0.06em', textAlign: 'center', maxWidth: 560 }}>{lightbox.title}</p>
