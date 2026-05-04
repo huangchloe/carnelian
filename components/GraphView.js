@@ -51,6 +51,7 @@ export default function GraphView({ artifact, onClose }) {
   const [expandCount, setExpandCount] = useState(0);
   const [selectedNode, setSelectedNode] = useState(null);
   const [nodeImages, setNodeImages] = useState({});
+  const [failedImages, setFailedImages] = useState(new Set());
   const [expandData, setExpandData] = useState({});
 
   const expandedRef = useRef(new Set());
@@ -58,6 +59,15 @@ export default function GraphView({ artifact, onClose }) {
   const linksRef = useRef([]);
   const positionsRef = useRef({});
   const imagesFetchedRef = useRef(new Set());
+
+  const markImageFailed = useCallback((id) => {
+    setFailedImages(prev => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
 
   const fetchNodeImage = useCallback(async (id, query) => {
     if (imagesFetchedRef.current.has(id)) return;
@@ -311,9 +321,11 @@ export default function GraphView({ artifact, onClose }) {
                 const pos = getPos(n.id);
                 const nr = r(n.type, n.depth);
                 const expanded = expandedRef.current.has(n.id);
-                const imgUrl = nodeImages[n.id];
+                const rawImgUrl = nodeImages[n.id];
+                const imgUrl = rawImgUrl && !failedImages.has(n.id) ? rawImgUrl : null;
                 const isSelected = selectedNode?.id === n.id;
                 const clipId = `clip-${n.id.replace(/[^a-zA-Z0-9-_]/g, '-')}`;
+                const fallbackLetter = (n.fullLabel || n.label || '?').trim().charAt(0).toUpperCase();
 
                 return (
                   <g key={n.id}
@@ -329,15 +341,21 @@ export default function GraphView({ artifact, onClose }) {
                     {imgUrl && (
                       <>
                         <image href={imgUrl} x={-nr} y={-nr} width={nr * 2} height={nr * 2}
-                          clipPath={`url(#${clipId})`} preserveAspectRatio="xMidYMid slice" opacity={0.9} />
+                          clipPath={`url(#${clipId})`} preserveAspectRatio="xMidYMid slice" opacity={0.9}
+                          onError={() => markImageFailed(n.id)} />
                         <circle r={nr} fill="none" stroke={n.color} strokeWidth={2.5} opacity={0.7} />
                       </>
                     )}
 
-                    {!imgUrl && !expanded && (
-                      <text textAnchor="middle" y={0} dominantBaseline="middle"
-                        fontSize={nr > 22 ? 12 : 9} fontFamily="var(--font-body, system-ui)"
-                        fill="white" opacity={0.7} style={{ pointerEvents: 'none', userSelect: 'none' }}>+</text>
+                    {!imgUrl && (
+                      <text textAnchor="middle" y={0} dominantBaseline="central"
+                        fontSize={nr * 0.85}
+                        fontFamily="var(--font-display, 'Cormorant Garamond', serif)"
+                        fontWeight={500}
+                        fill="white" opacity={0.9}
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                        {fallbackLetter}
+                      </text>
                     )}
 
                     {n.type === 'concept' && (
@@ -443,12 +461,16 @@ export default function GraphView({ artifact, onClose }) {
           <div className="graph-info-panel" style={{ width: 380, borderLeft: '1px solid #e8e4de', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
             <div className="graph-info-panel-image" style={{ height: 140, background: '#f0ece6', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
-              {nodeImages[selectedNode.id] ? (
+              {nodeImages[selectedNode.id] && !failedImages.has(selectedNode.id) ? (
                 <img src={nodeImages[selectedNode.id]} alt=""
                   style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.75 }}
-                  onError={e => e.target.style.display = 'none'} />
+                  onError={() => markImageFailed(selectedNode.id)} />
               ) : (
-                <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${selectedNode.color}18, ${selectedNode.color}32)` }} />
+                <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${selectedNode.color}18, ${selectedNode.color}32)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 64, fontFamily: 'var(--font-display)', color: selectedNode.color, opacity: 0.55, fontWeight: 500, lineHeight: 1 }}>
+                    {(selectedNode.fullLabel || selectedNode.label || '?').trim().charAt(0).toUpperCase()}
+                  </span>
+                </div>
               )}
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, white 0%, transparent 55%)' }} />
 
