@@ -115,15 +115,15 @@ export default function ManifestoPage() {
   gap: 20,
   fontFamily: 'var(--font-body)',
 }}>
-  <span style={{
-    fontSize: 11,
-    fontWeight: 500,
-    letterSpacing: '0.18em',
-    color: P.brand,
-    textTransform: 'uppercase',
-  }}>
-    Carnelian
-  </span>
+<span style={{
+  fontSize: 18,
+  fontWeight: 500,
+  letterSpacing: '0.24em',
+  color: P.brand,
+  textTransform: 'uppercase',
+}}>
+  Carnelian
+</span>
   <a href="/" style={{
     display: 'inline-block',
     padding: '12px 28px',
