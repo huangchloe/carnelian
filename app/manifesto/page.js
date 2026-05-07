@@ -2,7 +2,7 @@ const P = {
   bone: '#F5F3EF',
   ink: '#111111',
   muted: '#6F6A63',
-  brand: '#B31B1B',
+  brand: '#B94932',
   rule: '#d8d4ce',
 };
 
