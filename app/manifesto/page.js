@@ -101,43 +101,46 @@ export default function ManifestoPage() {
           {movements.map((text, i) => (
             <div key={i}>
               <div style={{ whiteSpace: 'pre-line' }}>{text}</div>
-              {i < movements.length - 1 && (
-                <div aria-hidden style={{
-                  margin: 'clamp(40px, 6vw, 64px) 0',
-                  height: 1,
-                  width: 80,
-                  background: P.rule,
-                }} />
-              )}
+{i < movements.length - 1 && (
+  <div aria-hidden style={{ height: 'clamp(40px, 6vw, 64px)' }} />
+)}
             </div>
           ))}
 
-          <div style={{
-            marginTop: 'clamp(56px, 8vw, 96px)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-            fontFamily: 'var(--font-body)',
-          }}>
-            <span style={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '0.24em',
-              color: P.brand,
-              textTransform: 'uppercase',
-            }}>
-              Carnelian
-            </span>
-            <a href="/" style={{
-              fontSize: 11,
-              letterSpacing: '0.18em',
-              color: P.muted,
-              textTransform: 'uppercase',
-              textDecoration: 'none',
-            }}>
-              [ Enter Here ]
-            </a>
-          </div>
+<div style={{
+  marginTop: 'clamp(56px, 8vw, 96px)',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: 24,
+  fontFamily: 'var(--font-body)',
+}}>
+  <span style={{
+    fontFamily: 'var(--font-display, "Cormorant Garamond", serif)',
+    fontSize: 'clamp(36px, 5vw, 56px)',
+    fontWeight: 400,
+    color: P.brand,
+    letterSpacing: '-0.01em',
+    lineHeight: 1,
+  }}>
+    Carnelian
+  </span>
+  <a href="/" style={{
+    display: 'inline-block',
+    padding: '12px 28px',
+    border: `1px solid ${P.brand}`,
+    color: P.brand,
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: '0.18em',
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+    borderRadius: 2,
+    transition: 'all 0.15s',
+  }}>
+    Enter Here
+  </a>
+</div>
         </article>
       </main>
     </div>
