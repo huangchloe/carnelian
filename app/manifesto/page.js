@@ -112,16 +112,15 @@ export default function ManifestoPage() {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  gap: 24,
+  gap: 20,
   fontFamily: 'var(--font-body)',
 }}>
   <span style={{
-    fontFamily: 'var(--font-display, "Cormorant Garamond", serif)',
-    fontSize: 'clamp(36px, 5vw, 56px)',
-    fontWeight: 400,
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: '0.18em',
     color: P.brand,
-    letterSpacing: '-0.01em',
-    lineHeight: 1,
+    textTransform: 'uppercase',
   }}>
     Carnelian
   </span>
