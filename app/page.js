@@ -330,7 +330,12 @@ export default function Home() {
     <main className="home-main">
 <nav className="home-nav">
   <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: '#B94932', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>Carnelian</span>
-  <UserMenu />
+  <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+    <Link href="/manifesto" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: '#6b6860', textTransform: 'uppercase', fontFamily: 'var(--font-body)', textDecoration: 'none' }}>
+      Manifesto
+    </Link>
+    <UserMenu />
+  </div>
 </nav>
 
       <div className="home-content">
